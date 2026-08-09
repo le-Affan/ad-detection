@@ -156,7 +156,144 @@ BASELINE_SPEC = {
     "ECOGPT": {"codes": ("bl",), "date": "VISDATE"},
     "ECOGSP": {"codes": ("bl",), "date": "VISDATE"},
     "UCSFFSX51": {"codes": ("bl", "scmri"), "date": "EXAMDATE"},
+    "MOCA": {"codes": ("bl",), "date": "VISDATE"},
 }
+
+
+# ---------------------------------------------------------------------
+# ECog domain / total scores
+# ---------------------------------------------------------------------
+
+# ECOGPT.csv and ECOGSP.csv ship the derived domain and total scores, but
+# they are populated ONLY for COLPROT == ADNI3 rows (0 of 4,736 ADNI2 and
+# 0 of 478 ADNIGO rows carry them). Our ADNIGO/ADNI2 cohort therefore
+# gets nothing from those columns and the scores must be recomputed from
+# the raw items.
+#
+# The construction below was not assumed — it was reverse-engineered
+# against the ~2,880 COLPROT == ADNI3 rows per instrument where both the
+# raw items and ADNI's official derived scores are present, and it
+# reproduces every official value exactly (100% value match AND 100%
+# NA-pattern match on all 6 domains and the total, for both ECOGPT and
+# ECOGSP). Established rules:
+#   * items are stored as label strings ("2- Questionable/occasionally
+#     worse"); the leading digit is the score
+#   * code 9 ("I don't know") recodes to NA
+#   * Visspat is a SEVEN-item domain here: VISSPAT8 is 100% empty in this
+#     export. Treating it as 8 items breaks the NA pattern (99.1% / 98.3%)
+#     because rows with 4 of 8 "missing" are really complete 7-item rows.
+#   * a score is the mean of its items when fewer than half are missing,
+#     else NA — the same rule applies at domain and total level
+#   * the TOTAL is the mean of all 39 items, NOT the mean of the 6 domain
+#     scores. Mean-of-domain-means matches only 3.9% (Pt) / 15.9% (SP) of
+#     official values, because the domains have unequal item counts.
+ECOG_DOMAINS = {
+    "Mem": [f"MEMORY{i}" for i in range(1, 9)],
+    "Lang": [f"LANG{i}" for i in range(1, 10)],
+    "Visspat": [f"VISSPAT{i}" for i in range(1, 8)],
+    "Plan": [f"PLAN{i}" for i in range(1, 6)],
+    "Organ": [f"ORGAN{i}" for i in range(1, 7)],
+    "Divatt": [f"DIVATT{i}" for i in range(1, 5)],
+}
+ECOG_ITEMS = [c for items in ECOG_DOMAINS.values() for c in items]
+
+
+def _mean_if_mostly_answered(frame):
+    """Mean across columns, but NA when half or more of them are missing."""
+    n = frame.shape[1]
+    return frame.mean(axis=1).where(frame.isna().sum(axis=1) < n / 2)
+
+
+def derive_ecog_scores(df, prefix):
+    """Add the 6 ECog domain scores and the total for one instrument.
+
+    `prefix` is 'EcogPt' (self report) or 'EcogSP' (study-partner report).
+    """
+    items = pd.DataFrame(index=df.index)
+    for col in ECOG_ITEMS:
+        score = pd.to_numeric(
+            df[col].astype(str).str.extract(r"^\s*(\d)")[0], errors="coerce"
+        )
+        items[col] = score.where(score != 9)  # 9 = "I don't know" -> NA
+
+    for domain, cols in ECOG_DOMAINS.items():
+        df[f"{prefix}{domain}"] = _mean_if_mostly_answered(items[cols])
+    df[f"{prefix}Total"] = _mean_if_mostly_answered(items)
+    return df
+
+
+def load_ecog_table(path, prefix):
+    df = load_domain_table(path)
+    return derive_ecog_scores(df, prefix)
+
+
+# ---------------------------------------------------------------------
+# MoCA total
+# ---------------------------------------------------------------------
+
+# MOCA.csv has the same problem as the ECog tables: the summary `MOCA`
+# column is populated only for COLPROT ADNI3/ADNI4 (0 of 4,629 ADNI2 and
+# 0 of 477 ADNIGO rows), while the raw items are fully populated for our
+# cohort (~5,050 rows). So the total is recomputed from items.
+#
+# As with ECog, the scoring was reverse-engineered rather than assumed,
+# against the 3,706 rows carrying ADNI's official MOCA value: the formula
+# below reproduces it exactly (100.00% match, mean difference 0.0000, on
+# all 3,703 rows where both are computable). Notes:
+#   * ADNI stores the RAW score with no education adjustment (the usual
+#     "+1 if <=12 years education" rule is not applied — adding it drops
+#     agreement to 0%)
+#   * IMMT1W*/IMMT2W* (immediate recall trials) are not scored
+#   * delayed recall counts only "Correct with No Cue"
+MOCA_ONE_POINT = [
+    "TRAILS", "CUBE", "CLOCKCON", "CLOCKNO", "CLOCKHAN",   # visuospatial/exec
+    "LION", "RHINO", "CAMEL",                              # naming
+    "DIGFOR", "DIGBACK",                                   # attention
+    "REPEAT1", "REPEAT2",                                  # language
+    "ABSTRAN", "ABSMEAS",                                  # abstraction
+    "DATE", "MONTH", "YEAR", "DAY", "PLACE", "CITY",       # orientation
+]
+MOCA_SERIAL = [f"SERIAL{i}" for i in range(1, 6)]
+MOCA_DELAYED = [f"DELW{i}" for i in range(1, 6)]
+
+
+def derive_moca_total(df):
+    parts = [(df[c] == "Correct").astype(float).where(df[c].notna())
+             for c in MOCA_ONE_POINT]
+
+    letters = pd.to_numeric(df["LETTERS"], errors="coerce")
+    parts.append((letters <= 1).astype(float).where(letters.notna()))
+
+    n_serial = sum((df[c] == "Correct").astype(float) for c in MOCA_SERIAL)
+    parts.append(
+        pd.cut(n_serial, [-0.1, 0.1, 1.1, 3.1, 5.1], labels=[0, 1, 2, 3]).astype(float)
+    )
+
+    fluency = pd.to_numeric(df["FFLUENCY"], errors="coerce")
+    parts.append((fluency >= 11).astype(float).where(fluency.notna()))
+
+    parts.append(
+        sum((df[c] == "Correct with No Cue").astype(float) for c in MOCA_DELAYED)
+    )
+
+    # every component must be scorable, otherwise the total is not comparable
+    stacked = pd.concat(parts, axis=1)
+    df["MOCA"] = stacked.sum(axis=1).where(stacked.notna().all(axis=1))
+    return df
+
+
+def load_moca_table(path):
+    return derive_moca_total(load_domain_table(path))
+
+
+def derive_apoe4(genotype):
+    """APOE4 = number of e4 alleles (0/1/2), from ADSL's genotype string
+    (e.g. 'e3/e4'). The doc's feature list asks for the allele count, not
+    the genotype label; the raw genotype is kept alongside as a
+    categorical."""
+    if pd.isna(genotype):
+        return None
+    return str(genotype).count("4")
 
 
 def select_baseline_row(df, codes, date_col):
@@ -287,11 +424,14 @@ def load_mri_volumetrics(path):
 # per-source visit/administrative columns, which are kept suffixed as
 # provenance for the baseline row each source contributed.
 CANONICAL_PRIORITY = {
-    "ORIGPROT": ["ADSL", "ECOGPT", "ECOGSP", "UCSFFSX51"],
+    "ORIGPROT": ["ADSL", "ECOGPT", "ECOGSP", "UCSFFSX51", "MOCA"],
     "CDRSB": ["ADSL", "CDR"],
     "CDGLOBAL": ["ADSL", "CDR"],
+    # ADSL's MOCA copy is empty for this cohort; the dedicated MOCA domain
+    # table leads, with ADSL only filling gaps.
+    "MOCA": ["MOCA", "ADSL"],
     "SITEID": ["ADSL", "CDR", "ADAS", "ECOGPT", "ECOGSP"],
-    "PTID": ["CDR", "ADAS", "ECOGPT", "ECOGSP"],
+    "PTID": ["CDR", "ADAS", "ECOGPT", "ECOGSP", "MOCA"],
     "PHASE": ["CDR", "ADAS"],
 }
 
@@ -351,9 +491,12 @@ def join_tables(raw_dir, out_path):
     raw_sources = {
         "CDR": load_domain_table(os.path.join(raw_dir, "CDR.csv")),
         "ADAS": load_domain_table(os.path.join(raw_dir, "ADAS_ADNIGO2.csv")),
-        "ECOGPT": load_domain_table(os.path.join(tables_dir, "ECOGPT.csv")),
-        "ECOGSP": load_domain_table(os.path.join(tables_dir, "ECOGSP.csv")),
+        "ECOGPT": load_ecog_table(os.path.join(tables_dir, "ECOGPT.csv"), "EcogPt"),
+        "ECOGSP": load_ecog_table(os.path.join(tables_dir, "ECOGSP.csv"), "EcogSP"),
         "UCSFFSX51": load_mri_volumetrics(os.path.join(tables_dir, "UCSFFSX51.csv")),
+        # MOCA has its own domain table; ADSL's MOCA copy is empty for the
+        # ADNIGO/ADNI2 cohort, so the dedicated table is the real source.
+        "MOCA": load_moca_table(os.path.join(tables_dir, "MOCA.csv")),
     }
 
     # Collapse every visit-level source to its own baseline row per RID
@@ -376,6 +519,7 @@ def join_tables(raw_dir, out_path):
     baseline_sources["DX"] = dx_bl
 
     joined, provenance, collided = merge_sources(baseline_sources)
+    joined["APOE4"] = joined["APOE"].apply(derive_apoe4)
 
     print(f"\nCollision handling: {len(collided)} column names appeared in >1 source "
           f"and were suffixed with their source tag.")

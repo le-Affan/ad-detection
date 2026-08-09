@@ -33,11 +33,37 @@ MRI_COLS = [
     "Ventricles", "Hippocampus", "Entorhinal", "Fusiform",
     "MidTemp", "ICV", "WholeBrain",
 ]
-COVERAGE_CHECK_COLS = ["CDRSB", "CDGLOBAL"] + MRI_COLS
+ECOG_COLS = [
+    f"Ecog{side}{dom}"
+    for side in ("Pt", "SP")
+    for dom in ("Mem", "Lang", "Visspat", "Plan", "Organ", "Divatt", "Total")
+]
+COVERAGE_CHECK_COLS = ["CDRSB", "CDGLOBAL", "MOCA"] + MRI_COLS + ECOG_COLS
 
 
 def filter_cohort(df):
     return df[df["ORIGPROT"].isin(COHORT_PHASES)].copy()
+
+
+# Removing step0's spurious VISCODE2 == 'bl' filter (it was an accidental
+# "has an ADAS baseline row" restriction, not a cohort rule) grew the
+# labelled cohort from 813 to 1,271 subjects. The 458 additions are almost
+# entirely feature-empty, so they are gated out here on data presence
+# rather than on a visit-code artefact.
+#
+# The gate is tied to what the doc's own Step 4 composite actually needs:
+# CogIndex = f(MMSE, CDRSB, ADAS13). A subject is kept only with a
+# non-null CDRSB and at least one of MMSE / ADAS13 — enough for the
+# composite to carry real signal rather than being reconstructed entirely
+# from imputed medians.
+COGINDEX_REQUIRED = "CDRSB"
+COGINDEX_ANY_OF = ["MMSCORE", "ADASTT13"]
+
+
+def filter_cogindex_support(df):
+    has_required = df[COGINDEX_REQUIRED].notna()
+    has_any = df[COGINDEX_ANY_OF].notna().any(axis=1)
+    return df[has_required & has_any].copy()
 
 
 def drop_invalid_labels(df):
@@ -62,7 +88,15 @@ def run(in_path, out_path):
         )
 
     df = filter_cohort(df)
+    n_cohort = len(df)
     df = drop_invalid_labels(df)
+    n_labelled = len(df)
+    df = filter_cogindex_support(df)
+    print(
+        f"Cohort filter -> {n_cohort}; valid label -> {n_labelled}; "
+        f"CogIndex-support gate -> {len(df)} "
+        f"(dropped {n_labelled - len(df)} feature-empty subjects)"
+    )
     df = assign_label(df)
 
     os.makedirs(os.path.dirname(out_path), exist_ok=True)

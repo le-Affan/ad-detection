@@ -1,0 +1,365 @@
+# ADNI Clinical Pipeline — Session 2 Handoff
+
+Continuation context for the project described in `docs/context.txt` (read that
+first — it holds the original spec, the 6-step architecture, and the
+non-negotiables). This file records what session 2 audited, found, fixed, and
+verified, plus exactly where the work stands.
+
+Session 2 was an independent audit of "already done" step0/step1 work, followed
+by four rounds of fixes. The headline: the label pipeline was sound, the feature
+pipeline was substantially broken, and it is now fixed and verified.
+
+---
+
+## 1. STATE AT START OF SESSION 2
+
+Believed-complete: step0 (join) and step1 (integrity/labels).
+- step0 output: 21,233 visit-rows x 325 cols
+- step1 output: 813 subjects x 326 cols, CN=190/EMCI=310/LMCI=162/AD=151
+
+Four things were flagged as unverified and handed over for audit:
+1. Hippocampus formula: sum vs average contradiction
+2. Whether the other ROIs should also be averages
+3. DX_bl SMC/CN disambiguation
+4. Whether the visit-code column collision was genuinely resolved
+
+---
+
+## 2. AUDIT RESULTS
+
+### Item 1 — Hippocampus sum vs average: SUM IS CORRECT (PASS)
+
+Resolved against ADNIMERGE's actual construction code, not documentation text.
+
+- ADNI staff (Naomi Saito) on the official adni-data Google Group quotes
+  `adnimerger.r`:  `ucsfvol$Hippocampus <- (ucsfvol$ST29SV + ucsfvol$ST88SV)`
+  — a plain SUM.
+- The `(ST29SV+ST88SV)/2` form appears only in ADNI's "Commonly Used Tables"
+  PDF, which describes ad-hoc use of the OLDER `UCSFFSX.csv` (FreeSurfer 4.3,
+  ADNI1 1.5T). It is out of sync with the shipped ADNIMERGE build.
+- `DATADIC.csv` contains NO "average" text for any of these fields. The earlier
+  claim that DATADIC said "average" does not hold — the only "average" hits in
+  DATADIC are TBM entries, unrelated.
+- Empirical: mean sum = 6,977 mm3, matching published ADNIMERGE hippocampal
+  volumes (~7,000). The average (3,489) matches nothing in the literature.
+
+### Item 2 — Other ROIs: ALL SUMS, no change needed (PASS)
+
+Every ROI matches published ADNIMERGE magnitude as a sum, none as an average:
+
+    ROI           sum         avg        ADNIMERGE ref
+    Ventricles    37,023      18,511     ~37k    OK
+    Entorhinal     3,565       1,782     ~3.5k   OK
+    Fusiform      18,103       9,052     ~18k    OK
+    MidTemp       19,957       9,979     ~20k    OK
+    ICV        1,507,973         n/a     ~1.5M   OK (single field ST10CV)
+
+Six-for-six on sums. Keep ROI_PAIRS as sums.
+
+### Item 3 — SMC/CN disambiguation: CLEAN (PASS)
+
+- 168 SMC-enrolled RIDs in ARM.csv; ZERO appear in the labelled cohort.
+- Raw ARM value x assigned DX_bl cross-tab is exact:
+  `AD -> AD 151`, `NL -> CN 188`, `LMCI -> LMCI 162`, `EMCI -> EMCI 310`.
+- ORIGPROT mismatch between step1 and ARM: 0.
+- Known, correct, not a defect: 2 EMCI-arm subjects resolve to CN because DXSUM
+  read CN at baseline. That is the documented "DXSUM wins" rule firing.
+  188 NL-arm + 2 = 190 CN.
+- The 258 label-less rows were not chased — step1 drops them regardless, so they
+  cannot affect output.
+
+### Item 4 — Visit-code collision: NOT RESOLVED (HARD FAIL)
+
+Only the cosmetic symptom (duplicate column names) had been avoided. Three
+distinct defects were found:
+
+(a) NO CROSS-TABLE VISIT-CODE HARMONIZATION. Each table codes baseline
+    differently:
+        ADAS       VISCODE2 == 'bl'     2,969 rows
+        CDR        VISCODE2 == 'sc'     3,991 rows  (only 19 'bl')
+        UCSFFSX51  VISCODE2 == 'scmri'  1,248 rows  (ZERO 'bl')
+        ECOGPT/SP  VISCODE2 == 'bl'     ~1,616 rows
+    step1 filtered `VISCODE2 == 'bl'`, so CDR and MRI contributed NOTHING.
+
+(b) VISCODE FOLDED INTO THE JOIN KEY. The key was
+    `["RID","VISCODE","VISCODE2"]`. VISCODE is protocol-specific and disagrees
+    across tables even when VISCODE2 agrees (UCSFFSX51 has VISCODE == VISCODE2
+    in only 0.2% of rows; 4.9% of CDR-MRI pairs matched on VISCODE2 still
+    disagree on VISCODE). Including it guarantees misalignment.
+
+(c) COLUMN COLLISION SILENTLY SHADOWED GOOD DATA. `visits` picked up
+    CDR-sourced `CDGLOBAL`/`CDRSB` first; the ADSL merge used
+    `suffixes=("","_ADSL")`, so ADSL's POPULATED copies were pushed to
+    `*_ADSL` while the EMPTY CDR-sourced ones kept the bare names:
+        CDRSB     bare 0/813   vs  CDRSB_ADSL     813/813
+        CDGLOBAL  bare 0/813   vs  CDGLOBAL_ADSL  813/813
+    Same class of bug on ORIGPROT — it resolved to ECOGPT's copy
+    (8,389/21,233 non-null) instead of ADSL's (21,213/21,233). The cohort
+    filter happened to give the same 920 rows either way: lucky, not correct.
+
+DAMAGE: 66 columns 100% null, 72 >99% null. ALL 7 MRI volumetrics 0/813 — the
+entire imaging block feeding the KAN Top-K was absent. All CDR 0/813.
+
+### BONUS FINDING — WholeBrain was a BUG, not an inherent undercount (FAIL)
+
+The prior note "WholeBrain is a real undercount, keep in mind for SHAP" was
+wrong and has been retracted. ADNI documents that for the 5.1 table
+(`UCSFFSX51.csv`) the four version-4.3 codes are REPLACED, not dropped:
+
+    ST19SV LeftCerebralCortex   -> ST147SV LeftCorticalGM
+    ST78SV RightCerebralCortex  -> ST148SV RightCorticalGM
+    ST20SV LeftCerebralWM       -> ST150SV LeftCorticalWM
+    ST79SV RightCerebralWM      -> ST151SV RightCorticalWM
+
+All four 5.1 codes ARE present in this export. The old code picked up
+ST150SV/ST151SV but MISSED ST147SV/ST148SV — bilateral cortical grey matter,
+the single largest compartment in the brain.
+
+    old WholeBrain mean:  631,434   (39.5% undercount)
+    new WholeBrain mean: 1,044,558   (matches ADNIMERGE ~1,000,000)
+
+---
+
+## 3. FIXES IMPLEMENTED
+
+### Round 1 — the four audit fixes
+
+1. JOIN KEY: `VISCODE` removed from every join key. Sources merge on RID alone.
+2. BASELINE HARMONIZATION, PRE-JOIN: each source is collapsed to one row per
+   RID *before* joining, via `select_baseline_row()`. Rows are ranked by which
+   preferred baseline code they carry (tier 0 = first code, tier 1 = second,
+   ...), all other visits fall into a final fallback tier, and within a tier the
+   earliest dated visit wins. Once every source is one-row-per-subject there is
+   no visit code left to reconcile.
+3. COLLISIONS: any column name appearing in more than one source is renamed
+   `NAME__TAG` BEFORE merging (58 such names). Columns unique to one source keep
+   clean names. A named canonical set is then coalesced back to clean names by
+   explicit priority (`CANONICAL_PRIORITY`), with ADSL leading wherever it
+   appears. Provenance of each coalesced column is printed.
+4. WHOLEBRAIN: ST147SV/ST148SV added (25 codes total). The old warning was
+   replaced with a hard `ValueError` if any code ever goes missing.
+
+### Round 2 — four follow-ups
+
+1. LABEL LEAKAGE: explicit 17-column exclusion list in step2 (see section 6).
+2. MOCA: recovered — see section 5.
+3. COHORT GATE: replaced the accidental visit-code restriction with a principled
+   data-presence gate tied to the doc's own Step 4 composite
+   (`CogIndex = f(MMSE, CDRSB, ADAS13)`): keep only subjects with non-null CDRSB
+   AND at least one of {MMSE, ADAS13}.
+4. ECOG DOMAIN + TOTAL SCORES: computed from raw items — see section 5.
+
+---
+
+## 4. CRITICAL PATTERN — "derived summary columns are ADNI3/ADNI4-only"
+
+This bit us three separate times and WILL recur on other domain tables. Several
+ADNI domain tables ship BOTH raw items and derived summary columns, but the
+derived columns are populated ONLY for `COLPROT` in {ADNI3, ADNI4}:
+
+    ECOGPT   EcogPt*  : 0 of 4,736 ADNI2 rows, 0 of 478 ADNIGO rows
+    ECOGSP   EcogSP*  : same
+    MOCA     MOCA     : 0 of 4,629 ADNI2 rows, 0 of 477 ADNIGO rows
+
+Our cohort is ADNIGO/ADNI2, so these are ALWAYS null for us. The raw items,
+however, are fully populated (~5,050 rows for MOCA, 8,093/8,107 for ECOG).
+
+RULE: if a summary column reads 0/814 for this cohort, check whether the raw
+items exist and recompute — do NOT assume the measure is unavailable. And use
+the ADNI3/ADNI4 rows (where items AND official values coexist) as a validation
+set to reverse-engineer the exact formula rather than assuming it.
+
+---
+
+## 5. VERIFIED DERIVATION FORMULAS (reverse-engineered, 100% validated)
+
+Do not re-derive these from memory or from documentation — they were validated
+empirically against ADNI's own official values and every one reproduces them
+exactly.
+
+### ECog domain scores and totals
+
+Validated against ~2,880 COLPROT==ADNI3 rows per instrument where raw items and
+official derived scores coexist. Result: 100% value match AND 100% NA-pattern
+match on all 6 domains and the total, for both ECOGPT and ECOGSP.
+
+- Items are label strings ("2- Questionable/occasionally worse"); the leading
+  digit is the score.
+- Code 9 ("I don't know") recodes to NA.
+- VISSPAT IS A SEVEN-ITEM DOMAIN. `VISSPAT8` is 100% empty in this export.
+  Treating Visspat as 8 items breaks the NA pattern (99.06% / 98.33%) because
+  rows with "4 of 8 missing" are really complete 7-item rows.
+- Domain item counts: Mem 8, Lang 9, Visspat 7, Plan 5, Organ 6, Divatt 4 = 39.
+- A score is the mean of its items when FEWER THAN HALF are missing, else NA.
+  The same `< n/2` rule applies at domain and total level.
+- THE TOTAL IS THE MEAN OF ALL 39 ITEMS, **NOT** the mean of the 6 domain
+  scores. Mean-of-domain-means matches only 3.94% (Pt) / 15.94% (SP) of official
+  values, because the domains have unequal item counts and domain-averaging
+  silently reweights them.
+
+### MoCA total
+
+Validated against the 3,706 rows carrying ADNI's official MOCA value:
+100.00% exact, mean difference 0.0000, on all 3,703 computable rows.
+
+    MOCA = sum of:
+      20 one-point Correct/Incorrect items:
+        TRAILS, CUBE, CLOCKCON, CLOCKNO, CLOCKHAN      (visuospatial/exec)
+        LION, RHINO, CAMEL                             (naming)
+        DIGFOR, DIGBACK                                (attention)
+        REPEAT1, REPEAT2                               (language)
+        ABSTRAN, ABSMEAS                               (abstraction)
+        DATE, MONTH, YEAR, DAY, PLACE, CITY            (orientation)
+      LETTERS  : 1 point if <= 1 error
+      SERIAL   : count correct of SERIAL1-5 -> 4-5 = 3pts, 2-3 = 2, 1 = 1, 0 = 0
+      FFLUENCY : 1 point if >= 11 words
+      DELW1-5  : 1 point each, ONLY for "Correct with No Cue"
+
+- ADNI stores the RAW score with NO education adjustment. Adding the standard
+  "+1 if <=12 years education" drops agreement to 0%.
+- IMMT1W*/IMMT2W* (immediate recall trials) are NOT scored.
+- Total is NA unless every component is scorable.
+
+### APOE4
+
+ADSL ships `APOE` as a genotype string (`e3/e4`, `e4/e4`, ...), not the allele
+count the doc asks for. `APOE4` = count of "4" characters in the genotype
+(0/1/2). The raw genotype is kept alongside as a categorical.
+
+---
+
+## 6. LABEL-LEAK EXCLUSION LIST (step2)
+
+Enumerated explicitly — NOT keyword-matched on "DX", which would both miss
+ARM/ACTARM (they carry the diagnosis with no "DX" in the name) and over-match
+innocent columns.
+
+    DX_bl, label, ARM, ACTARM, ARMCD, ACTARMCD, ARM_CAT, DXSUM_CAT,
+    DX, DXCHANGE, DXCURREN, DXCONV, DXCONTYP, DXREV, DIAGNOSIS, TRTA, TRTP
+
+ARM is the sharpest risk: the EMCI/LMCI/SMC granularity in DX_bl was derived
+FROM the enrollment arm, making ARM close to a direct encoding of the target.
+It is excluded on leakage grounds, NOT because it is currently empty — an ADSL
+refresh that populated it would otherwise silently leak the label.
+`ARM_CAT`/`DXSUM_CAT` are step0 intermediates and literally the label's
+constructors.
+
+`assert_no_leakage()` runs against both the candidate names and their step0
+source names, and is negative-control tested (feeding it ARM/DX/DX_bl/ACTARM
+raises every time). Confirmed zero leak columns in the candidate set.
+
+---
+
+## 7. CURRENT PIPELINE STATE
+
+### Files
+
+    src/step0_join_tables.py        rewritten
+    src/step1_data_integrity.py     rewritten
+    src/step2_feature_selection.py  new
+    docs/context.txt                original spec (unchanged)
+    docs/context2.txt               this file
+
+    dataset/processed/step0_joined.csv     5,166 rows x 404 cols (one row/subject)
+    dataset/processed/step1_labeled.csv      814 rows x 405 cols  <-- COHORT SOURCE OF TRUTH
+    dataset/processed/step2_features.csv     814 rows x 37 cols (RID + label + 35 features)
+    dataset/processed/step2_manifest.json    kept/dropped features, cat_features, source map
+
+NOTE: there is no git repo in this project. Backups of the pre-fix step0/step1
+scripts and the old 813-row step1_labeled.csv were written to the session
+scratchpad, which is session-scoped and should be treated as already gone.
+
+### Cohort
+
+    1,699 ADNIGO/ADNI2 subjects
+    -> 1,271 with a valid label (dropped 165 SMC, 4 plain MCI, 259 null DX_bl)
+    ->   814 after the CogIndex-support gate (dropped 457 feature-empty)
+
+    Final class distribution:  CN=190  EMCI=310  LMCI=163  AD=151
+
+Regression vs the old 813-subject cohort: 0 label disagreements, 0 subjects
+removed, 1 added (RID 4622, LMCI, CDRSB=2.5, MMSE=25, no ADAS13). The old
+`VISCODE2=='bl'` filter had excluded them for lacking an ADAS baseline row; the
+principled gate correctly keeps them. The gate independently reproducing the old
+813 confirms that filter had been acting as an accidental data-presence proxy.
+
+### Feature coverage in step1_labeled.csv (814 subjects)
+
+    CDRSB, CDGLOBAL          814/814  (100.0%)
+    MOCA                     809/814  ( 99.4%)
+    all 7 MRI volumetrics    812-813/814 (~99.9%)
+    EcogPt* domains+total    789-811/814 (96.9-99.6%)
+    EcogSP* domains+total    769-802/814 (94.5-98.5%)
+
+    WholeBrain mean: 1,044,558
+
+### step2 output
+
+35 features kept, NONE dropped — no feature exceeded the 50% missingness
+threshold. Worst is EcogSPOrgan at 5.5%; MRI block at 0.1%;
+CDRSB/MMSE/AGE/PTGENDER/PTEDUCAT at 0.0%.
+
+Output uses the doc's ADNIMERGE-style names (MMSE, ADAS13, PTGENDER, ...) with a
+`feature_source_map` in the manifest recording each one's step0 origin, since
+there is no ADNIMERGE table in this dump. Mapping:
+
+    AGE->AGE  PTGENDER->SEX  PTEDUCAT->EDUC  APOE4->APOE4(derived)
+    CDRSB->CDRSB  ADAS11->ADASTT11  ADAS13->ADASTT13  MMSE->MMSCORE
+    RAVLT_immediate->RAVLTIMM  RAVLT_learning->RAVLTLRN
+    RAVLT_forgetting->RAVLTFG  RAVLT_perc_forgetting->RAVLTFGP
+    FAQ->FAQTOTAL  MOCA->MOCA
+    Ecog{Pt,SP}{Mem,Lang,Visspat,Plan,Organ,Divatt,Total} -> same names
+    Ventricles/Hippocampus/WholeBrain/Entorhinal/Fusiform/MidTemp/ICV -> same
+
+`PTGENDER` is registered as the CatBoost categorical — do NOT one-hot encode it.
+
+---
+
+## 8. WHAT IS NEXT
+
+NOT YET BUILT: step3 (split), step4 (processing), step5 (CatBoost+SHAP), and
+`preprocessing.py` (master runner).
+
+### step3_split.py — next task, spec agreed
+
+- Split on subject (RID) level only; a subject must never appear in more than
+  one split.
+- 70% train / 15% validation / 15% test.
+- Stratify by the 4-class label.
+- Fixed random seed 42.
+- Save the three RID lists to disk (train_rids.csv / val_rids.csv /
+  test_rids.csv) so the split is reusable without recomputation.
+- Report: exact per-split subject counts, per-split class distribution to
+  confirm stratification held, and confirmation of zero RID overlap.
+
+Read the cohort from `dataset/processed/step1_labeled.csv` (or the derived
+`step2_features.csv`, which carries the identical 814 RID set — verified
+identical). Do not reconstruct the cohort by re-filtering.
+
+### Then step4 and step5 per docs/context.txt
+
+step4: median/mode imputation FIT ON TRAIN ONLY; missingness indicator columns
+for features >10% NaN in train (note: nothing in the current set is above 5.5%,
+so this may produce zero indicators — that is expected, not a bug); the CogIndex
+composite; z-score normalization fit on train only.
+
+step5: CatBoost MultiClass + SHAP TreeExplainer, Top-K by mean absolute SHAP
+(default K=20), save model + Top-K list + filtered matrices + SHAP bar PNG.
+
+---
+
+## 9. STANDING GOTCHAS
+
+- No ADNIMERGE.csv exists in this dump. Anything the doc attributes to
+  "ADNIMERGE" must be reconstructed from the ~215 raw domain tables.
+- Never trust a summary column that reads 0/814 — check for raw items first
+  (see section 4).
+- Never trust ADNI documentation PDFs over ADNI's actual construction code.
+  The Hippocampus /2 contradiction and the WholeBrain v4.3-vs-v5.1 code swap
+  were both documentation-vs-implementation mismatches.
+- Never join ADNI visit-level tables on VISCODE. Use VISCODE2, or better,
+  collapse to one row per subject first.
+- Never rely on pandas merge `suffixes=` to resolve collisions — it silently
+  decides by column order which source wins, and the empty source can win.
+- The 4-class labels are final and verified. Do not collapse EMCI/LMCI.
+- All imputation/normalization must be fit on train only.
