@@ -1,0 +1,115 @@
+# Claude Code Session — ADNI Clinical Pipeline
+
+## Who I am and what I'm building
+
+**"Alzheimer's Disease & Stage Detection using Deep Learning"** My specific role is the **clinical/tabular data pipeline** — my teammate handles the MRI imaging side separately.
+
+---
+
+## The full system (context for what my pipeline feeds into)
+
+The complete system is a 4-step multimodal pipeline:
+
+1. **MRI Stream** — 3D CNN (DenseNet/ResNet backbone), dual output: `DEMO` (continuous severity score 0–2, regression, MSE loss) and `ALZ` (AD probability 0–1, binary, BCE loss). Grad-CAM for explainability. ← *teammate's work*
+2. **Clinical Stream** — CatBoost + SHAP on tabular ADNI data, selects Top-K features. ← *my work*
+3. **Multimodal Fusion** — Z-score alignment, concatenate `[DEMO, ALZ, Age, MMSE, CDR, ...]` into a single fused vector.
+4. **KAN Decision Model** — Kolmogorov-Arnold Network with two output heads: `COG` (4-class softmax: CN/EMCI/LMCI/AD, CE loss) and `ADD` (binary sigmoid, BCE loss). Combined loss: `λ₁·CE(COG) + λ₂·BCE(ADD)`.
+
+**My pipeline's output** is a Top-K feature vector that gets concatenated with `[DEMO, ALZ]` from the MRI stream, passed to the KAN. That's the interface I'm building toward.
+
+---
+
+## My task: the clinical data pipeline
+
+### Goal
+Build a clean, subject-level, 4-class CN/EMCI/LMCI/AD classification pipeline using tabular cognitive/clinical features from the ADNI dataset. The output is a trained CatBoost model + SHAP-selected Top-K features, plus a preprocessed feature matrix for downstream fusion.
+
+### Dataset
+- All downloaded from https://adni.loni.usc.edu (ADNI access already obtained)
+
+### Critical dataset constraint — read carefully
+The EMCI/LMCI distinction **only exists in the `DX_bl` column**, and **only for ADNI-GO/ADNI2 subjects**. ADNI1 subjects have plain "MCI" in that column. The per-visit column `DX` only carries 3 classes (CN, MCI, Dementia) regardless of phase. So:
+- Label source must be `DX_bl` (not `DX`)
+- Must filter to ADNI-GO/ADNI2 cohort subjects only
+- Drop SMC (Subjective Memory Concern) subjects — map only: CN→0, EMCI→1, LMCI→2, AD→3
+
+---
+
+## Architecture of the pipeline I'm building
+
+### Step 0 — Table joining
+Join `ADNIMERGE.csv` with `CDR.csv` and `ADAS_ADNIGO2.csv` on `RID` + `VISCODE`. Merge to enrich ADNIMERGE with granular CDR subscores and ADAS item scores not already present.
+
+### Step 1 — Data integrity
+- Fix known ADNIMERGE issues: AGE column is always baseline age (doesn't update across visits), duplicate rows, visit code inconsistencies.
+- Restrict to ADNI-GO/ADNI2 subjects (cohort filter for EMCI/LMCI label validity).
+- Select baseline visit (`VISCODE == 'bl'`) for the static 4-class label assignment.
+- Assign 4-class label from `DX_bl`: CN=0, EMCI=1, LMCI=2, AD=3. Drop SMC.
+
+### Step 2 — Feature selection
+Target feature set (from ADNIMERGE + joined tables):
+- **Demographics:** `AGE`, `PTGENDER`, `PTEDUCAT`, `APOE4`
+- **Core cognitive:** `CDRSB`, `ADAS11`, `ADAS13`, `MMSE`, `RAVLT_immediate`, `RAVLT_learning`, `RAVLT_forgetting`, `RAVLT_perc_forgetting`, `FAQ`, `MOCA`
+- **ECog (participant + study partner):** `EcogPtMem`, `EcogPtLang`, `EcogPtVisspat`, `EcogPtPlan`, `EcogPtOrgan`, `EcogPtDivatt`, `EcogPtTotal`, `EcogSPMem`, `EcogSPLang`, `EcogSPVisspat`, `EcogSPPlan`, `EcogSPOrgan`, `EcogSPDivatt`, `EcogSPTotal`
+- **MRI volumetrics (from ADNIMERGE):** `Ventricles`, `Hippocampus`, `WholeBrain`, `Entorhinal`, `Fusiform`, `MidTemp`, `ICV`
+- Drop features with >50% missingness. Drop any column that directly encodes the diagnosis (e.g. `DX`, `DX_bl` after labeling, any medication/treatment indicator directly tied to AD stage).
+
+### Step 3 — Splitting (subject-level, stratified)
+- Split on **subject (RID) level**, not row level. One subject must not appear in both train and test.
+- 70% train / 15% validation / 15% test, stratified by the 4-class label.
+- Fix random seed (42) for reproducibility.
+- Save split RID lists to disk so the split is reusable.
+
+### Step 4 — Feature processing (train-only)
+- **Missing value imputation:** median for continuous, mode for categorical. Fit imputer **on train set only**, apply to val/test.
+- Add **missingness indicator columns** for features with >10% NaN in train (binary flag per feature).
+- **Composite cognitive index:** compute `CogIndex = (normalized MMSE) - (normalized CDRSB) - (normalized ADAS13)` as an engineered feature.
+- **Z-score normalization:** fit scaler on train set only, apply to val/test.
+
+### Step 5 — CatBoost + SHAP
+- Train a CatBoost classifier (4-class, `MultiClass` loss) on the train set.
+- Run SHAP `TreeExplainer` on the trained model.
+- Select **Top-K features** by mean absolute SHAP value (K is configurable, default 20).
+- Output: (a) the trained CatBoost model, (b) the Top-K feature name list, (c) the preprocessed feature matrix filtered to Top-K columns for train/val/test.
+- Save SHAP bar chart as PNG.
+
+---
+
+## Tech stack
+- Python 3.10+
+- pandas, numpy for data handling
+- scikit-learn for imputation, scaling, splitting utilities
+- catboost for the gradient boosting classifier
+- shap for feature importance
+- matplotlib / seaborn for SHAP visualizations
+- Google Colab / Kaggle (GPU available but not needed for this pipeline — tabular only)
+
+---
+
+## What I want to do in this session
+
+**Immediate task:** Build the full pipeline described above as clean, modular Python — either as a set of `.py` modules or a structured Jupyter notebook. Specifically:
+
+1. `step0_join_tables.py` — join ADNIMERGE + CDR + ADAS-Cog
+2. `step1_data_integrity.py` — cohort filter, baseline visit selection, 4-class label assignment
+3. `step2_feature_selection.py` — column selection, missingness filter, feature list
+4. `step3_split.py` — subject-level stratified train/val/test split
+5. `step4_feature_processing.py` — imputation, missingness indicators, composite index, normalization
+6. `step5_catboost_shap.py` — CatBoost training, SHAP analysis, Top-K selection, outputs
+7. `preprocessing.py` — master runner that calls all steps in sequence with argparse CLI
+
+Each step should: (a) read from a defined input path, (b) write a clean output CSV/pickle, (c) be independently testable, (d) include docstrings.
+
+---
+
+## Key constraints and non-negotiables
+
+- **4-class labels only:** CN / EMCI / LMCI / AD. Do not collapse EMCI and LMCI.
+- **Subject-level splits:** A patient's data must never appear in both train and test.
+- **No leakage:** All imputation and normalization must be fit on train set only.
+- **ADNI-GO/ADNI2 restriction for labels:** `DX_bl` is only reliable for these cohorts.
+- **`DX_bl` not `DX`:** The per-visit `DX` column only has 3 classes.
+- **No direct label proxies as features:** Remove any column that directly encodes the diagnosis (like `DX` itself, or the label column after assignment).
+- **CatBoost natively handles categoricals** — do not one-hot encode PTGENDER, PTETHCAT, etc.; pass them as `cat_features` to CatBoost.
+- **Missingness indicators:** Add binary flag columns for features above the NaN threshold — this is important for clinical data where missingness can be informative.
+
