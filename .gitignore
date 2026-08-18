@@ -4,4 +4,6 @@ __pycache__/
 *.pyc
 .venv/
 .ipynb_checkpoints/
+models/
+catboost_info/
 EOF
