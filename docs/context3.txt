@@ -1,0 +1,358 @@
+# ADNI Clinical Pipeline — Session 3 Handoff
+
+Continuation context for the project described in `docs/context.txt` (the
+original spec) and `docs/context2.txt` (session 2's audit and the step0/step1/
+step2 rebuild). Read both first — this file only records what session 3 added.
+
+Session 3 built the remaining pipeline (step3, step4, step5, and the master
+runner), found and partially fixed a real overfitting problem in step5, and ran
+two independent audits. The headline: **the clinical pipeline is now complete
+end-to-end and verified from raw data to trained model.**
+
+---
+
+## 1. STATE AT START OF SESSION 3
+
+Complete and verified: step0, step1, step2.
+Not built: step3, step4, step5, `preprocessing.py`.
+
+One correction to context2.txt: it states "there is no git repo in this
+project." That is no longer true — the repo exists and the work is committed.
+
+---
+
+## 2. WHAT WAS BUILT
+
+### Environment (new this session)
+
+There was no venv and no `requirements.txt`; `sklearn` was not installed.
+Created `.venv/` at the project root and froze `requirements.txt`.
+
+    python3 -m venv .venv
+    .venv/bin/pip install pandas scikit-learn catboost shap matplotlib
+
+ALWAYS run pipeline scripts with `.venv/bin/python`, not bare `python3` —
+the system interpreter has none of these packages.
+
+`.gitignore` gained `models/` and `catboost_info/` (CatBoost writes a training
+log directory into CWD on every fit). Note: `.gitignore` has a stray trailing
+`EOF` line that predates this session — harmless, left alone, not mine to fix
+silently.
+
+### step3_split.py
+
+- Reads the cohort from `step2_features.csv`. Does NOT reconstruct or re-filter.
+- Two-stage `train_test_split`: carve off test, then split the remainder.
+  70/15/15, stratified on the 4-class label, `random_state=42`.
+- Writes `train_rids.csv` / `val_rids.csv` / `test_rids.csv` (single RID column).
+- Result: **train 569 / val 122 / test 123**, zero pairwise RID overlap
+  (asserted, not just printed).
+
+### step4_processing.py
+
+- Median imputation (numeric) + mode imputation (categorical), fit on TRAIN ONLY.
+- Missingness indicators for features >10% NaN in train. **Zero were created** —
+  worst feature is EcogSPOrgan at 5.5%. This is correct, not a bug; do not
+  "fix" it by lowering the threshold to force indicators into existence.
+- `CogIndex = (normalized MMSE) - (normalized CDRSB) - (normalized ADAS13)`,
+  computed from the already-normalized components.
+- Z-score normalization fit on train only. RID, label, and PTGENDER are excluded
+  from normalization (34 of 36 columns get normalized).
+- Output: `step4_{train,val,test}.csv` (38 cols each) + `step4_manifest.json`
+  recording every imputation median/mode, every normalization mean/std, the
+  indicator list, and the CogIndex formula.
+
+ORDER MATTERS AND IS EASY TO MISREAD: imputation runs BEFORE normalization, so
+the manifest's mean/std are the post-imputation train statistics. Comparing them
+against raw (pre-impute) train stats produces a spurious mismatch on any feature
+with NaNs. This tripped the mid-session audit before being traced correctly.
+
+### step5_catboost_shap.py
+
+- CatBoost `MultiClass`, PTGENDER via `cat_features` (never one-hot).
+- Val split used as `eval_set` with `early_stopping_rounds=50` and
+  `use_best_model=True`.
+- Hyperparameter sweep over depth {4,5,6} x l2_leaf_reg {3,5,10} x
+  learning_rate {0.03,0.1} = 18 configs. **Selected on VAL accuracy only**;
+  test is not consulted until the winner is fixed. Ties break toward the more
+  regularized model (shallower first, then stronger L2).
+- SHAP `TreeExplainer` on the test set, Top-K by mean |SHAP| (default K=20).
+- Outputs to `models/`: `step5_catboost.cbm`, `step5_topk_features.json`,
+  `step5_shap_values.npz`, `step5_shap_bar.png`, `step5_metrics.json`
+  (the metrics JSON records all 18 sweep results, not just the winner).
+
+`run()` accepts a `grid=` argument. This is the hook the master runner uses to
+pin hyperparameters — do not remove it.
+
+### preprocessing.py (master runner, project root)
+
+- Steps 0-4 run as **subprocesses** (they are pure CLI scripts; step0 has no
+  `run()` function at all, only `main()`). Step 5 is **imported** so its `grid=`
+  can be controlled. This split is deliberate, not an inconsistency.
+- `--from-step N` resumes without rerunning earlier steps.
+- `--skip-sweep` pins the selected params instead of re-running the grid.
+- Fail-fast: every step's output is validated against known-good shapes before
+  the next step runs. On mismatch it prints which step failed and why, stops,
+  and exits 1.
+
+Runtimes: full pipeline **17.1s**, `--from-step 3` 13.6s, `--from-step 3
+--skip-sweep` **3.5s**. step0 rebuilds from 752M of raw in ~4s, so `--from-step`
+matters far less than expected — the sweep was the only real cost.
+
+---
+
+## 3. THE OVERFITTING FINDING (real, partially fixed)
+
+The first step5 run scored **train 0.9912 / val 0.8115 / test 0.7967** — a
+19.5-point train-test gap. This was flagged rather than accepted.
+
+Investigation first ruled out the obvious suspect: early stopping was NOT being
+ignored. The original model stopped at 160 trees of a 1000 cap, so
+`use_best_model=True` was working. The overfit came from capacity (depth 6,
+l2_leaf_reg 3), so the sweep grid was biased toward shallower trees and
+stronger L2.
+
+    metric      before    after     delta
+    train       0.9912    0.9701    -0.0211
+    val         0.8115    0.8361    +0.0246
+    test        0.7967    0.8130    +0.0163
+    train-test  0.1945    0.1571    -0.0374
+
+Selected params: **depth=6, l2_leaf_reg=10, learning_rate=0.1**, 265 trees.
+
+### Three honest caveats — do not let these get lost
+
+1. **A 15.7-point gap remains.** Regularization bought ~3.7 points of it. This
+   is not solved, only improved.
+
+2. **The selection is weakly grounded.** Val is 122 subjects, so one subject is
+   0.82 points. The top 13 of 18 configs span 0.8033-0.8361 — a spread of four
+   subjects. The winner *tied exactly* with depth=6/l2=3/lr=0.1 and was chosen
+   by the regularization tiebreak, not by a real margin. Treat the selected
+   config as one of a dozen statistically indistinguishable options.
+
+3. **The gap-minimizing config was deliberately NOT chosen.**
+   depth=4/l2=10/lr=0.03 has the smallest gap (train 0.8963 / val 0.8197, gap
+   7.7 points) but lower val accuracy. Picking it would improve the gap number
+   while predicting worse. It is recorded under `sweep` in `step5_metrics.json`
+   if anyone wants it.
+
+If a genuine reduction is wanted, the lever is **cross-validation** (e.g. 5-fold
+CV over train+val for both selection and estimation), not more grid points.
+More tuning against a 122-subject val set is fitting noise. That is a step3
+split-strategy change, so it was left alone.
+
+---
+
+## 4. CURRENT RESULTS
+
+### Final model
+
+    train 0.9701   val 0.8361   test 0.8130   (train-test gap +0.1571)
+    params: depth=6, l2_leaf_reg=10, learning_rate=0.1, 265 trees
+
+### Test per-class
+
+    class  precision  recall   f1     support
+    CN       1.000     1.000   1.000    29
+    EMCI     0.774     0.872   0.820    47
+    LMCI     0.562     0.375   0.450    24
+    AD       0.840     0.913   0.875    23
+
+**LMCI is the weak class** and is expected to stay weak. EMCI and LMCI are
+adjacent points on one continuum with genuinely fuzzy clinical boundaries;
+LMCI's 0.562 precision means the model confuses it with its neighbours, which
+is what human raters do too. CN is perfectly separable at 1.000/1.000.
+
+### Top-10 SHAP (test set, mean |SHAP|)
+
+    CDRSB                 0.5658
+    CogIndex              0.2804
+    MMSE                  0.1435
+    ADAS13                0.1105
+    ADAS11                0.0975
+    RAVLT_perc_forgetting 0.0938
+    EcogSPMem             0.0809
+    FAQ                   0.0718
+    Fusiform              0.0705
+    EcogSPDivatt          0.0669
+
+CDRSB dominates by 2x over the next feature. CogIndex ranking #2 is expected —
+it is engineered from CDRSB/MMSE/ADAS13, which also independently top the list.
+That is designed correlation, not leakage.
+
+---
+
+## 5. AUDITS RUN THIS SESSION
+
+Two independent audits, both passed. Everything below was recomputed, not
+taken from prior reports.
+
+### Mid-session recheck of steps 0-4 (5 checks, all PASS)
+
+- Cohort integrity: step2 RID set == union of the three split files exactly.
+- Label integrity: CN=190/EMCI=310/LMCI=163/AD=151 holds; per-split proportions
+  all within ~1 point of overall.
+- Leakage: zero leak-listed columns in any `step4_*.csv`.
+- Normalization: manifest stats reapplied to raw val reproduce `step4_val.csv`
+  to within 4.4e-16.
+- No upstream mutation: step0/step1/step2 mtimes unchanged by step3/step4.
+
+### Final end-to-end sanity check (5 checks, all PASS)
+
+Ran after deleting `dataset/processed/` and `models/` entirely and rebuilding
+from raw.
+
+1. **Fresh rebuild** reproduced every target value exactly: step0 5166x404,
+   step1 814x405, step2 814x37, split 569/122/123 with zero overlap, zero NaN
+   post-imputation in all three step4 files, and accuracy 0.9701/0.8361/0.8130.
+2. **3-subject end-to-end trace** (RIDs 4623, 4680, 5023): raw ADSL values ->
+   step1 -> step2 -> step4 normalized -> SHAP. Every hand-recomputed
+   normalization matched to <=1.11e-16; CogIndex matched to 0.00e+00.
+3. **Leakage negative control**: all 17 excluded columns raised; a clean feature
+   list did not raise; injecting `DX_bl` into `FEATURE_MAP` and calling `run()`
+   raised `AssertionError` AND wrote no output file (it fails before the write,
+   so a leaked run cannot leave a poisoned artifact).
+4. **Label correctness**: `DX_bl` re-derived independently from raw `ARM.csv` +
+   `DXSUM.csv` for **all 814 subjects** — 0 mismatches, per-class 190/310/163/151
+   exact. (A 10-RID sample was done first but happened to draw no EMCI, which
+   proved little, so it was escalated to the full cohort.)
+5. **No split leakage**: train-fit stats reapplied to raw val/test reproduce the
+   processed files across 4,148 val cells and 4,182 test cells, max diff
+   4.441e-16. Refitting on val would give MMSE mean 27.5738 and on test 27.0488
+   vs the train-fit 27.3831 actually used — proof the stats were not refit.
+
+### Fail-fast was verified, not assumed
+
+`step2_features.csv` was truncated to 400 rows and the runner resumed from
+step 3. step3 ran and produced 279/61/60; the runner caught it:
+
+    PIPELINE FAILED
+      step3 train has 279 RIDs, expected 569
+      Stopped; later steps were not run.
+
+Exit code 1. Steps 4 and 5 never ran, so the existing model was not overwritten
+with garbage. The file was restored and a clean rerun done afterward.
+
+---
+
+## 6. KNOWN GAPS (none are defects, all are worth knowing)
+
+- **`step5_shap_values.npz` does not store the base/expected value**, only the
+  per-feature contributions. Additivity therefore cannot be checked from that
+  artifact alone. Worse, `shap.TreeExplainer(model).expected_value` returns
+  **nan** for multiclass CatBoost — to recover the base, use
+  `model.get_feature_importance(pool, type="ShapValues")`, whose last column is
+  the bias. Additivity was verified this way and holds exactly (base is constant
+  across all 123 subjects, std = 0.0; shap-lib values vs CatBoost native differ
+  by 0.000e+00).
+
+- **`preprocessing.py` hardcodes the expected shapes** (`EXPECTED`,
+  `EXPECTED_SPLIT_ROWS`, `STEP4_COLS`). That is what makes fail-fast meaningful,
+  but a *legitimate* cohort change — an ADNI data refresh, a step2 threshold
+  change — will trip the guard and require updating those constants. Intended
+  behaviour, but it will look like a failure the first time it happens.
+
+- **The 122-subject val set is small enough that hyperparameter selection is
+  near-noise.** See section 3, caveat 2.
+
+---
+
+## 7. CURRENT PIPELINE STATE
+
+### Files
+
+    preprocessing.py                 master runner (steps 0-5)
+    src/step0_join_tables.py         unchanged this session
+    src/step1_data_integrity.py      unchanged this session
+    src/step2_feature_selection.py   unchanged this session
+    src/step3_split.py               new
+    src/step4_processing.py          new
+    src/step5_catboost_shap.py       new
+    requirements.txt                 new (frozen from .venv)
+    docs/context.txt                 original spec
+    docs/context2.txt                session 2 handoff
+    docs/context3.txt                this file
+
+    dataset/raw/adnimerge2_tables/   216 raw ADNI tables
+    dataset/raw/ADAS_ADNIGO2.csv
+    dataset/raw/CDR.csv
+
+    dataset/processed/step0_joined.csv    5,166 x 404
+    dataset/processed/step1_labeled.csv     814 x 405   <-- COHORT SOURCE OF TRUTH
+    dataset/processed/step2_features.csv    814 x  37
+    dataset/processed/{train,val,test}_rids.csv   569 / 122 / 123
+    dataset/processed/step4_{train,val,test}.csv  569/122/123 x 38
+    dataset/processed/step4_manifest.json
+    models/step5_*                        model, Top-K, SHAP, PNG, metrics
+
+`dataset/` and `models/` are gitignored — regenerate with `preprocessing.py`,
+do not expect them in a fresh clone.
+
+### Commits (working tree clean as of end of session)
+
+    606b636  feat: add master runner for pipeline steps 0-5
+    2de255c  feat: add CatBoost classifier with SHAP feature importance (step5)
+    d2e5b6a  feat: add subject-level stratified train/val/test split (step3)
+    ef259e0  chore: env set up along with requirements.txt
+    6ebb5a9  fix: repair step0 joins dropping MRI/CDR/ECog data
+
+### How to run
+
+    .venv/bin/python preprocessing.py                      # full, ~17s
+    .venv/bin/python preprocessing.py --from-step 3         # skip the join
+    .venv/bin/python preprocessing.py --skip-sweep          # pin params, ~3.5s
+    .venv/bin/python preprocessing.py --top-k 30            # different K
+
+---
+
+## 8. WHAT IS NEXT
+
+The clinical pipeline as specified in `docs/context.txt` is **complete**. All
+seven deliverables (step0-step5 plus `preprocessing.py`) exist, run end-to-end
+from raw data, and are verified.
+
+What remains is the **fusion interface** — the reason this pipeline exists.
+Per `docs/context.txt`, the clinical stream's Top-K feature vector gets
+concatenated with `[DEMO, ALZ]` from the teammate's MRI stream and fed to a KAN
+with two heads (`COG` 4-class softmax, `ADD` binary sigmoid).
+
+Nothing has been built for that yet. Open questions to settle with the teammate
+before building it:
+
+- What RID set does the MRI stream cover, and how does it intersect our 814?
+  Our split must be reused (train/val/test RID lists are on disk for exactly
+  this reason) or the fusion model will leak across splits.
+- Does the KAN consume the Top-K columns only, or all 36? `step5_topk_features.json`
+  has the Top-K list; the filtered matrices are derivable from the step4 CSVs.
+- `[DEMO, ALZ]` need z-score alignment with our features. Our normalization
+  stats are train-fit and live in `step4_manifest.json` — the MRI side must fit
+  its own stats on the SAME train RIDs, not on its own split.
+
+### Optional improvements, in priority order
+
+1. **Cross-validation for step5 selection** (see section 3). The single highest-
+   value change if model quality matters more than pipeline completeness.
+2. Save the SHAP base value into the npz (section 6).
+3. Consider whether the LMCI weakness warrants class weighting — but note that
+   accuracy is currently the only selection metric, and macro-F1 might be the
+   more honest target given the class imbalance (EMCI 310 vs AD 151).
+
+---
+
+## 9. STANDING GOTCHAS (session 3 additions)
+
+Everything in context2.txt section 9 still applies. New:
+
+- Run scripts with `.venv/bin/python`. The system Python has no dependencies.
+- step4 imputes BEFORE normalizing. Manifest mean/std are post-imputation
+  statistics. Comparing them to raw train stats gives a false mismatch.
+- step5's zero missingness indicators are correct (max NaN 5.5% < 10%).
+- Never select hyperparameters on test. The sweep uses val only, by design.
+- Do not one-hot PTGENDER anywhere. It is the registered CatBoost categorical
+  and step4 deliberately leaves it unnormalized.
+- CatBoost writes `catboost_info/` into the working directory on every fit.
+  It is gitignored; delete it freely.
+- The 4-class labels are final and verified twice over (session 2 by audit,
+  session 3 by full 814-subject re-derivation from raw). Do not collapse
+  EMCI/LMCI.
