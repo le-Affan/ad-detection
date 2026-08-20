@@ -10,6 +10,13 @@ IDA zips lay files out as  ADNI/<PTID>/<Description>/<date>/<ImageID>/<file>.nii
 so the subject and image id are both recoverable from the archive path; each
 extracted file is matched back to the selection by Image ID, which is the key
 we actually chose on, rather than by filename text.
+
+Partial downloads are tolerated. A zip that is still being fetched has no
+central directory and raises BadZipFile; those are logged and skipped instead
+of aborting the run, and members are extracted atomically so a failure cannot
+leave a truncated NIfTI behind. Re-running after more zips complete picks them
+up with no code change, so the rest of the MRI pipeline can be built against
+whatever subset is on disk today.
 """
 import os
 import re
@@ -27,21 +34,94 @@ MANIFEST = os.path.join(ROOT, "dataset", "mri_manifest", "mri_manifest.csv")
 
 IMGID_RE = re.compile(r"(?:^|[/_])I(\d{4,})(?:[/_.]|$)")
 PTID_RE = re.compile(r"(\d{3}_S_\d{4})")
+
+
+def _safe_dest(member, root):
+    """Resolve an archive member to a path inside root, or None if it escapes.
+
+    IDA archives are trusted, but a member named '../x' or '/x' would write
+    outside the staging directory, so the check is cheap insurance.
+    """
+    dest = os.path.normpath(os.path.join(root, member))
+    if not dest.startswith(os.path.abspath(root) + os.sep):
+        return None
+    return dest
+
+
+def _extract_member(zf, member, root):
+    """Extract one member atomically, returning its destination path.
+
+    Written to a '.part' file and renamed only after the whole member has been
+    read, so an interrupted or CRC-failing member never leaves a plausible-
+    looking NIfTI behind for the preprocessing step to pick up. zipfile
+    verifies the CRC as the stream is read, so a truncated or corrupt member
+    raises here rather than producing a silently short file.
+    """
+    dest = _safe_dest(member, root)
+    if dest is None:
+        raise ValueError(f"member escapes staging dir: {member}")
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    part = dest + ".part"
+    try:
+        with zf.open(member) as src, open(part, "wb") as out:
+            shutil.copyfileobj(src, out, 1 << 20)
+        os.replace(part, dest)
+    except BaseException:
+        if os.path.exists(part):
+            os.remove(part)
+        raise
+    return dest
+
+
 def extract():
+    """Extract NIfTI members from every readable zip in _zips.
+
+    Zips still downloading have no central directory yet and raise BadZipFile.
+    Those are reported and skipped rather than aborting the run, so the
+    pipeline can be built and exercised on whatever has finished while the
+    remaining zips are still arriving. Re-running once they land picks them up
+    with no code change.
+    """
     zips = sorted(z for z in os.listdir(ZIPS) if z.endswith(".zip"))
     if not zips:
         raise SystemExit("no zips found in " + ZIPS)
     os.makedirs(STAGE, exist_ok=True)
     total = 0
+    skipped = []
     for z in zips:
         path = os.path.join(ZIPS, z)
-        with zipfile.ZipFile(path) as zf:
-            members = [m for m in zf.namelist() if m.lower().endswith((".nii", ".nii.gz"))]
-            zf.extractall(STAGE, members=members)
-            total += len(members)
-        print(f"  {z}: {len(members)} image files")
-    print(f"extracted {total} image files")
-    return total
+        size = os.path.getsize(path)
+        try:
+            zf = zipfile.ZipFile(path)
+        except (zipfile.BadZipFile, OSError, EOFError) as e:
+            skipped.append((z, size, f"{type(e).__name__}: {e}"))
+            print(f"  {z}: SKIPPED ({type(e).__name__}: {e})")
+            continue
+        with zf:
+            members = [m for m in zf.namelist()
+                       if m.lower().endswith((".nii", ".nii.gz"))]
+            failed = []
+            for m in members:
+                try:
+                    _extract_member(zf, m, STAGE)
+                    total += 1
+                except (zipfile.BadZipFile, OSError, EOFError, ValueError) as e:
+                    failed.append((m, f"{type(e).__name__}: {e}"))
+            if failed:
+                skipped.append((z, size, f"{len(failed)} of {len(members)} members failed"))
+                print(f"  {z}: {len(members) - len(failed)}/{len(members)} image files"
+                      f"  ({len(failed)} FAILED, first: {failed[0][1]})")
+            else:
+                print(f"  {z}: {len(members)} image files")
+
+    print(f"extracted {total} image files from {len(zips) - len(skipped)} of {len(zips)} zips")
+    if skipped:
+        print(f"\n--- SKIPPED ZIPS ({len(skipped)}) ---")
+        for z, size, why in skipped:
+            print(f"  {z:38s} {size / 2**30:6.2f} GiB  {why}")
+        print("  These are almost certainly still downloading (a partial zip has no"
+              "\n  central directory yet). Re-run this script once they complete.")
+    return total, skipped
 
 
 def image_id_from(path):
@@ -124,10 +204,18 @@ def verify(placed, unmatched):
     print(f"subjects with >1 file           : {len(multi)}")
 
     if missing:
-        print("\n--- MISSING (no file downloaded) ---")
-        for p in missing:
+        # While zips are still arriving this list is long and expected, so it
+        # is summarised by class rather than printed in full.
+        print("\n--- MISSING (not yet downloaded) ---")
+        miss_dx = info.loc[missing, "DX_bl"].value_counts()
+        print("  by class: " + "  ".join(
+            f"{k}={int(miss_dx.get(k, 0))}" for k in ("CN", "EMCI", "LMCI", "AD")))
+        for p in missing[:10]:
             r = info.loc[p]
             print(f"  RID {r.RID:>5s}  {p:<11s} {r.DX_bl:<4s} {r.PHASE}")
+        if len(missing) > 10:
+            print(f"  ... and {len(missing) - 10} more"
+                  " (full list in downloaded_manifest.csv, downloaded == False)")
 
     excluded = sorted(set(man.PTID) - expected, key=lambda p: int(info.loc[p, "RID"]))
     print("\n--- EXCLUDED BY DESIGN (no baseline structural T1 in IDA) ---")
@@ -156,7 +244,7 @@ def verify(placed, unmatched):
 
 def main():
     print("=== extracting ===")
-    extract()
+    _total, skipped = extract()
     print("\n=== organising into dataset/mri_raw/<PTID>/ ===")
     placed, unmatched = organise()
     print(f"placed files for {len(placed)} subjects")
