@@ -1,9 +1,28 @@
-dataset/raw/
-dataset/processed/
+# Python
 __pycache__/
 *.pyc
 .venv/
 .ipynb_checkpoints/
+
+# Pipeline inputs/outputs -- regenerate with preprocessing.py
+dataset/raw/
+dataset/processed/
 models/
 catboost_info/
-EOF
+
+# MRI download area.
+# Deny by default: this directory fills with ~27 GB of zips and, after
+# unpacking, one NIfTI per subject in dataset/mri_raw/<PTID>/. Only the
+# small provenance artefacts below are worth tracking, so new files are
+# ignored unless explicitly allowed.
+dataset/mri_raw/*
+!dataset/mri_raw/*.py
+!dataset/mri_raw/selected_scans.csv
+!dataset/mri_raw/selected_image_ids.txt
+!dataset/mri_raw/ida_search_results_baselineT1.csv
+
+# NEVER commit: _zips/zip_urls.txt holds pre-authenticated IDA download
+# URLs. Those UUID links grant the collection to anyone who has them,
+# with no login. Covered by the deny-by-default rule above; named here so
+# it does not get whitelisted back in by accident.
+dataset/mri_raw/_zips/
