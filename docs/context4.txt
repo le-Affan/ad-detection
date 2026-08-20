@@ -1,0 +1,388 @@
+# ADNI MRI Acquisition — Session 4 Handoff
+
+Continuation of `docs/context.txt` (original spec), `docs/context2.txt`
+(session 2 audit + step0/1/2 rebuild) and `docs/context3.txt` (session 3:
+step3/4/5 + master runner). Read context3.txt first — this file only records
+what session 4 added.
+
+Session 4 did **no work on the clinical pipeline**. It is untouched and still
+complete/verified as described in context3.txt. This session was entirely
+about the **MRI stream**: building the acquisition manifest, evaluating
+reference repos, and pulling the actual scans off the LONI IDA portal.
+
+Headline: the 811-subject baseline T1 selection is **finished and exact**;
+the 27.28 GB download is **47.8% done and cleanly paused**.
+
+---
+
+## 1. STATE AT START OF SESSION 4
+
+Clinical pipeline complete (step0–step5 + `preprocessing.py`). No MRI work of
+any kind had been started. `dataset/mri_manifest/` and `dataset/mri_raw/` did
+not exist.
+
+---
+
+## 2. MRI ACQUISITION MANIFEST (`dataset/mri_manifest/`)
+
+Built from `step1_labeled.csv` (814 × 405, the cohort source of truth).
+
+### PTID join source
+
+PTID was **already present** in `step1_labeled.csv` — no external join needed.
+step0 coalesces it via `CANONICAL_PRIORITY["PTID"] = [CDR, ADAS, ECOGPT,
+ECOGSP, MOCA]`, so it resolves from `dataset/raw/CDR.csv`. Re-verified against
+that raw file anyway: 814/814 exact match, 0 RIDs with conflicting PTIDs.
+
+### Two visit blocks, not one — READ THIS BEFORE TOUCHING THE MANIFEST
+
+There is **no cohort-wide baseline visit code**. step0 deliberately collapses
+each source table to *its own* baseline code before joining. So the manifest
+carries both, unmixed:
+
+    BASELINE_VISCODE / VISCODE2 / EXAMDATE   CDR, 'sc' for all 814   814/814
+    MRI_VISCODE / VISCODE2 / EXAMDATE        UCSFFSX51 FreeSurfer    813/814
+
+`BASELINE_*` anchors the cohort and labels. `MRI_*` is the visit a scan was
+actually processed from. They were deliberately NOT coalesced into one column.
+
+### Sanity checks — 14/14 PASS
+
+814 rows; RID unique; PTID unique; 0 nulls in PTID or BASELINE_EXAMDATE; all
+match `^\d{3}_S_\d{4}$`; **PTID trailing segment == RID with 0 mismatches**
+(compared as ints so zero-padding is not a false hit); `label` agrees with
+`DX_bl` on every row; CN=190 / EMCI=310 / LMCI=163 / AD=151 exact.
+
+    PHASE           ADNI2 683 / ADNIGO 131   (== ORIGPROT)
+    clinical dates  2010-05-11 -> 2013-07-30
+    MRI scan dates  2010-06-17 -> 2013-09-04  (813 dated)
+
+### FreeSurfer coverage (availability indicator, not proof)
+
+    in UCSFFSX51 at BASELINE visit : 804 / 814
+    in UCSFFSX51 at ANY visit      : 813 / 814
+
+10 RIDs lack a baseline FreeSurfer row: 2360, 4003, 4004, 4012, 4022, 4095,
+4176, 4508, 5013, 5017. Nine have a scan at m03/m12/m24; only **4095** has
+none at all. Note 4 of the 10 are site `033_S_`.
+
+Files: `mri_manifest.csv` (814 × 14), `ptid_list.txt` (814 PTIDs, no header),
+`build_manifest.py` (regenerates + re-runs all checks).
+
+---
+
+## 3. REFERENCE REPO EVALUATION (read-only, no clones)
+
+Inspected via GitHub API + raw file fetches. `gh` CLI is NOT installed on this
+machine; `curl` works fine.
+
+| repo | subject-level split? | verdict |
+|---|---|---|
+| NYUMedML/CNN_design_for_AD | **CONFIRMED** (measured 0 overlap) | best dual-head reference |
+| vkola-lab/brain2020 | **CORRECTED** — result clean, mechanism is row-level shuffle | do not copy label logic |
+| damianpolakpjwstk/... | **RESOLVED: subject-level**, genuinely correct | blocked, see below |
+| Toqa277/MRI-Alzheimers-CNN | **RESOLVED: row-level**, unstratified | best backbone |
+| wangyirui/AD_Prediction | subject-level, frozen in .txt | Python-2 only |
+
+### Cohort overlap with our 814 (measured, not assumed)
+
+    wangyirui   244 / 814 (30%)  — all from its 2-class lists
+    brain2020     0 / 814
+    NYUMedML      0 / 814
+
+wangyirui's Normal/AD labels agree with our `DX_bl` on **all 244** (141 CN,
+103 AD, zero disagreement) — a free external validation of our label
+derivation. Worth citing if labels get questioned.
+
+### Key per-repo findings
+
+**NYUMedML** — split confirmed empirically (train 463 / val 99 / test 96
+subjects, ~4 sessions each, zero pairwise overlap), but there is *no split
+code in the repo*; it lives in shipped TSVs. Real bug in `datasets/adni_3d.py`:
+the label filter is discarded in Train mode (second assignment re-indexes the
+original frame), so EMCI/LMCI would be dropped in val/test but become
+`label = -100` in train. Backbone is a plain 4-block dilated conv stack, NOT a
+ResNet; input 96³. **Landmine:** blocks 3 and 4 both `add_module('pool2_s1',…)`,
+so the net effectively has 3 pools, not 4 — the arithmetic only lands on the
+hardcoded `5*5*5` because of this. It already ships `LinearRegressor_mmse`
+alongside the classifier — the closest thing to our DEMO+ALZ dual head.
+Preprocessing needs Clinica + SPM12 + MATLAB + FreeSurfer 6.0 (not Colab-able).
+
+**brain2020** — `utils.read_csv` does `labels = [0 if a[1]=='NL' else 1 …]`.
+Hard binary; our EMCI/LMCI would be **silently relabelled AD-positive**. The
+quietest failure of the five; never copy this. Input hardcoded 181×217×181
+(MNI152 1mm). Needs FSL (~10 GB, not pip-installable).
+
+**damianpolak** — split is genuinely patient-level and correct. But two hard
+blockers: (a) entry point requires **ADNIMERGE.csv**, which ADNI no longer
+ships — the exact reason our step0 exists; (b) `imaging_models/model.py`
+imports `pseudo3d_pytorch`, which is neither vendored nor in requirements.
+Also `requirements.txt` lists the deprecated `sklearn` shim, which now *raises
+on install*. Uses DX (not DX_bl), so EMCI/LMCI collapse to MCI.
+
+**Toqa277** — split is `train_test_split` over plain file indices with no
+`stratify=` and no subject parsing at all; structurally cannot be made
+subject-level without rewriting the dataset class. But the **backbone is the
+best fit**: textbook 3D ResNet-18, `AdaptiveAvgPool3d((1,1,1))` → 512-d vector
+→ `Linear(512, num_classes)`. No hardcoded spatial dims in the model, so input
+size is free; Grad-CAM target is `layer4`. Labels come from *directory names*,
+so 4-class is a trivial change. Preprocessing is ANTsPy-only (pip-installable,
+no FSL/FreeSurfer/MATLAB) — by far the most Colab-friendly of the five, though
+its notebook has a literal syntax error (`=root_directory = …`) and an
+undefined `filename`.
+
+**Recommendation stands:** Toqa277 ResNet-18 for the trunk, NYUMedML's
+trunk/head composition idiom for the two heads, Toqa277's ANTsPy chain for
+preprocessing.
+
+---
+
+## 4. IDA PORTAL — WHAT WAS LEARNED
+
+### NIfTI IS available (this was the pivotal discovery)
+
+The Advanced Search "Image Types" checkboxes map to format:
+
+    Type = Original        ->  Format = DCM    (DICOM)
+    Type = Pre-processed   ->  Format = NiFTI
+
+Default is Original-only. Searching with the default and downloading would
+have silently produced 100% DICOM. **DICOM-only subjects: 0** — every subject
+with a baseline structural T1 also has a Pre-processed NIfTI.
+
+### "Weighting = T1" is NOT "a T1 scan"
+
+Of 6,209 T1-flagged baseline hits across 814 subjects, **2,645 were junk**:
+localizers (2,267), calibration scans (182), field maps (196). Filtering on
+Weighting alone pulls ~40% garbage. Must additionally exclude by Description.
+
+### Baseline visits used
+
+`ADNIGO Screening MRI`, `ADNI2 Screening MRI-New Pt`, `ADNI2 Baseline-New Pt`.
+(`ADNI2 Initial Visit-Cont Pt` deliberately excluded — our cohort is ORIGPROT
+∈ {ADNIGO, ADNI2}, i.e. new patients.)
+
+### The Subject ID and Image ID fields accept huge pastes
+
+814 comma-separated PTIDs (8,953 chars) and later 811 Image IDs (5,676 chars)
+were both accepted with **zero truncation**. Searching by Image ID is the way
+to reselect an exact set without clicking 811 checkboxes across 41 pages.
+
+---
+
+## 5. THE 811-SUBJECT SELECTION (final, agreed, applied)
+
+Rule, implemented in `dataset/mri_raw/select_scans.py`:
+
+1. **Pipeline:** prefer `MT1; GradWarp; N3m`, else `MT1; N3m`.
+   Exclude `Spatially Normalized, Masked and N3 corrected T1 image` (already
+   skull-stripped + MNI-normalised) and the `HHP`/`HarP` boutique pipelines.
+   Reason: mixing preprocessing levels injects a **site-correlated covariate**
+   into training, and the normalised variant would collide with running our
+   own skull-strip/registration.
+2. **Protocol:** prefer non-accelerated (MPRAGE) over accelerated
+   (GRAPPA2 / SENSE2 / Accelerated SAG IR-SPGR).
+3. **Tie:** scan date closest to `MRI_EXAMDATE`.
+4. Determinism guard: lowest Image ID.
+
+Result:
+
+    pre-processed rows considered : 1644
+    excluded by pipeline rule     :  215  (193 SpatNorm, 11 HHP, 11 HarP)
+    selected                      :  811  (811 unique PTIDs, 811 unique Image IDs)
+
+    pipeline    MT1; GradWarp; N3m  632
+                MT1; N3m            179
+    accelerated used                  8   (only option for those subjects)
+    candidates per subject   1:5  2:781  3:23  4:2
+
+    class    cohort  selected
+    CN          190       190
+    EMCI        310       309
+    LMCI        163       162
+    AD          151       150
+
+**3 subjects excluded by design, never retried** (no baseline structural T1
+exists in IDA for them):
+
+    RID 2360  126_S_2360  EMCI  ADNIGO
+    RID 4095  098_S_4095  AD    ADNI2
+    RID 4187  941_S_4187  LMCI  ADNI2   (localizer only)
+
+### The date_gap red herring — DO NOT "FIX" THIS
+
+`selected_scans.csv` has 8 rows with `date_gap` up to **741 days**. This looks
+alarming and is not a defect. Those 8 are exactly the subjects with
+`HAS_FS_BASELINE = False`, i.e. their manifest `MRI_EXAMDATE` is itself a
+*non-baseline* (m03/m12/m24) FreeSurfer date. Re-measured against the clinical
+baseline they collapse to **12–28 days**. A `gap_to_clinical_baseline` column
+was added for this reason; use that one in the methods section.
+
+Cohort-wide vs clinical baseline: median 15 d, 686/811 within 30 d, max 167 d.
+
+### Collection on the portal
+
+    name : cohort814_baseline_T1_nifti   (UI truncates to cohort814_baseline_T1_nif)
+    id   : 513791
+    items: 811, all Type=Pre-processed, Format=NiFTI
+
+Built by pasting the 811 Image IDs into Advanced Search → search returned
+**exactly 811 rows, one per subject** → Select All → Add To Collection. So the
+collection is *provably* the selection, not an approximation.
+
+Two leftover probe collections still exist and should be deleted once the data
+is verified: `cohort814_format_probe` (46), `cohort814_preproc_probe` (68).
+**Do not touch `MajorProject` (775) or `umpd` (25010)** — those are the user's.
+
+---
+
+## 6. DOWNLOAD — CURRENT STATE (PAUSED)
+
+    total   27.28 GB in 10 zips  (IDA "Advanced Download" -> "10 Zip Files")
+    done    13.04 GB  (47.8%)
+    paused  2026-08-21, cleanly, nothing running
+
+    complete    4   nif, nif1, nif2, nif3      11.09 GB
+    partial     2   nif4 (74.9%), nif9 (0.8%)   2.16 GB
+    not started 4   nif5, nif6, nif7, nif8
+
+The 4 complete zips were **structurally verified** (central directory read):
+82 + 81 + 81 + 81 = 325 valid NIfTI. 82 + 81×9 = 811, so the split is
+consistent.
+
+### LONI throughput — measured, not guessed
+
+    3 streams   829 KB/s   (clean, first run)
+    10 streams  801 KB/s   + many HTTP 503
+    1 stream    340-650 KB/s, and rising overnight
+
+**Concurrency is counterproductive.** LONI returns 503 above ~2 connections
+and caps ~0.8 MB/s per account. Control test: with LONI saturated, GitHub
+still delivered 6.1 MB/s on the same link, so the cap is account-side, not
+bandwidth. Pushing to 10 streams *degraded* throughput to ~145 KB/s for a
+while; backing off to 1 stream reversed it. **Use one stream.**
+
+### How to resume
+
+    dataset/mri_raw/_zips/resume.sh            # curl -C -, byte-range resume
+    dataset/mri_raw/_zips/resume.sh aria2c     # aria2c -c -x1 -s1 (NOT installed)
+
+Reads `resume_manifest.csv`, skips complete, continues partials from their
+exact offsets. Nothing re-downloads.
+
+**URL EXPIRY:** the IDA links expire ~**2026-08-29** (10 days from minting) or
+once a download completes server-side. If they 403/404, regenerate via the
+collection → ADVANCED DOWNLOAD → "URL List" and replace
+`_zips/zip_urls.txt`. Partials stay valid across URL regeneration because
+resume is byte-offset based, not URL-bound.
+
+### Manual browser download path (if preferred)
+
+Log in → set study to **ADNI** → Search & Download → Image Collections →
+My Collections → `cohort814_baseline_T1_nif` (811) → tick **All** (counter must
+read `811 items selected`) → **ADVANCED DOWNLOAD** (not 1-Click, which is one
+27 GB zip / "about 1 day") → `Group Files As: 10 Zip Files` → click each link.
+
+Mixing browser-downloaded zips with the existing partials is **safe**:
+`unpack_and_verify.py` matches files to subjects by **Image ID**, not by zip
+index or filename order.
+
+---
+
+## 7. FILES ADDED THIS SESSION
+
+    dataset/mri_manifest/build_manifest.py          committed
+    dataset/mri_manifest/mri_manifest.csv           committed  (814 x 14)
+    dataset/mri_manifest/ptid_list.txt              committed
+    dataset/mri_raw/select_scans.py                 committed
+    dataset/mri_raw/unpack_and_verify.py            committed  (NOT YET RUN)
+    dataset/mri_raw/selected_scans.csv              committed  (811, full provenance)
+    dataset/mri_raw/selected_image_ids.txt          committed
+    dataset/mri_raw/ida_search_results_baselineT1.csv  committed (6,209 rows)
+
+    dataset/mri_raw/_zips/*.zip                     gitignored (14 GB)
+    dataset/mri_raw/_zips/zip_urls.txt              gitignored — SEE SECURITY
+    dataset/mri_raw/_zips/expected_sizes.txt        gitignored
+    dataset/mri_raw/_zips/resume_manifest.{csv,json} gitignored
+    dataset/mri_raw/_zips/resume.sh, fetch.sh       gitignored
+    dataset/mri_raw/finish.sh, finish.log           gitignored
+
+Committed as `14a0989 feat: build manifest for downloading images complete`.
+
+`.gitignore` was rewritten: stray `EOF` line removed (predates this session),
+rules grouped, and a **deny-by-default** block added for `dataset/mri_raw/`
+with an explicit whitelist. Deny-by-default because that directory fills with
+27 GB of zips and later 811 `<PTID>/` folders — an allow-list cannot be
+outrun; a block-list can.
+
+`requirements.txt` was checked and **needs no change**: `pip freeze` is
+byte-identical to it, and every third-party import across the repo
+(catboost, matplotlib, numpy, pandas, shap, sklearn) is already covered.
+Everything added this session uses only pandas + stdlib.
+
+---
+
+## 8. SECURITY / COMPLIANCE — DO NOT SKIP
+
+1. **`_zips/zip_urls.txt` is effectively a credential.** Those UUID links
+   download the full 27 GB collection with **no login**. Never commit them,
+   never send them to anyone. Gitignored deny-by-default and called out in a
+   `.gitignore` comment so a future `!` line cannot whitelist them back.
+
+2. **ADNI Data Use Agreement.** `mri_manifest.csv`, `ptid_list.txt` and
+   `selected_scans.csv` contain subject-level ADNI data (PTIDs, diagnoses,
+   exam dates for 814 people). The DUA prohibits redistribution. The GitHub
+   remote `le-Affan/ad-detection` returns 404 unauthenticated, i.e. it is
+   **private** — which is what makes committing these acceptable. **If the
+   repo is ever made public, those files must come out first.**
+
+3. An outbound bundle `dataset/adni_baseline_T1_partial_2026-08-21.tar`
+   (13.04 GB) was created near the end of the session for sending to a third
+   party, then the task was abandoned. **It is currently untracked and NOT
+   gitignored** — add `dataset/*.tar` to `.gitignore` or delete the file
+   before any `git add -A`. Staging dir `dataset/mri_raw/_bundle/` also
+   remains (hard links, so ~no extra disk).
+
+---
+
+## 9. WHAT IS NEXT
+
+1. **Finish the download** (14.24 GB outstanding) — `resume.sh`, one stream,
+   before the URLs expire ~2026-08-29.
+2. **Run `unpack_and_verify.py`** — extracts to `dataset/mri_raw/<PTID>/`,
+   matches by Image ID, and emits `downloaded_manifest.csv` plus the
+   got/missing-by-RID report and total size. It has never been run against a
+   real zip; the Image-ID regex and PTID-path fallback are untested on actual
+   IDA archive layout.
+3. **Delete the two probe collections** from the portal once verified.
+4. **Then** the fusion interface from context3.txt §8 — clinical Top-K ⊕
+   `[DEMO, ALZ]` → KAN with COG (4-class softmax) + ADD (binary sigmoid)
+   heads. Still nothing built. The MRI stream must reuse our train/val/test
+   RID lists and fit its normalisation on the SAME train RIDs.
+
+---
+
+## 10. STANDING GOTCHAS (session 4 additions)
+
+Everything in context2.txt §9 and context3.txt §9 still applies. New:
+
+- **Use one download stream against LONI.** More is slower and triggers 503s.
+- **`Weighting = T1` includes localizers, calibration scans and field maps.**
+  Always filter Description as well.
+- **Image Type must include "Pre-processed" to get NIfTI.** The default
+  "Original" is DICOM-only.
+- **`date_gap > 30` in `selected_scans.csv` is expected for 8 subjects** and is
+  an artefact of the reference date, not a bad selection. Use
+  `gap_to_clinical_baseline`.
+- **`pgrep -f` will match the shell running your own command.** Killing
+  download processes with `pgrep -f 'pattern'` repeatedly killed the calling
+  shell (exit 144). Use the bracket trick — `pgrep -f -- '[-]o cohort814'` —
+  or explicit PIDs.
+- **Killing `curl` is not enough.** The `bash -c fetch` wrapper shells hold the
+  retry loop and will respawn curl after their backoff. Kill supervisors
+  top-down: watcher → fetch.sh → xargs → wrapper → curl.
+- **IDA collection names are truncated to 25 characters** in the UI.
+- **`gh` CLI is not installed**; use `curl` against api.github.com.
+- The IDA "Advanced Download" page takes ~60 s to prepare even a small
+  collection, and offers a **URL List** link that is far more reliable than
+  clicking zip links in the browser.
