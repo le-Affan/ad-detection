@@ -2,13 +2,26 @@
 __pycache__/
 *.pyc
 .venv/
+.venv312/
 .ipynb_checkpoints/
+
+# RULE FOR THIS FILE: ignore DATA, never CODE.
+# Source lives in src/ and is always tracked. Where an ignore rule covers a
+# directory that could ever hold a .py, the rule is written as `dir/*` with an
+# explicit `!dir/*.py` so git can still descend and see the source. A bare
+# `dir/` stops git descending at all, which would swallow code silently.
 
 # Pipeline inputs/outputs -- regenerate with preprocessing.py
 dataset/raw/
 dataset/processed/
 models/
 catboost_info/
+
+# Preprocessed MRI volumes: ~1.8 GB now, ~4.6 GB at the full cohort, and
+# DUA-restricted subject data. Written as `*` rather than `mri_prep/` so that
+# any helper script dropped in here stays visible to git.
+dataset/mri_prep/*
+!dataset/mri_prep/*.py
 
 # MRI download area.
 # Deny by default: this directory fills with ~27 GB of zips and, after
@@ -26,3 +39,7 @@ dataset/mri_raw/*
 # with no login. Covered by the deny-by-default rule above; named here so
 # it does not get whitelisted back in by accident.
 dataset/mri_raw/_zips/
+
+# Outbound data bundles (multi-GB, ADNI DUA-restricted - never commit)
+dataset/*.tar
+dataset/*.tar.*
