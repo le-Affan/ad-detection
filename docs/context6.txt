@@ -1,0 +1,396 @@
+# ADNI MRI Pipeline — Session 6 Handoff
+
+Continuation of `docs/context.txt` (original spec), `context2.txt` (audit +
+step0/1/2 rebuild), `context3.txt` (step3/4/5 + master runner), `context4.txt`
+(MRI acquisition) and `context5.txt` (MRI preprocessing + model code, verified
+on 5 subjects). Read context5.txt first — this file only records session 6.
+
+Session 6 did **no work on the clinical pipeline**; it is untouched and still
+complete/verified per context3.txt. No work on `model.py` either.
+
+Headline: this session ran the MRI pipeline over the **full 811-subject
+cohort** on the machine that actually holds the data. Unpack, preprocess and
+index are all done and verified. A real preprocessing defect was found at
+cohort scale that the 5-subject smoke test could not have caught, diagnosed to
+root cause, fixed, and the 12 affected subjects reprocessed. Still nothing
+trained.
+
+---
+
+## 1. STATE AT START OF SESSION 6
+
+Fresh clone on a **new Windows machine** — the "MRI-only machine" that
+`docs/SETUP.md` was written for. Nothing built: no venv, no unpacked data, no
+preprocessed volumes. The 27.3 GB zip that was 47.8% downloaded at the end of
+session 5 had finished downloading and was sitting in the repo.
+
+This is the first session where the full dataset was actually present.
+
+---
+
+## 2. THIS MACHINE
+
+    OS        Windows 11 Home Single Language, 10.0.26200
+    CPU       Intel i7-11800H, 8 physical / 16 logical cores
+    GPU       NVIDIA RTX 3050 Ti Laptop, 4 GB VRAM
+    Python    3.12.3, available as `py -3.12` (also 3.11 Store, 3.10)
+    Disk      154 GB free at start, 118 GB free after unpack
+
+Note the venv layout differs from SETUP.md, which is written POSIX-style:
+
+    .venv312/Scripts/python.exe        <- Windows
+    .venv312/bin/python                <- what SETUP.md says
+
+There is **no `.venv`** on this machine and there does not need to be. The
+clinical pipeline cannot run here (no `dataset/raw/`), which is by design.
+
+### torch on Windows — SETUP.md is wrong for this platform
+
+SETUP.md §4 says the default PyPI torch wheel drags in ~3 GB of unusable
+`nvidia-*` packages, so install from the CPU index. **That is Linux-specific.**
+On Windows the default PyPI wheel *is* CPU-only:
+
+    pip install torch    ->  torch-2.13.0-cp312-cp312-win_amd64.whl, 122 MB
+                             torch.__version__      = 2.13.0+cpu
+                             torch.cuda.is_available() = False
+                             no nvidia-* packages pulled at all
+
+So despite the RTX 3050 Ti, **torch here is CPU-only right now**. This was left
+deliberately: torch is not used by unpack, m1 or m2, and the resulting env
+matches `requirements-mri.txt` exactly. CUDA on Windows needs an explicit
+index, e.g.
+
+    pip install torch --index-url https://download.pytorch.org/whl/cu124
+
+Do that before training, not before preprocessing. See §9.
+
+Install went clean otherwise: 40 packages from `requirements-mri.txt`,
+`antspyx==0.6.3` found a cp312 Windows wheel, **no ITK/ANTs source build**.
+
+---
+
+## 3. UNPACK — 811/811, CLEAN
+
+The zip arrived at `dataset/mri_raw/cohort814_baseline_T1_nif.zip`. It has to
+be at `dataset/mri_raw/_zips/` — `unpack_and_verify.py:30` globs `_zips`. It
+was moved there (same volume, instant).
+
+Verified complete before unpacking by reading the central directory: 811
+members, 37 GB uncompressed. A partial download has no central directory and
+raises `BadZipFile`, so this check is cheap and conclusive.
+
+    matched by Image ID: 811, by PTID path: 0
+    subjects MISSING a file : 0      unexpected subjects  : 0
+    files matching no selection: 0   subjects with >1 file: 0
+    total bytes on disk: 34.43 GiB
+
+    EXCLUDED BY DESIGN: RID 2360, 4095, 4187 (no baseline structural T1 in IDA)
+
+    pipeline   MT1; GradWarp; N3m  632      protocols  MPRAGE        596
+               MT1; N3m            179                 Sag IR-SPGR   173
+                                                       (8 accelerated)
+
+The staging dir cleaned itself up. The zip is still on disk; deleting it
+reclaims 27 GB now that unpack has verified 811/811.
+
+---
+
+## 4. PRE-FLIGHT VERIFICATION (before the long run)
+
+Done deliberately rather than trusting the unpack log. All 811 headers read
+with nibabel: 0 unreadable, 0 degenerate shapes, 0 bad zooms, 0 zero-byte
+files, exactly one NIfTI per subject, manifest and disk agree both ways.
+
+Four native geometries:
+
+    (176, 240, 256)  450
+    (196, 256, 256)  208
+    (170, 256, 256)  151
+    (176, 256, 256)    2      <- never seen before session 6
+
+Session 5 tested three of these four. The 2-subject geometry was new and gave
+no trouble.
+
+Split files confirmed untouched — clean `git status`, last touched by commit
+118be9a, i.e. byte-identical to what the clinical machine committed. Coverage:
+
+    train 569 rids (567 on disk)   val 122 (121)   test 123 (123)
+    union 814, overlap 0           <- no subject in two splits
+
+### CPU / threading, measured not assumed
+
+`ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS` is **unset** everywhere (shell, User,
+Machine), and antspyx exposes no thread API, so ITK falls back to its default.
+Measured by sampling the real chain from outside the process:
+
+    OS threads in process   53   (thread pool, most parked)
+    cores busy, mean      12.2   of 16 logical
+    cores busy, peak      15.1   of 16 logical
+    RSS                630-830 MB
+    wall per subject      ~32 s
+
+**SETUP.md understates this** — it says "ANTs already uses ~10 cores". It is
+12-15 here, i.e. the machine is saturated and there is essentially no headroom
+for subject-level parallelism. The only slack is periodic serial troughs
+(~15% of wall time dipping to 5-6 cores). Running 2 workers x 8 threads might
+recover part of that; it was NOT tried and remains an open idea, not a
+recommendation.
+
+---
+
+## 5. m1 FULL RUN — 811/811, ZERO FAILURES
+
+Launched fully detached so it survived the session closing. On Windows the
+robust way is WMI, because a process created by `Win32_Process.Create` is
+spawned by the WMI service and sits outside the caller's job object:
+
+    Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
+      CommandLine = "cmd.exe /c <root>\.venv312\Scripts\python.exe -u " +
+                    "<root>\src\mri\m1_preprocess.py --tag full " +
+                    "> <root>\dataset\mri_prep\m1_full.log 2>&1"
+      CurrentDirectory = "<root>" }
+
+Log: `dataset/mri_prep/m1_full.log` (gitignored by the `dataset/mri_prep/*`
+rule). Result: **811/811 ok, 0 FAILED**, report written.
+
+### The 12.75 h wall time was a laptop suspend, not a compute problem
+
+One subject, `041_S_4051`, logged **19,832 s (5.5 h)**. Its output is entirely
+normal (corr 0.547, above median). `time.time()` counts across sleep, so the
+machine suspended mid-subject. **The other 810 total 7.24 h**, matching the
+~32 s/subject estimate. Only that one row's `seconds` value is meaningless.
+
+If you rerun on a laptop, disable sleep or expect one inflated row.
+
+### Cohort-scale QC
+
+    corr_vs_mni   median 0.518   mean 0.509   range 0.054 - 0.641
+    per class     CN 0.521   EMCI 0.517   LMCI 0.507   AD 0.479
+
+AD lowest reproduces the session-5 pattern at scale — that is the atrophy
+signal, not a processing problem.
+
+---
+
+## 6. THE CLIP DEFECT — FOUND, DIAGNOSED, FIXED
+
+This is the most important thing in this file. It is the cohort-scale analogue
+of session 5's registration defect: something the 5-subject test could not
+have surfaced.
+
+### Symptom
+
+12 of 811 subjects had, in `m1_report_full.csv`:
+
+    min != 0   (0.001 - 0.031)      frac_zero = 0.0000
+    mask_fill = 1.000               frac_outside_mask = 0.785498
+
+That last number was **byte-identical across all 12**, which is what marked it
+as deterministic rather than noise. Their whole volume was non-zero — the
+brain mask's effect had been undone.
+
+### Root cause
+
+Traced stage by stage. The mechanism is a broken cancellation:
+
+`iMath TruncateIntensity` raises the background to a positive constant for
+**every** subject (298.86 on the normal control `002_S_2010`). Step 7 then
+does `(arr - lo) / (hi - lo)` with `lo = arr.min()`, which normally *is* that
+background constant, so the background lands back on exactly 0. The two steps
+cancel and nobody notices.
+
+B-spline resampling (step 2-3) rings at sharp intensity edges and can leave
+voxels below zero. Usually those sit outside the brain and the mask kills
+them. In 12 subjects the ringing was large enough to survive:
+
+    027_S_4966   native min 0.000
+                 after reorient+resample   min -147.956
+                 after reg 4a              min  -88.573
+                 after reg 4b              min   -3.060
+                 after mask (step 5)       min   -3.060   <- survived
+                 after Truncate            min   -0.760
+
+Now `lo = -0.760`, not the background level. The cancellation fails, the
+background maps to something > 0, and the entire volume floats up off zero.
+
+Two secondary points worth keeping:
+
+- The final `vol96` min is > 0 only because the **linear downsample averages
+  away** the isolated minimum voxel. At full res min is always exactly 0 by
+  construction of min-max. So `min > 0` in the report is a *downsampling
+  artefact of a normalisation bug*, not the bug itself.
+- **Dynamic range is NOT the trigger.** An early hypothesis said high native
+  max caused it; that is wrong. `094_S_4282` peaks at 55,884 and is clean;
+  affected subjects ranged 7,189 - 22,692. All 12 affected happen to be
+  `196x256x256`, which is suggestive but was **not** established as causal.
+
+### The 12 affected subjects
+
+    003_S_4350  027_S_4801  027_S_4804  027_S_4926  027_S_4936  027_S_4938
+    027_S_4955  027_S_4966  094_S_4459  109_S_2278  126_S_4686  129_S_4287
+
+### The fix — commit ce89ac4
+
+New step 5b in `m1_preprocess.py`, between masking and truncation:
+
+    brain = brain.new_image_like(np.clip(brain.numpy(), 0.0, None))
+
+T1 magnitude data is non-negative, so anything below zero there is pure
+artefact. `m1_params_*.json` gained a `clip_negative` key so the provenance
+record is not silently wrong.
+
+### Why it is safe for the other 799
+
+With no negative voxel present, `np.clip(x, 0, None)` is **the identity
+function** — this is a proof per subject, not a statistical argument.
+
+Verified directly on 25 subjects, chosen risk-weighted rather than at random:
+the 12 highest-dynamic-range unaffected subjects at the six affected sites
+(topped by `094_S_4282` at native max 55,884, 2.5x the worst affected), plus
+one per native-shape x class cell. **All 25 had post-mask min exactly
+0.000000 with zero negative voxels.**
+
+Cohort-wide: any negative voxel forces `lo < 0 <= background`, which forces
+`min > 0` in the output. The pre-fix report shows `min == 0` for all 799, so
+none of them carried one.
+
+### Reprocessing and verification
+
+    .venv312/Scripts/python.exe src/mri/m1_preprocess.py \
+      --ptids <the 12, comma-separated> --force --tag fix12
+
+**Use a different `--tag`.** With `--ptids` + `--force`, `--tag full` would
+overwrite `m1_report_full.csv` with only 12 rows. See §9.
+
+After reprocessing, read back from disk (not from the CSV):
+
+    min == 0 exactly     811/811
+    max == 1 exactly     811/811
+    in_unit_range True   811/811
+    shape 96x96x96       811/811
+    frac_outside_mask max  0.7855 -> 0.0361
+
+The other 799 were **not** touched — proven by mtime in both `vol96/` and
+`mni/`: 12 rewritten, 799 still stamped 03:19:41 from the original run.
+
+`m1_report_full.csv` was then merged (799 original rows verbatim + the 12 new
+ones). The pre-fix original is preserved as
+`dataset/mri_prep/m1_report_full_before_clipfix.csv`.
+
+---
+
+## 7. WHAT THE QC NUMBER ACTUALLY DOES AT COHORT SCALE
+
+Session 5 set `corr_vs_mni < ~0.30` as the "suspect, go look" threshold. At
+811 subjects that threshold flagged 8, and **all 8 were false positives for
+registration failure.** Every one was well aligned — brain edge tracking the
+red mask contour in all three planes on the QC PNG. Two benign causes:
+
+- **Contrast outliers.** `027_S_4966` (corr 0.092) is geometrically correct
+  but has an extreme bimodal intensity profile. `corr_vs_mni` is an *intensity*
+  correlation, so an unusual contrast profile tanks it even when the geometry
+  is right.
+- **Severe atrophy.** `099_S_4086`, `037_S_4071` have massively enlarged
+  ventricles. Exactly the "low r on an atrophied brain is signal, not error"
+  case from context5 §4.
+
+One of the 8 was a genuine artefact, but of the clip defect, not registration:
+**`109_S_2278` went 0.216 -> 0.547** after the fix. Its low score was the
+background floor inflating the correlation denominator.
+
+`027_S_4966` went 0.092 -> 0.054 — the clip did not rescue it, which confirms
+it is a contrast outlier. Leave it in; it is real data.
+
+After the fix, 7 subjects sit below 0.30. **Keep the threshold as a screen,
+but the PNG is what decides.** Do not drop subjects on the number alone.
+
+---
+
+## 8. m2 INDEX + DATASET — VERIFIED
+
+    .venv312/Scripts/python.exe src/mri/m2_index.py
+
+    preprocessed volumes on disk : 811
+    -> dataset/mri_prep/mri_index.csv
+
+    DX_bl   CN  EMCI  LMCI   AD  total
+    train  133   216   114  104    567
+    val     28    46    24   23    121
+    test    29    47    24   23    123
+    total 811    (label/DX_bl agreement: 811/811)
+
+567/121/123 is exactly the predicted 569/122/123 minus the three
+excluded-by-design RIDs. Class balance holds across splits (~23/38/20/19%), so
+no split took a skewed draw.
+
+`ADNIVolumes` verified with `strict=True` on all three splits: batches come
+back `(4, 1, 96, 96, 96)` float32, range [0.000, 1.000]. Target mapping
+confirmed live: label 0 -> demo 0.0/alz 0, 1 -> 0.5/0, 2 -> 1.0/0,
+3 -> 2.0/1.
+
+**val and test were exercised with real data for the first time.** Context5 §6
+noted all five smoke-test subjects had landed in train, so those loaders had
+never been touched. Both work.
+
+`__getitem__` returns a **dict**, not a tuple:
+
+    {"volume", "demo", "alz", "label", "ptid", "rid"}
+
+---
+
+## 9. WHAT IS NEXT
+
+1. **Training loop — still does not exist.** Optimiser, epochs, val metrics,
+   checkpointing, early stopping. Only the 3-iteration mechanical probe from
+   session 5 was ever run, and its weights were discarded.
+   - Install CUDA torch first (§2). 4 GB VRAM is tight for a 33.2 M-param 3D
+     ResNet-18 on 96^3 volumes; expect a small batch size and check it before
+     designing the schedule.
+   - **AD is the smallest class: 104 train / 23 val / 23 test.** 23 val AD
+     subjects is a thin basis for early-stopping on an AD-specific metric.
+     Decide the val metric with that in mind.
+2. **Fusion is still blocked on this machine.** `dataset/processed/step4_*.csv`
+   and `models/step5_topk_features.json` are not tracked. Same open decision as
+   SETUP.md §5 — nothing changed this session.
+3. Optional housekeeping: delete `dataset/mri_raw/_zips/*.zip` to reclaim
+   27 GB, and consider correcting SETUP.md §2/§4 for the Windows torch and
+   thread-count findings above.
+
+---
+
+## 10. STANDING GOTCHAS (session 6 additions)
+
+Everything in context2 §9, context3 §9, context4 §10 and context5 §8 still
+applies. New:
+
+- **On Windows, `pip install torch` gives you a CPU-only build silently.** No
+  error, no `nvidia-*` packages, `torch.cuda.is_available()` just returns
+  False. SETUP.md's advice to avoid the default index is Linux-only.
+- **`m1_report_<tag>.csv` is written once, at the end, from rows accumulated in
+  memory.** A run killed partway writes no report at all. Worse, a *resumed*
+  run does `continue` on already-done subjects **without appending a row**, so
+  its report covers only the subjects processed in that invocation. The volumes
+  are always safe and atomic; it is the QC table that silently goes short.
+- **Never reprocess a subset with `--tag full`.** `--ptids X --force --tag full`
+  overwrites `m1_report_full.csv` with just those rows. Use a fresh tag and
+  merge.
+- **`time.time()` counts across laptop sleep**, so a suspended run leaves one
+  absurd `seconds` value. Check whether wall-clock and the sum of `seconds`
+  disagree before believing a slow subject is a real performance problem.
+- **A metric can be broken by normalisation, not just by alignment.** The clip
+  defect made `109_S_2278` look like a registration failure at corr 0.216 when
+  it was fine. Compare `frac_zero` / `min` / `frac_outside_mask` before
+  concluding anything from `corr_vs_mni`.
+- **`corr_vs_mni < 0.30` had a 100% false-positive rate for registration
+  failure at cohort scale (8/8).** It is a screen that tells you which PNG to
+  open, nothing more.
+- **ANTs saturates this CPU (12-15 of 16 logical cores).** Do not expect
+  subject-level parallelism to help much, and do not expect the GPU to help at
+  all — ANTs registration is CPU-only. Only training benefits from CUDA.
+- The MRI stream still has **no hardcoded subject list or count** anywhere, and
+  that property was relied on this session — going from 5 to 811 subjects
+  needed no code change. Keep it that way. (`preprocessing.py` deliberately
+  does the opposite; do not "fix" either to match the other.)
+- `dataset/mri_prep/*` is gitignored with a `!*.py` exception, so logs, reports
+  and QC PNGs written there cannot be committed by accident. Confirmed this
+  session.
