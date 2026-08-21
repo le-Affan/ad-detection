@@ -139,6 +139,16 @@ def preprocess(path, head_w, mask_w, brain_w, size=OUT_SIZE):
     # 5. brain mask
     brain = aligned * mask_w
 
+    # 5b. Clamp the b-spline undershoot. Resampling a high-dynamic-range scan
+    # rings at sharp intensity edges and can leave voxels well below zero
+    # (-3.06 on 027_S_4966, from a native max of 22118). T1 magnitude data is
+    # non-negative, so those are pure artefact. They matter because step 7
+    # anchors min-max on arr.min(): a single negative outlier makes `lo` an
+    # artefact value rather than the background level, so the background no
+    # longer maps to 0 and the whole volume floats up off zero. That hit 12 of
+    # 811 subjects. A no-op for the rest -- their post-mask min is already 0.
+    brain = brain.new_image_like(np.clip(brain.numpy(), 0.0, None))
+
     # 6. percentile truncation, 7. min-max to [0, 1]
     brain = ants.iMath(brain, "TruncateIntensity", TRUNC_LO, TRUNC_HI)
     arr = brain.numpy()
@@ -298,7 +308,9 @@ def run(ptids=None, size=OUT_SIZE, force=False, qc=True, tag="qc"):
 
     with open(os.path.join(PREP, f"m1_params_{tag}.json"), "w") as f:
         json.dump({"orientation": ORIENTATION, "work_spacing": WORK_SPACING,
-                   "transform": "Affine x2 (head->head, then brain->brain)", "truncate": [TRUNC_LO, TRUNC_HI],
+                   "transform": "Affine x2 (head->head, then brain->brain)",
+                   "clip_negative": "after mask, before truncate (b-spline undershoot)",
+                   "truncate": [TRUNC_LO, TRUNC_HI],
                    "normalise": "min-max to [0,1] before downsample",
                    "downsample": {"size": size, "interp": "linear"},
                    "n4": "first, in native space",
