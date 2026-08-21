@@ -13,9 +13,20 @@ __pycache__/
 
 # Pipeline inputs/outputs -- regenerate with preprocessing.py
 dataset/raw/
-dataset/processed/
+dataset/processed/*
 models/
 catboost_info/
+
+# EXCEPTION: the train/val/test split. These three files are 4 KB total and
+# are the ONE clinical artefact the MRI stream cannot do without -- m2_index.py
+# reads them to assign each scan a split, and both streams must use the same
+# assignment or fusion leaks across splits. Everything else in dataset/processed/
+# is rebuildable from dataset/raw/, but dataset/raw/ is 752 MB of ADNI tables
+# that a machine set up only for the MRI work will not have. Tracking them makes
+# the repo clonable onto an MRI-only machine.
+!dataset/processed/train_rids.csv
+!dataset/processed/val_rids.csv
+!dataset/processed/test_rids.csv
 
 # Preprocessed MRI volumes: ~1.8 GB now, ~4.6 GB at the full cohort, and
 # DUA-restricted subject data. Written as `*` rather than `mri_prep/` so that

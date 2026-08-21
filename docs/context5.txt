@@ -1,0 +1,224 @@
+# ADNI MRI Pipeline — Session 5 Handoff
+
+Continuation of `docs/context.txt` (original spec), `context2.txt` (audit +
+step0/1/2 rebuild), `context3.txt` (step3/4/5 + master runner) and
+`context4.txt` (MRI acquisition). Read context4.txt first — this file only
+records session 5.
+
+Session 5 did **no work on the clinical pipeline**; it is untouched and still
+complete/verified per context3.txt. This session built the **MRI preprocessing
+and model code** and verified it end to end on 5 subjects.
+
+Headline: the MRI pipeline runs raw NIfTI -> preprocessed 96^3 volumes ->
+dual-head 3D ResNet-18 forward pass. Registration had a real defect that was
+found and fixed. Nothing has been trained.
+
+---
+
+## 1. STATE AT START OF SESSION 5
+
+Clinical pipeline complete. MRI: 27.28 GB download 47.8% done, paused; nothing
+unpacked; `unpack_and_verify.py` written but never run.
+
+---
+
+## 2. ENVIRONMENT — TWO VENVS NOW, DELIBERATELY
+
+    .venv     Python 3.14.6   clinical pipeline   requirements.txt
+    .venv312  Python 3.12.13  MRI pipeline        requirements-mri.txt
+
+`antspyx` ships wheels for cp38–cp313 only. On Python 3.14 pip falls back to
+compiling ITK + ANTs from source, which is why the MRI stream has its own
+interpreter. This is not tidiness; it is the difference between a 30-second
+install and a multi-hour build that usually fails.
+
+torch is installed from the PyTorch **CPU** index because this machine has no
+GPU; the default PyPI wheel pulls ~3 GB of unusable `nvidia-*` packages. On a
+CUDA machine install torch from the default index instead — see `docs/SETUP.md`.
+
+`.venv` was verified byte-identical to `requirements.txt` after all of this;
+the clinical environment was not touched.
+
+---
+
+## 3. UNPACK — DONE FOR THE 4 COMPLETE ZIPS
+
+`unpack_and_verify.py` was patched to tolerate partial downloads: a zip still
+being fetched has no central directory and raises `BadZipFile`, which
+previously aborted the whole run. Those are now logged and skipped. Members are
+also extracted **atomically** (stream to `.part`, rename only after a full read
+that zipfile CRC-checks), so an interrupted or corrupt member cannot leave a
+truncated NIfTI behind for preprocessing to pick up.
+
+Result on this machine: 325 subjects from 4 zips, nif4/nif9 skipped cleanly.
+**All 325 verified byte-identical to the archive by size + CRC32**, 325/325
+valid NIfTI-1 headers, zero `.part` leftovers, zips untouched so resume stays
+valid.
+
+The 325 are NOT skewed. IDA packs zips round-robin, not sequentially by site —
+each zip carried 43–44 of 58 sites and a mod-10 crosstab over PTID-sorted rank
+is flat. Class drift vs the full cohort is at most 3.4 points.
+
+---
+
+## 4. THE REGISTRATION DEFECT — FOUND, DIAGNOSED, FIXED
+
+This is the most important thing in this file.
+
+The first m1 run scored `dice = 0.979`, which looked fine and **was
+meaningless**: the volume is multiplied by the brain mask before the metric is
+computed, so dice can only report how much of the mask is non-zero. It cannot
+detect misalignment. It was replaced by `mask_fill`, named honestly, and
+correlation against the template became the real alignment check.
+
+### Calibration first, then diagnosis
+
+    known-good affine (Colin27 -> template)   r = 0.61
+    deliberate 15-voxel misalignment          r = 0.37
+    deliberate 30-voxel misalignment          r = 0.22
+    what we were getting                      r = 0.13 - 0.20
+
+So the metric was fine and the registration was genuinely broken.
+
+### Root cause
+
+ANTsPy's bundled `mni` is **already skull-stripped**, and so is nilearn's
+`load_mni152_template` (its non-zero fraction exactly equals its brain mask).
+The Toqa277 reference used FSL's **whole-head** `MNI152_T1_1mm.nii`. Registering
+a whole head to a brain-only template makes the affine shrink the entire head
+to fit the brain: skull and scalp end up inside the mask and the brain itself
+is 10–15% undersized.
+
+### What did NOT work (all measured, do not retry)
+
+    fixed mask + mask_all_stages   r = 0.002   (worst of all)
+    no mask                        r = 0.199
+    AffineFast / TRSAA             r = 0.20
+    neck cropping, 4 fractions     r = 0.15 - 0.21
+    aff_metric GC / meansquares    r = 0.10 / -0.00
+    shift grid search              no offset helped -> not a translation error
+    iterated bootstrap stripping   plateaued at 0.25
+
+### The fix
+
+`nilearn.datasets.fetch_icbm152_2009()` provides the whole-head ICBM152 2009a
+T1 **plus** its published brain mask — the same pairing the reference gets from
+FSL. Registration now runs two stages:
+
+    1. whole head -> whole head        r 0.20 -> 0.39
+    2. mask, then refine brain -> brain r      -> 0.42
+
+Two other reference bugs fixed while in there: `ants.resample_image` defaults to
+`interp_type=1` which is **nearest neighbour** (the reference's downsample
+inherits that and aliases badly), and N4 now runs **first**, in native space,
+rather than after registration as the reference does.
+
+### HOW TO READ THE CORRELATION NUMBER
+
+r does not approach 1.0 even when registration is perfect, and it must not. An
+affine cannot match individual anatomy to a smooth population template. An
+atrophied brain with enlarged ventricles legitimately scores lower than a
+healthy one — that difference is the signal the classifier exists to find.
+**Use r to catch gross failures (< ~0.30), never to rank subjects.** The AD
+subject in the 5-subject test scored lowest at 0.449 for exactly this reason.
+
+---
+
+## 5. WHAT WAS BUILT
+
+    src/mri/m1_preprocess.py   ANTsPy chain, resumable, atomic writes, QC PNGs
+    src/mri/m2_index.py        globs disk -> joins manifest + splits -> index
+    src/mri/dataset.py         PyTorch Dataset, split filter, target mapping
+    src/mri/model.py           3D ResNet-18 trunk + DEMO/ALZ heads + loss
+    docs/SETUP.md              clone-and-run instructions for a new machine
+
+All three pipeline stages read whatever is on disk at run time and skip work
+already done. **There is no hardcoded subject list or count anywhere in the MRI
+stream** — this is deliberate, so the remaining subjects need no code change.
+Note this is the opposite of `preprocessing.py`, which hardcodes expected shapes
+on purpose to fail fast on a fixed cohort. Do not "fix" either to match the
+other.
+
+### Target mapping (decided this session)
+
+    DX_bl   label   DEMO    ALZ
+    CN        0      0.0     0
+    EMCI      1      0.5     0
+    LMCI      2      1.0     0
+    AD        3      2.0     1
+
+DEMO uses CDR-like spacing, not even spacing. Both mappings are single dicts at
+the top of `dataset.py` and are the only place either target is defined.
+
+### One deliberate deviation from the SDD, flagged
+
+`model.forward()` returns the ALZ **logit**, with `alz_prob()` separate. The
+sigmoid is still the output nonlinearity, but BCE must be computed from the
+logit via `BCEWithLogitsLoss`; applying sigmoid then plain `BCELoss` is
+numerically unstable and produces NaN gradients once the model is confident.
+
+---
+
+## 6. VERIFIED ON 5 SUBJECTS (all 4 classes, all 3 native shapes)
+
+    PTID         class  native          time   corr   range
+    002_S_4171   LMCI   170x256x256    24.9s  0.494  [0,1]
+    003_S_2374   EMCI   196x256x256    27.6s  0.519  [0,1]
+    009_S_5027   AD     176x240x256    25.2s  0.449  [0,1]
+    011_S_4105   CN     176x240x256    23.8s  0.459  [0,1]
+    016_S_4584   LMCI   196x256x256    24.1s  0.540  [0,1]
+
+All collapse to 96^3 float32, min exactly 0.000 and max exactly 1.000.
+QC montage: `dataset/mri_prep/qc/five/_montage_5subjects.png`.
+
+Forward pass, batch of 5: features (5,512), demo (5,), alz_logit (5,).
+Untrained outputs verified against theory rather than eyeballed — BCE 0.697 vs
+ln(2) = 0.693, MSE 1.241 vs target variance about zero 1.25. All 33,161,026
+parameters receive finite gradients across 64/64 tensors.
+
+Model: 33.2 M params, 126.5 MiB fp32. Trunk uses `AdaptiveAvgPool3d((1,1,1))`
+so **input size is free** — unlike NYUMedML which hardcodes a 5*5*5 flatten.
+Grad-CAM target is `trunk.layer4`.
+
+**All 5 test subjects happened to land in the train split**, so val/test have
+never been exercised with real data. Empty loaders were confirmed not to crash.
+
+---
+
+## 7. WHAT IS NEXT
+
+1. On the machine that has the full dataset: follow `docs/SETUP.md`. Put the
+   zip in `dataset/mri_raw/_zips/`, then unpack -> m1 -> m2.
+   Expect 811 subjects and ~5.7 h for m1. **A GPU does not speed up m1** —
+   ANTs registration is CPU-only. Only training benefits.
+2. Then a real training loop (does not exist yet): optimiser, epochs, val
+   metrics, checkpointing, early stopping. Only a 3-iteration mechanical probe
+   has been run, and its weights were discarded.
+3. Then fusion — see context3.txt §8 and `docs/SETUP.md` §5. The clinical
+   step4 CSVs and Top-K list are **not currently tracked** and will block that
+   machine; decide before starting.
+
+---
+
+## 8. STANDING GOTCHAS (session 5 additions)
+
+Everything in context2 §9, context3 §9 and context4 §10 still applies. New:
+
+- **Run MRI scripts with `.venv312/bin/python`, clinical with `.venv/bin/python`.**
+  Neither environment has the other's packages.
+- **Never trust `ants.resample_image` defaults** — `interp_type=1` is nearest
+  neighbour. Always pass it explicitly. Linear (0) is required for the final
+  downsample because it cannot overshoot the [0,1] range; b-spline and sinc ring.
+- **Never register a whole-head scan to a skull-stripped template.** Both
+  ANTsPy's bundled `mni` and nilearn's `load_mni152_template` are stripped;
+  `fetch_icbm152_2009()["t1"]` is not.
+- **A metric computed after masking cannot validate the alignment that produced
+  the mask.** That is how `dice = 0.979` hid a 30-voxel misregistration.
+- **Low correlation on an atrophied brain is signal, not error.** See §4.
+- ITK picks its writer from the file extension, so atomic writes must use a
+  temp name that keeps `.nii.gz` — `foo.nii.gz.part` fails to write at all.
+- `dataset/processed/{train,val,test}_rids.csv` are now tracked on purpose.
+  Both streams must use the same split or fusion leaks. Never regenerate them
+  on one machine only.
+- The 4-class labels remain final and verified twice over. Do not collapse
+  EMCI/LMCI.

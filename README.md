@@ -1,5 +1,9 @@
 # Alzheimer's Disease Stage Detection using CNN + KAN
 
+> **Setting up on a new machine?** See [`docs/SETUP.md`](docs/SETUP.md) — it
+> covers the two virtualenvs, where to put the MRI dataset zip, and the exact
+> run order. Session handoffs are in `docs/context*.txt`.
+
 ## Overview
 This project implements an interpretable deep learning framework for multi-stage Alzheimer’s disease classification and continuous severity scoring.
 
