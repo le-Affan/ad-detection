@@ -105,7 +105,16 @@ class ADNIVolumes(Dataset):
         are ordinary filename characters on Linux and would not resolve.
         """
         if self.data_root:
-            return os.path.join(self.data_root, "vol96", f"{r.PTID}.nii.gz")
+            base = os.path.join(self.data_root, "vol96", str(r.PTID))
+            # EXTENSION IS NOT ASSUMED. m1 writes .nii.gz, but a relocated copy
+            # may be decompressed -- Kaggle, for one, gunzips every member of an
+            # uploaded archive, so the same data arrives as plain .nii. nibabel
+            # reads either, so the only thing that breaks is a hardcoded suffix.
+            for ext in (".nii.gz", ".nii"):
+                p = base + ext
+                if os.path.exists(p):
+                    return p
+            return base + ".nii.gz"      # report the canonical name if absent
         rel = str(r.vol_path).replace("\\", "/")
         return os.path.join(ROOT, *rel.split("/"))
 
