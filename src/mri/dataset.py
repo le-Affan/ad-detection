@@ -65,7 +65,11 @@ class ADNIVolumes(Dataset):
         file read, and left on by default so a bad volume surfaces at once.
     """
 
-    def __init__(self, split="train", index_path=INDEX, strict=True):
+    def __init__(self, split="train", index_path=None, strict=True, data_root=None):
+        self.data_root = data_root
+        if index_path is None:
+            index_path = (os.path.join(data_root, "mri_index.csv")
+                          if data_root else INDEX)
         if not os.path.exists(index_path):
             raise FileNotFoundError(
                 f"{index_path} not found -- run src/mri/m2_index.py first")
@@ -89,9 +93,34 @@ class ADNIVolumes(Dataset):
         """
         return self.df.label.value_counts().reindex(range(4), fill_value=0).to_dict()
 
+    def volume_path(self, r):
+        """Absolute path to a row's model-input volume.
+
+        Two resolution modes. With `data_root` set (Kaggle, or any relocated
+        copy of the preprocessed data) the path is rebuilt from PTID against
+        that root, because the index's `vol_path` is only meaningful relative
+        to the repo it was generated in. Without it, `vol_path` is used as
+        recorded -- but separators are normalised first: m2_index.py writes
+        native paths, so an index built on Windows carries backslashes, which
+        are ordinary filename characters on Linux and would not resolve.
+        """
+        if self.data_root:
+            base = os.path.join(self.data_root, "vol96", str(r.PTID))
+            # EXTENSION IS NOT ASSUMED. m1 writes .nii.gz, but a relocated copy
+            # may be decompressed -- Kaggle, for one, gunzips every member of an
+            # uploaded archive, so the same data arrives as plain .nii. nibabel
+            # reads either, so the only thing that breaks is a hardcoded suffix.
+            for ext in (".nii.gz", ".nii"):
+                p = base + ext
+                if os.path.exists(p):
+                    return p
+            return base + ".nii.gz"      # report the canonical name if absent
+        rel = str(r.vol_path).replace("\\", "/")
+        return os.path.join(ROOT, *rel.split("/"))
+
     def __getitem__(self, i):
         r = self.df.iloc[i]
-        path = os.path.join(ROOT, r.vol_path)
+        path = self.volume_path(r)
         vol = np.asarray(nib.load(path).dataobj, dtype=np.float32)
 
         if self.strict:
