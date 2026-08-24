@@ -1,0 +1,465 @@
+# ADNI MRI Training on Kaggle — Session 7 Handoff
+
+Continuation of `docs/context.txt` (original spec), `context2.txt` (audit +
+step0/1/2 rebuild), `context3.txt` (step3/4/5 + master runner), `context4.txt`
+(MRI acquisition), `context5.txt` (MRI preprocessing + model code) and
+`context6.txt` (full-cohort m1/m2 run). Read context6.txt first — this file
+only records session 7.
+
+Session 7 did **no work on the clinical pipeline**; it is untouched and still
+complete/verified per context3.txt.
+
+Headline: the **training loop now exists and runs end-to-end on Kaggle GPU**.
+Four full training runs completed. The model trains, does not crash, and is
+reproducible — but **it does not learn 4-class staging**. Accuracy sits at
+0.42–0.44 against a 0.38 majority-class floor across every configuration
+tried. The binary AD head is the only part that works (AUC ~0.83). Getting to
+a green run took **9 kernel versions**, and most of the failures were
+infrastructure, not modelling.
+
+---
+
+## 1. STATE AT START OF SESSION 7
+
+MRI pipeline preprocessed and indexed (811 subjects, 567/121/123). No training
+loop existed. torch was CPU-only. Nothing had ever been trained.
+
+---
+
+## 2. KAGGLE MCP — SETUP AND ITS LIMITS
+
+`claude mcp add kaggle -- npx mcp-remote https://www.kaggle.com/mcp \
+  --header "Authorization: Bearer <KGAT token>"`
+
+Node v20.19.5 / npx 10.8.2 already present. Stored in `~/.claude.json` under
+the project (local scope) — **never use `-s project`**, which writes `.mcp.json`
+into the repo and would commit the token.
+
+- First `claude mcp list` showed **timeout after 30000ms**. That was the cold
+  `npx` download of `mcp-remote` exceeding the health-check window, not a bad
+  token. Running `npx -y mcp-remote <url>` once by hand warms the cache and it
+  connects thereafter.
+- MCP tools only appear in a session **after restarting Claude Code**.
+
+### THE MCP IS READ-HEAVY. Key gaps found the hard way:
+
+    no create_dataset tool at all      -> must use REST /api/v1/datasets/create/new
+    upload_dataset_file               -> only mints a GCS URL + blob token
+    datasets.get scope DENIED          -> get_dataset_status/info/list_files all 403
+                                          (this cleared once the dataset finished
+                                           processing; it is state, not pure scope)
+
+The KGAT token **does authenticate against the plain REST API** (`/api/v1/...`),
+which is what made the workaround possible. Use MCP where it works, REST where
+it does not.
+
+---
+
+## 3. THE DATASET ON KAGGLE
+
+    l0affan/adni-mri-prep      PRIVATE      status: ready
+    uploaded 4,826,373,700 B (4.49 GiB), byte-exact, 9m25s @ 8.5 MB/s
+    1626 entries: 811 vol96 + 811 mni + mri_index.csv + 3 split RID CSVs
+
+Built as one store-only zip (`.nii.gz` is already compressed, so ZIP_STORED
+costs 13 s and adds 201 KB of headers instead of burning CPU for 0%).
+
+### TWO THINGS ABOUT THIS DATASET THAT WILL BITE AGAIN
+
+1. **Kaggle GUNZIPS every archive member.** The files arrive as `.nii`, not
+   `.nii.gz`, which is why `totalBytes` reads **26.3 GB** rather than 4.49 GiB.
+   `dataset.py` now resolves either extension.
+2. **`mni/` is ~23 GB of that 26 GB and training never reads it.** Only
+   `vol96/` is used (`dataset.py` loads `vol_path` only; `mni_path` sits in the
+   index unread). Including it was a mistake — it inflates the mount for no
+   benefit. **Re-upload without `mni/` if the dataset is ever rebuilt.**
+
+Verification of privacy: anonymous fetch of the dataset URL returns 404 across
+repeated probes, and it was confirmed manually in the UI.
+
+---
+
+## 4. WHAT WAS BUILT (committed)
+
+    src/mri/m3_train.py         new    trainer, dual-head
+    src/mri/m3_probe_batch.py   new    GPU batch-size probe
+    src/mri/dataset.py          mod    data_root + extension resolution
+    src/mri/model.py            mod    ARCHS presets + dropout wiring
+
+Commits, oldest first:
+
+    e772bdb  feat: add MRI training loop with measured hyperparameters
+    cae65f7  fix: resolve volume paths with either .nii or .nii.gz
+    f0f9440  Merge pull request #1 (branch -> master)
+    0d4b8df  revert: restore mri_raw acquisition provenance
+    8282644  feat: add augmentation, smaller backbones, stronger regularisation
+
+`feat/mri-training-loop` was merged and deleted (local + remote). Only `master`
+exists now.
+
+### m3_train.py
+
+AdamW, 3-epoch linear warmup into cosine decay, AMP on CUDA. `best.pt` on val
+improvement + `last.pt` every epoch (full optimizer/scaler/RNG state for
+`--resume`), weights-only `epoch_XXX.pt` snapshots. `epoch_log.csv`, 35
+columns, flushed per epoch.
+
+**THREE VALUES ARE MEASURED, NOT GUESSED** — this is the part worth preserving:
+
+- `--alz-pos-weight auto` computes train neg/pos at runtime (**463/104 =
+  4.451923**). Deliberately not hardcoded: the MRI stream holds no subject
+  counts anywhere, which is what let it scale 5 -> 811 without a code change.
+- `--lam-demo/--lam-alz auto` measure per-task **trunk gradient norms** on the
+  initialised model and equalise contribution.
+- `--batch-size auto` probes real peak GPU memory.
+
+### m3_probe_batch.py
+
+Probes candidate batch sizes with a **full training step including
+`optimizer.step()`** — AdamW allocates its moment buffers lazily (~265 MB at
+33M params), so probing forward+backward only under-reports peak memory and
+recommends a size that OOMs on the real run. Reports peak **reserved** (not
+allocated) memory, since later allocations fail against reserved blocks.
+Takes `--arch`; probing the wrong architecture measures the wrong footprint.
+
+---
+
+## 5. HARD-WON FACTS ABOUT LOSS BALANCING
+
+### The 2x DEMO skew that everyone assumes from loss magnitudes is wrong
+
+Reasoning from loss values (MSE ~1.24 vs BCE ~0.693) predicts DEMO carries ~2x
+the gradient. **Measured, the ratio is 1.85x at batch 8 and 2.06x at batch 32**,
+and `pos_weight` itself moves it a lot (2.58x -> 1.74x at batch 4), because
+weighting positives boosts the ALZ gradient. Measure after pos_weight is set.
+
+### Norm-of-the-mean, not mean-of-norms
+
+The first implementation averaged per-batch gradient norms and was measurably
+unstable — the estimate **rose monotonically** with sample size (18.5 -> 33.9
+-> 46.2 at 2/4/8 batches) instead of converging, because norms are not linear
+so averaging them estimates `E||g||` rather than `||E g||`. Accumulating scaled
+backward passes and taking one norm at the end converges properly. Also: at 2
+batches `pos_weight` had *zero* effect because those 8 subjects contained no AD
+case. Default is now 16 batches; the estimate still converges from above.
+
+### WHY LAMBDAS ARE FROZEN, NOT RUNNING-NORMALISED
+
+Running normalisation keeps the balance correct throughout training, which is
+better for optimisation, and was **rejected anyway**: it makes the objective
+non-stationary, so `val_loss` at epoch 40 is not comparable to epoch 5. Early
+stopping and best-checkpoint selection both compare val loss across epochs, so
+a moving normaliser silently corrupts the two mechanisms that decide which
+weights get kept.
+
+### THE FLAW THIS CREATED — READ BEFORE TRUSTING ANY best.pt FROM THIS SESSION
+
+**Balancing gradient norms does not balance loss magnitudes.** With
+lambda = 0.42/1.58 and BCE's larger absolute value, the monitored combined loss
+ends up **85–95% ALZ**. DEMO contributes as little as 5.3%.
+
+So early stopping and `best.pt` are chosen almost entirely by the binary head:
+
+    v8 combined-loss best   epoch 9
+    v8 val_mse best         epoch 16  (0.344)  -- never checkpointed
+    v8 val_alz_auc best     epoch 6   (0.808)  -- never checkpointed
+
+The saved model is optimal for neither head. This is the single most important
+unresolved defect in the training code.
+
+---
+
+## 6. THE KAGGLE KERNEL — 9 VERSIONS, AND WHY
+
+    kernel: l0affan/adni-mri-dual-head-training   (PRIVATE, kernelId 131752365)
+
+Pushed via REST `/api/v1/kernels/push` with `kernelExecutionType:
+SaveAndRunAll` (= committed background run). The four `.py` sources are
+embedded as **base64** and hash-verified on every build, so the kernel is
+self-contained and needs no second dataset.
+
+    v1-v3   CPU only. Root cause: account not phone-verified.
+    v4      GPU attached, but Kaggle gave a Tesla P100.
+    v5      P100 again; also hardcoded mount path.
+    v6      T4 (set via UI). Died on wrong mount path after 10 min.
+    v7      FIRST GREEN RUN. Baseline, resnet18.
+    v8      resnet18w + augmentation + dropout + wd.
+    v9      LR sweep 1e-4 / 5e-5 / 3e-5.
+
+### Failure 1 — GPU never provisioned (v1–v3)
+
+`enableGpu: true` was **stored correctly** (`machineShape: Gpu` confirmed via
+`/kernels/pull`) but no GPU appeared and `nvidia-smi` did not exist in the
+container. Two wrong diagnoses were made and discarded along the way: a missing
+`hasEnableGpu` presence flag, and a pinned CPU Docker image. Neither was it.
+
+**The actual cause was that the Kaggle account was not phone-verified.**
+Kaggle fails silently here: the setting saves, the session just runs CPU.
+`get_accelerator_quota` reporting 30 h available is **policy allowance, not
+entitlement** — it does not tell you whether GPUs will be provisioned.
+
+### Failure 2 — the P100 cannot run Kaggle's own torch (v4, v5)
+
+    gpu : Tesla P100-PCIE-16GB sm_60
+    torch 2.10.0+cu128 arch list: sm_70 sm_75 sm_80 sm_86 sm_90 sm_100 sm_120
+    CUDA KERNEL LAUNCH FAILED: cudaErrorNoKernelImageForDevice
+
+`torch.cuda.is_available()` returns **True** and then every kernel launch dies.
+**Verify CUDA by running a real tensor op, never by `is_available()`.**
+
+Fix: accelerator must be **GPU T4 x2** (sm_75). The API enum is
+**`machineShape: "NvidiaTeslaT4"`** — discovered from v6's metadata after the
+UI was used. Guessed values (`GpuT4x2`, `T4x2`, `GpuT4`) all silently normalise
+to `Gpu`, which is why the API looked incapable of selecting a card. It is not;
+the value just has to be exact.
+
+### Failure 3 — the mount path is not stable (v6)
+
+`FATAL: /kaggle/input/adni-mri-prep/vol96 still absent after 600 s` while
+`/kaggle/input` contained `['datasets']`. **The data was mounted the whole
+time, at a different path.** Kaggle has used both layouts for this same kernel:
+
+    /kaggle/input/adni-mri-prep/vol96                    (flat)
+    /kaggle/input/datasets/l0affan/adni-mri-prep/vol96   (nested)
+
+**Never hardcode the mount path.** The kernel now walks `/kaggle/input` for
+whatever directory contains `vol96/`.
+
+---
+
+## 7. THE KERNEL'S OWN STRUCTURE (worth keeping)
+
+Four phases, each failing fast with a diagnostic:
+
+    0  environment; real CUDA launch test; mount DISCOVERY with retry
+    1  batch-size probe on real hardware + volume-loading benchmark
+    2  calculated time estimate, and an epoch cap
+    3  training
+
+**The epoch cap exists because a Kaggle commit killed at the session limit can
+lose its `/kaggle/working` output entirely.** The run sizes itself to finish
+inside a 9.5 h budget rather than trusting it will fit.
+
+**The loading benchmark matters.** The probe uses synthetic tensors and
+measures compute only, but reading 688 volumes/epoch is the real bottleneck
+(v7: 9.7 s loading vs 5.2 s compute). Estimating from `sec/step` alone
+understates epoch time badly.
+
+### BUILD TOOLING — the template is a separate file for a reason
+
+`build_kernel.py` reads `kernel_template.py` (a normal, valid `.py`) and
+substitutes base64 sources. It was originally a giant string literal inside the
+generator, which required escaping every backslash **twice** — that
+double-escaping silently corrupted two builds, and one bad slice truncated the
+generator entirely. Keep the template as its own file; `py_compile` can then
+check it directly. Every build hash-verifies the round-trip.
+
+These live in the session scratchpad (not the repo): `kernel_template.py`,
+`build_kernel.py`, `push*.json`. **Regenerate them if needed — they are gone.**
+
+---
+
+## 8. RESULTS — FOUR COMPLETED RUNS
+
+Every run: 567/121/123 split, batch 32, patience 15, early stopping fired.
+
+### v7 baseline — resnet18, no augmentation, dropout 0, wd 1e-4, lr 1e-4
+
+    best val loss 1.9601 @ epoch 9 of 24
+    train_loss 1.79 -> 0.0141        val_loss 2.10 -> 9.3437
+    acc4 peak 0.421   macro-F1 peak 0.362   ALZ AUC peak 0.835
+    per-class F1 @ best: CN 0.380  EMCI 0.351  LMCI 0.140  AD 0.000
+
+**Total memorisation.** Train loss 0.014 while val loss climbed to 9.34.
+
+### v8 — resnet18w (8.3M) + augmentation + dropout 0.3 + wd 1e-2, lr 1e-4
+
+    best val loss 1.7528 @ epoch 9 of 24
+    train_loss 2.25 -> 0.7002        val_loss 2.15 -> 3.3586
+    acc4 peak 0.421   macro-F1 peak 0.344   ALZ AUC peak 0.808
+    per-class F1 @ best: CN 0.000  EMCI 0.517  LMCI 0.297  AD 0.083
+
+**Overfitting fixed, generalisation unchanged.** Train loss no longer collapses
+(0.70 vs 0.014) and best val loss improved ~11%, but `acc4` peak is *identical*
+at 0.421 and AUC got slightly worse. The per-class picture just rotated which
+class collapses to zero.
+
+### v9 — LR sweep, everything else pinned
+
+      lr  best_vloss  ep  fin_train  min_vmse  min_vbce   acc4    mF1    auc
+    1e-4      1.7568   6     0.8460    0.3390    0.9910  0.438  0.375  0.828
+    5e-5      1.6548   7     0.7453    0.3328    0.9414  0.438  0.365  0.842
+    3e-5      1.6612  15     0.6466    0.3350    0.9437  0.430  0.385  0.832
+
+**Lower LR fixes the instability but not the ceiling.** At 1e-4 val_loss spikes
+to 13.04; at 3e-5 nothing exceeds 2.4 across 30 epochs, and it trains far
+longer before early stopping. But `min_vmse` is 0.333–0.339 and `acc4` is
+0.430–0.438 across a 3.3x LR range — statistically indistinguishable on a
+121-subject val set, where one subject is 0.83 accuracy points.
+
+**5e-5 is the best pick** (lowest val loss, best AUC 0.842).
+
+### THE SEPARATED LOSS CURVES — the most diagnostic result of the session
+
+Logging `val_mse` and `val_bce` separately (v8) showed:
+
+    val_mse   0.751 -> 0.383 -> 0.344 (min @ ep16)   DEMO improves monotonically
+    val_bce   1.160 -> 1.009 -> 2.017 (min @ ep8)    ALZ overfits
+    train_bce 1.160 -> 0.361
+
+**DEMO is not starved of gradient — it is the healthier head.** It is ALZ that
+overfits, and every violent combined-loss spike is a BCE spike. The hypothesis
+that lambda drift was starving DEMO is **disproved**.
+
+---
+
+## 9. WHERE THIS ACTUALLY STANDS
+
+Four runs, spanning 4x capacity difference and a 3.3x LR range, all land at
+**acc4 0.42–0.44 and ALZ AUC 0.83**. The majority-class floor is 0.38 (EMCI,
+46/121). That reproducibility across very different settings points at the
+**data, not the optimiser**: 567 subjects for 4-class staging, where EMCI/LMCI
+is the hard boundary — the same boundary the clinical CatBoost failed worst on
+(LMCI F1 0.450, its weakest class).
+
+The one thing that consistently works is **ALZ AUC ~0.83**. The binary head
+learns real signal; the 4-class DEMO head does not.
+
+---
+
+## 10. WHAT IS NEXT — DECIDED BUT NOT BUILT
+
+The agreed next step is to **split the dual-head model into two fully
+independent pipelines**, abandoning the shared trunk:
+
+- Two separate models, each its own `ResNet3DTrunk` + single head.
+- DEMO: MSE only, checkpoint selected on DEMO's own val loss / MAE / macro-F1.
+- ALZ: BCE with `pos_weight`, checkpoint selected on ALZ's own val loss / AUC.
+- No shared trunk and **no lambda machinery at all** — not bypassed, absent.
+- Same split, checkpointing, per-model batch probing, per-model
+  `epoch_log.csv`.
+- Starting hyperparameters for both: resnet18w, augmentation on (flips off),
+  dropout 0.3, wd 1e-2, **lr 5e-5**.
+
+Agreed design decisions, not yet implemented:
+
+- **One script with `--task {demo,alz}`**, not two scripts. The infrastructure
+  is ~90% identical; two files would drift. Independence of *runs* is what
+  matters, not of source files.
+- **New file `m4_train.py`**, leaving `m3_train.py` untouched — a fresh file has
+  no lambda code to silently reactivate, and the v7/v8/v9 joint results stay
+  reproducible.
+
+**NOTHING OF THIS WAS WRITTEN.** No `m4_train.py`, no `augment.py`, no model
+changes. Working tree is clean at `8282644`. Verify before assuming.
+
+### FUSION IMPACT — flag for whoever builds the KAN
+
+Splitting the model **changes what feeds the fusion stage**. Instead of one
+model emitting `[DEMO, ALZ]` jointly, two independent checkpoints get loaded
+and their outputs concatenated. Things that assumed a joint model:
+
+- Inference must load **two** checkpoints, not one.
+- Grad-CAM has **two** `trunk.layer4` targets, one per model.
+- `DualHeadNet.forward(return_features=True)` returned a single shared 512-d
+  (or 256-d for resnet18w) vector. There are now **two separate feature
+  vectors** — if the KAN was to consume trunk features rather than the scalar
+  outputs, the shape changes.
+- `docs/SETUP.md` and context5/context6 describe a dual-head model.
+- `dataset.py` needs **no change** — it already returns `demo` and `alz`
+  targets in every batch; each trainer just uses one.
+
+---
+
+## 11. AUGMENTATION — WHAT IS DELIBERATELY EXCLUDED
+
+Implemented as train-split-only, applied inside `run_epoch` under `if train`,
+so val/test cannot receive it **by construction rather than by convention**.
+Batched affine + intensity jitter, on-device, fp32, outside autocast.
+
+Defaults: rot +-5 deg, trans +-2 voxels (~3.8 mm), brightness +-0.05,
+contrast +-0.05.
+
+**LEFT-RIGHT FLIP IS OFF BY DEFAULT AND SHOULD STAY OFF.** Medial-temporal
+atrophy in AD is asymmetric, typically left-lateralised in amnestic
+presentations, so hemisphere asymmetry is itself diagnostic; mirroring trains
+the model to ignore exactly that. The volumes are MNI-registered so a flip
+looks anatomically plausible — which is precisely what makes it a tempting
+mistake. Opt in via `--aug-flip-lr` only with a reason.
+
+**SCALING IS NOT OFFERED AT ALL.** Brain volume *is* the atrophy signal (it is
+why WholeBrain/Hippocampus/ICV are clinical features), so scale jitter would
+perturb the thing being measured.
+
+Rotation/translation are small because the data is already affine-registered to
+ICBM152 — they model residual registration error, not a re-registration.
+
+---
+
+## 12. BACKBONE VARIANTS
+
+    arch        params      vs resnet18
+    resnet18    33,161,026     1.0x      original; the baseline
+    resnet10    14,356,546     2.3x
+    resnet18w    8,298,402     4.0x      current choice
+    resnet10w    3,596,322     9.2x      never tried
+
+`ResNet3DTrunk` already parameterised widths and blocks, so these are
+configurations, not new architectures. **`DualHeadNet()` with no arguments is
+still exactly 33,161,026 parameters** — verified — so the baseline remains
+reproducible with:
+
+    --arch resnet18 --dropout 0.0 --weight-decay 1e-4 --no-aug
+
+---
+
+## 13. REPO STATE
+
+    master  8282644  (== origin/master, in sync, clean tree)
+    no other branches, local or remote
+
+Session 7 also restored 5 tracked ADNI acquisition-provenance files under
+`dataset/mri_raw/` that had been deleted as collateral when the 27 GB zip was
+cleared out of that directory. They are the audit trail for how 811 scans were
+selected from 6,209 IDA candidates — `select_scans.py`, `selected_scans.csv`
+(with `gap_to_clinical_baseline`), `selected_image_ids.txt`,
+`ida_search_results_baselineT1.csv`, `unpack_and_verify.py`. Restored in
+`0d4b8df`. **Do not let a directory cleanup take them again.**
+
+Note `dataset/mri_raw/_zips/` and the 27 GB zip are gone from disk. That is
+fine — unpack is done and verified.
+
+---
+
+## 14. STANDING GOTCHAS (session 7 additions)
+
+Everything in context2 §9, context3 §9, context4 §10, context5 §8 and
+context6 §10 still applies. New:
+
+- **Verify CUDA with a real tensor op.** `torch.cuda.is_available()` returns
+  True on a P100 that cannot execute a single kernel.
+- **Kaggle's P100 (sm_60) is incompatible with its own torch build.** Always
+  select **GPU T4 x2**; the API enum is exactly `NvidiaTeslaT4`.
+- **Kaggle GPU requires phone verification**, and fails silently to CPU
+  without it. Quota endpoints report allowance, not entitlement.
+- **Never hardcode `/kaggle/input/<slug>`.** Discover the directory containing
+  `vol96/`; Kaggle has used both flat and nested layouts for the same kernel.
+- **Kaggle gunzips archive members** — expect `.nii`, not `.nii.gz`.
+- **`kernels/output` returns nothing while a kernel is running.** The log only
+  materialises at terminal state. The Kaggle UI streams it live; the API does
+  not. Plan monitoring around that.
+- **`kernels/list` returns junk fields** — it reported `isPrivate: False` and
+  `currentVersionNumber: 0` for a kernel that is private and at version 6. Use
+  `/kernels/pull` for authoritative metadata.
+- **A Kaggle commit killed at the session limit can lose all output.** Size the
+  run to finish inside a budget.
+- **Probe batch size with a full optimizer step**, and with the architecture
+  you will actually train.
+- **Balancing gradient norms does not balance loss magnitudes** — see §5. Any
+  early stopping on a combined loss inherits this.
+- **Norms are not linear**: average the gradients, then take the norm; never
+  average per-batch norms.
+- **Do not embed a code template as a string literal inside its generator.**
+  Double-escaping corrupted two builds.
+- The 4-class labels remain final and verified twice over. Do not collapse
+  EMCI/LMCI.
