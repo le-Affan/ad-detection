@@ -106,12 +106,39 @@ class ResNet3DTrunk(nn.Module):
         return torch.flatten(self.pool(x), 1)
 
 
-class DualHeadNet(nn.Module):
-    """Trunk plus the DEMO regression head and the ALZ binary head."""
+# Backbone variants, smallest last. ResNet3DTrunk already parameterises widths
+# and block counts, so these are configurations rather than new architectures --
+# nothing about the trunk changes, and `resnet18` is bit-for-bit the original.
+#
+# The point of the smaller ones is sample efficiency: 33.2M parameters against
+# 567 training subjects memorised the train split outright (train loss 0.014
+# while val loss climbed to 9.34). Fewer parameters is the most direct lever.
+ARCHS = {
+    "resnet18":  {"widths": (64, 128, 256, 512), "blocks": (2, 2, 2, 2)},
+    "resnet10":  {"widths": (64, 128, 256, 512), "blocks": (1, 1, 1, 1)},
+    "resnet18w": {"widths": (32, 64, 128, 256),  "blocks": (2, 2, 2, 2)},
+    "resnet10w": {"widths": (32, 64, 128, 256),  "blocks": (1, 1, 1, 1)},
+}
 
-    def __init__(self, in_channels=1, dropout=0.0):
+
+class DualHeadNet(nn.Module):
+    """Trunk plus the DEMO regression head and the ALZ binary head.
+
+    `arch` selects a preset from ARCHS; `widths`/`blocks` override it directly.
+    The default is `resnet18`, so DualHeadNet() is unchanged from the original
+    33,161,026-parameter model and the baseline stays reproducible.
+    """
+
+    def __init__(self, in_channels=1, dropout=0.0, arch="resnet18",
+                 widths=None, blocks=None):
         super().__init__()
-        self.trunk = ResNet3DTrunk(in_channels)
+        if arch not in ARCHS:
+            raise ValueError(f"unknown arch {arch!r}; choose from {sorted(ARCHS)}")
+        cfg = ARCHS[arch]
+        self.arch = arch
+        self.trunk = ResNet3DTrunk(in_channels,
+                                   widths=widths or cfg["widths"],
+                                   blocks=blocks or cfg["blocks"])
         d = self.trunk.out_features
         self.drop = nn.Dropout(dropout) if dropout > 0 else nn.Identity()
         self.demo_head = nn.Linear(d, 1)

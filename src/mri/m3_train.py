@@ -11,9 +11,20 @@ path from PTID. Nothing here hardcodes a subject list or count, matching the
 rest of the MRI stream (and deliberately unlike preprocessing.py, which pins
 expected shapes to fail fast on a fixed cohort).
 
-NO AUGMENTATION. This is the clean baseline run by design. 567 training
-subjects against 33.2M parameters will overfit; that gap is the measurement,
-not a bug to paper over before it has been observed once.
+THE DEFAULTS NOW FIGHT OVERFITTING, BECAUSE THE BASELINE MEASURED IT.
+The first run (resnet18, no augmentation, dropout 0, wd 1e-4) memorised the
+train split outright: train loss 0.014 against val loss 9.34, best checkpoint
+at epoch 9 of 24, and AD F1 exactly 0.000 at that checkpoint. Three defaults
+changed in response -- a smaller backbone (`--arch resnet10`), dropout 0.3, and
+train-only augmentation -- plus weight decay raised from 1e-4 to AdamW's own
+reference 1e-2.
+
+THE BASELINE REMAINS EXACTLY REPRODUCIBLE:
+
+    --arch resnet18 --dropout 0.0 --weight-decay 1e-4 --no-aug
+
+`DualHeadNet()` with no arguments is still the original 33,161,026-parameter
+model, so nothing downstream of model.py changed meaning.
 
 THE TWO LOSSES ARE NOT ON A COMMON SCALE, AND THE LAMBDAS CORRECT FOR IT.
 The objective is `lam_demo * MSE(DEMO) + lam_alz * BCE(ALZ)`. Left at 1.0/1.0
@@ -81,7 +92,7 @@ from torch.utils.data import DataLoader
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from dataset import ADNIVolumes, DEMO_BY_LABEL  # noqa: E402
-from model import DualHeadNet, dual_head_loss    # noqa: E402
+from model import ARCHS, DualHeadNet, dual_head_loss  # noqa: E402
 
 CLASSES = ["CN", "EMCI", "LMCI", "AD"]
 # nearest-value targets for snapping DEMO back to a class; single-sourced
@@ -98,6 +109,82 @@ def set_seed(seed):
 def demo_to_label(demo):
     """Snap continuous DEMO predictions to the nearest class target."""
     return np.abs(np.asarray(demo)[:, None] - DEMO_VALUES[None, :]).argmin(1)
+
+
+def _rotation_matrices(angles):
+    """(B, 3) radians about x/y/z -> (B, 3, 3) composed rotation."""
+    ax, ay, az = angles[:, 0], angles[:, 1], angles[:, 2]
+    z, o = torch.zeros_like(ax), torch.ones_like(ax)
+    ca, sa = torch.cos(ax), torch.sin(ax)
+    cb, sb = torch.cos(ay), torch.sin(ay)
+    cg, sg = torch.cos(az), torch.sin(az)
+    rx = torch.stack([o, z, z, z, ca, -sa, z, sa, ca], 1).view(-1, 3, 3)
+    ry = torch.stack([cb, z, sb, z, o, z, -sb, z, cb], 1).view(-1, 3, 3)
+    rz = torch.stack([cg, -sg, z, sg, cg, z, z, z, o], 1).view(-1, 3, 3)
+    return rz @ ry @ rx
+
+
+def augment_batch(vol, rot_deg=0.0, trans_vox=0.0, brightness=0.0, contrast=0.0,
+                  flip_lr=False):
+    """Random affine + intensity jitter, per sample, on whatever device vol is on.
+
+    TRAIN SPLIT ONLY. This is called from run_epoch under `if train`, so val and
+    test cannot receive it by construction rather than by convention.
+
+    WHAT IS DELIBERATELY ABSENT, and why -- both would corrupt the label:
+
+      LEFT-RIGHT FLIP is opt-in (`flip_lr`) and off by default. Medial-temporal
+      atrophy in AD is asymmetric, typically left-lateralised in amnestic
+      presentations, so hemisphere asymmetry is itself diagnostic. Mirroring
+      teaches the model to be invariant to exactly that signal. The volumes are
+      MNI-registered so a flip looks anatomically plausible, which is precisely
+      what makes it a tempting mistake.
+
+      SCALING is not offered at all. Brain volume IS the atrophy signal -- it is
+      why WholeBrain/Hippocampus/ICV are features in the first place -- so scale
+      jitter would perturb the thing being measured.
+
+    Rotation and translation are kept small because these volumes are already
+    affine-registered to ICBM152. Augmentation is meant to model residual
+    registration error, not to undo the registration.
+
+    Background is exactly 0 by construction (m1 min-max normalises after the
+    clip fix), so grid_sample's zero padding is anatomically consistent -- newly
+    exposed corners look like background, not like a border artefact.
+    """
+    b = vol.size(0)
+    dev = vol.device
+
+    if flip_lr:
+        m = torch.rand(b, device=dev) < 0.5
+        if m.any():
+            vol = vol.clone()
+            vol[m] = torch.flip(vol[m], dims=[2])   # (B,C,X,Y,Z): X is L-R
+
+    if rot_deg > 0 or trans_vox > 0:
+        ang = (torch.rand(b, 3, device=dev) * 2 - 1) * math.radians(rot_deg)
+        rot = _rotation_matrices(ang)
+        # affine_grid works in normalised [-1, 1] coords, so a voxel offset is
+        # 2 * v / extent along each axis
+        extent = torch.tensor(vol.shape[2:], device=dev, dtype=vol.dtype)
+        tr = (torch.rand(b, 3, device=dev) * 2 - 1) * trans_vox
+        tr = 2.0 * tr / extent
+        theta = torch.cat([rot.to(vol.dtype), tr.unsqueeze(-1)], dim=2)
+        grid = torch.nn.functional.affine_grid(theta, list(vol.shape),
+                                               align_corners=False)
+        vol = torch.nn.functional.grid_sample(vol, grid, mode="bilinear",
+                                              padding_mode="zeros",
+                                              align_corners=False)
+
+    if contrast > 0:
+        c = 1 + (torch.rand(b, 1, 1, 1, 1, device=dev) * 2 - 1) * contrast
+        mean = vol.mean(dim=(1, 2, 3, 4), keepdim=True)
+        vol = (vol - mean) * c + mean
+    if brightness > 0:
+        vol = vol + (torch.rand(b, 1, 1, 1, 1, device=dev) * 2 - 1) * brightness
+    if contrast > 0 or brightness > 0:
+        vol = vol.clamp_(0.0, 1.0)   # dataset guarantees [0,1]; keep it true
+    return vol
 
 
 def compute_metrics(demo_pred, alz_logit, labels):
@@ -136,8 +223,12 @@ def compute_metrics(demo_pred, alz_logit, labels):
 
 
 def run_epoch(model, loader, device, lam_demo, lam_alz, pos_weight,
-              optimizer=None, scaler=None, amp=False):
-    """One pass. Training when `optimizer` is given, evaluation otherwise."""
+              optimizer=None, scaler=None, amp=False, aug=None):
+    """One pass. Training when `optimizer` is given, evaluation otherwise.
+
+    `aug` is a kwargs dict for augment_batch and is applied only when training,
+    so val/test are structurally incapable of receiving augmentation.
+    """
     train = optimizer is not None
     model.train(train)
     tot = tot_mse = tot_bce = 0.0
@@ -150,6 +241,11 @@ def run_epoch(model, loader, device, lam_demo, lam_alz, pos_weight,
         tgt = {"demo": batch["demo"].to(device, non_blocking=True),
                "alz": batch["alz"].to(device, non_blocking=True)}
         bs = vol.size(0)
+        if train and aug:
+            # fp32, outside autocast: grid_sample and the intensity ops are
+            # cheap here and stay exact
+            with torch.no_grad():
+                vol = augment_batch(vol, **aug)
 
         with torch.set_grad_enabled(train):
             with torch.amp.autocast("cuda", enabled=amp):
@@ -296,8 +392,27 @@ def main():
     ap.add_argument("--probe-safety", type=float, default=0.85,
                     help="max fraction of VRAM the auto batch size may reserve")
     ap.add_argument("--lr", type=float, default=1e-4)
-    ap.add_argument("--weight-decay", type=float, default=1e-4)
+    # 1e-2 is AdamW's own reference default; the 1e-4 used for the baseline was
+    # borrowed from Adam-with-L2 habits and is weak for decoupled weight decay.
+    # Raised deliberately after the baseline memorised the train split.
+    ap.add_argument("--weight-decay", type=float, default=1e-2)
     ap.add_argument("--warmup-epochs", type=int, default=3)
+    ap.add_argument("--arch", default="resnet10", choices=sorted(ARCHS),
+                    help="backbone size; resnet18 is the original baseline")
+    ap.add_argument("--dropout", type=float, default=0.3,
+                    help="on the pooled feature vector, before both heads")
+    # --- augmentation (train split only) ---
+    ap.add_argument("--no-aug", action="store_true",
+                    help="disable all augmentation (baseline behaviour)")
+    ap.add_argument("--aug-rot-deg", type=float, default=5.0,
+                    help="max rotation per axis; small because data is registered")
+    ap.add_argument("--aug-trans-vox", type=float, default=2.0,
+                    help="max translation in voxels (~1.9 mm each at 96^3)")
+    ap.add_argument("--aug-brightness", type=float, default=0.05)
+    ap.add_argument("--aug-contrast", type=float, default=0.05)
+    ap.add_argument("--aug-flip-lr", action="store_true",
+                    help="OFF by default on purpose: AD atrophy is asymmetric, "
+                         "so mirroring destroys lateralised signal")
     ap.add_argument("--lam-demo", type=float, default=None,
                     help="omit for gradient-balanced auto; give both to pin manually")
     ap.add_argument("--lam-alz", type=float, default=None)
@@ -386,9 +501,16 @@ def main():
                              persistent_workers=args.num_workers > 0)
                for s in sets}
 
-    model = DualHeadNet().to(device)
+    model = DualHeadNet(arch=args.arch, dropout=args.dropout).to(device)
     n_par = sum(p.numel() for p in model.parameters())
-    print("params      : {:,}".format(n_par))
+    _base = 33161026
+    print("arch        : {}  ({:,} params{})".format(
+        args.arch, n_par,
+        "" if args.arch == "resnet18"
+        else ", {:.1f}x smaller than resnet18".format(_base / n_par)))
+    print("dropout     : {}".format(args.dropout))
+    print("weight decay: {}".format(args.weight_decay))
+    n_par = n_par
 
     # --- loss weights: measured gradient balance, then frozen ----------------
     grad_norms = None
@@ -413,6 +535,18 @@ def main():
     print("loss        : {:.4f} * MSE(DEMO) + {:.4f} * BCE(ALZ, pos_weight={})".format(
         args.lam_demo, args.lam_alz,
         "off" if pw is None else "{:.4f}".format(pw)))
+
+    aug = None if args.no_aug else {
+        "rot_deg": args.aug_rot_deg, "trans_vox": args.aug_trans_vox,
+        "brightness": args.aug_brightness, "contrast": args.aug_contrast,
+        "flip_lr": args.aug_flip_lr}
+    if aug is None:
+        print("augment     : OFF (baseline)")
+    else:
+        print("augment     : rot +-{}deg  trans +-{}vox  bright +-{}  "
+              "contrast +-{}  flip_lr {}  [TRAIN SPLIT ONLY]".format(
+                  args.aug_rot_deg, args.aug_trans_vox, args.aug_brightness,
+                  args.aug_contrast, args.aug_flip_lr))
 
     opt = torch.optim.AdamW(model.parameters(), lr=args.lr,
                             weight_decay=args.weight_decay)
@@ -470,7 +604,7 @@ def main():
 
     with open(os.path.join(args.out_dir, "train_config.json"), "w") as f:
         json.dump({**vars(args), "device": str(device), "amp": amp,
-                   "params": n_par, "train_counts": counts,
+                   "params": n_par, "train_counts": counts, "augment": aug,
                    "grad_balance": grad_norms}, f, indent=2)
 
     print("\n{:>3} {:>8} {:>8} {:>8} {:>6} {:>6} {:>6} {:>6} {:>6}".format(
@@ -478,7 +612,8 @@ def main():
     for epoch in range(start_epoch, args.epochs):
         t0 = time.time()
         tr = run_epoch(model, loaders["train"], device, args.lam_demo,
-                       args.lam_alz, pw, optimizer=opt, scaler=scaler, amp=amp)
+                       args.lam_alz, pw, optimizer=opt, scaler=scaler,
+                       amp=amp, aug=aug)
         t1 = time.time()
         va = run_epoch(model, loaders["val"], device, args.lam_demo,
                        args.lam_alz, pw, amp=amp)

@@ -33,23 +33,29 @@ import sys
 import torch
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from model import DualHeadNet, dual_head_loss  # noqa: E402
+from model import ARCHS, DualHeadNet, dual_head_loss  # noqa: E402
 
 SHAPE = (96, 96, 96)
 
 
-def probe_one(bs, device, amp, shape=SHAPE, steps=2):
+def probe_one(bs, device, amp, shape=SHAPE, steps=2, arch="resnet18",
+              dropout=0.0):
     """Run `steps` full training steps at batch size `bs`; return peak memory.
 
     Returns (ok, reserved_bytes, allocated_bytes, sec_per_step, err).
     Two steps, because step 1 allocates the AdamW state and step 2 is what a
     steady-state iteration actually costs.
+
+    `arch` MUST match the architecture being trained. Probing the default
+    resnet18 (33.2M) while training resnet18w (8.3M) measures roughly 4x the
+    real parameter and optimizer footprint and picks a needlessly small
+    batch.
     """
     torch.cuda.empty_cache()
     torch.cuda.reset_peak_memory_stats()
     model = opt = None
     try:
-        model = DualHeadNet().to(device)
+        model = DualHeadNet(arch=arch, dropout=dropout).to(device)
         opt = torch.optim.AdamW(model.parameters(), lr=1e-4)
         scaler = torch.amp.GradScaler("cuda", enabled=amp)
         x = torch.randn(bs, 1, *shape, device=device)
@@ -96,6 +102,8 @@ def main():
     ap.add_argument("--no-amp", action="store_true")
     ap.add_argument("--train-subjects", type=int, default=567,
                     help="only used to estimate epoch time")
+    ap.add_argument("--arch", default="resnet18", choices=sorted(ARCHS),
+                    help="must match what will actually be trained")
     args = ap.parse_args()
 
     if not torch.cuda.is_available():
@@ -107,6 +115,7 @@ def main():
     amp = not args.no_amp
     total = torch.cuda.get_device_properties(0).total_memory
     print("gpu    : {}".format(torch.cuda.get_device_name(0)))
+    print("arch   : {}".format(args.arch))
     print("vram   : {:.2f} GiB".format(total / 2**30))
     print("amp    : {}".format(amp))
     print("budget : {:.2f} GiB ({:.0%} of total)\n".format(
@@ -116,7 +125,7 @@ def main():
         "batch", "reserved", "allocated", "% total", "sec/step", "verdict"))
     best = None
     for bs in [int(s) for s in args.sizes.split(",") if s.strip()]:
-        ok, res, alloc, sec, err = probe_one(bs, device, amp)
+        ok, res, alloc, sec, err = probe_one(bs, device, amp, arch=args.arch)
         if not ok:
             print("{:>6} {:>12} {:>12} {:>9} {:>10} {:>9}".format(
                 bs, "-", "-", "-", "-", err))
