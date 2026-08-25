@@ -1,8 +1,10 @@
 # Setting up on a new machine
 
-Written for the case that actually matters right now: a machine that has the
-**MRI dataset and nothing else**. It clones this repo, drops one zip in one
-place, and runs the MRI pipeline end to end.
+A clone gives you the **entire clinical stream** — raw ADNI tables, every
+intermediate, the trained model — so `preprocessing.py` runs end to end on a
+fresh machine with nothing else installed. The MRI stream is the one that still
+needs an out-of-band transfer: it clones this repo, drops one zip in one place,
+and runs from there.
 
 ---
 
@@ -17,16 +19,19 @@ Tracked, so you get it from the clone:
     dataset/mri_manifest/         mri_manifest.csv - 814 subjects, PTID/RID/label
     dataset/mri_raw/*.py          unpack + scan-selection scripts
     dataset/mri_raw/selected_scans.csv     the 811-scan selection, full provenance
-    dataset/processed/*_rids.csv  the train/val/test split - see note below
     docs/                         spec and session handoffs
 
-NOT tracked (too large, or DUA-restricted subject data):
+    dataset/raw/                  752 MB of raw ADNI tables (~115 MB packed)
+    dataset/processed/            every clinical intermediate, step0 -> step4
+    dataset/processed/*_rids.csv  the train/val/test split - see note below
+    models/                       trained CatBoost model, metrics, SHAP artefacts
+    catboost_info/                training curves from the step5 run
 
-    dataset/raw/                  752 MB of raw ADNI tables    <- clinical only
-    dataset/processed/step*.csv   clinical intermediates
+NOT tracked (too large for git - transfer these out of band):
+
     dataset/mri_raw/<PTID>/       extracted NIfTI, ~34 GB
     dataset/mri_prep/             preprocessed volumes, ~4.6 GB
-    models/                       trained models
+    dataset/*.tar                 outbound MRI bundles
 
 **The split files are tracked on purpose.** `dataset/processed/{train,val,test}_rids.csv`
 are 4 KB total and are the one clinical artefact the MRI stream cannot work
@@ -36,10 +41,14 @@ assignment or the fusion model leaks across splits. Everything else in
 `dataset/processed/` is rebuildable from `dataset/raw/`, which this machine
 will not have.
 
-**What you cannot do on an MRI-only machine:** rerun the clinical pipeline
-(`preprocessing.py`, steps 0–5). It needs `dataset/raw/`. You do not need it
-for MRI preprocessing or MRI training. You *will* need clinical outputs later
-for fusion — see the last section.
+**The clinical pipeline needs nothing but the clone.** `dataset/raw/` is
+tracked, so `python preprocessing.py` reruns steps 0–5 on any machine with
+`requirements.txt` installed. The step0–step4 outputs and the trained model are
+tracked too, so you can also just read them without rerunning anything.
+
+**This repo is private and must stay private.** `dataset/raw/` and the
+`dataset/processed/` intermediates are DUA-restricted ADNI subject data. Do not
+make the remote public and do not fork it anywhere public.
 
 ---
 

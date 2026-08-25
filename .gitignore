@@ -5,40 +5,36 @@ __pycache__/
 .venv312/
 .ipynb_checkpoints/
 
-# RULE FOR THIS FILE: ignore DATA, never CODE.
-# Source lives in src/ and is always tracked. Where an ignore rule covers a
-# directory that could ever hold a .py, the rule is written as `dir/*` with an
-# explicit `!dir/*.py` so git can still descend and see the source. A bare
-# `dir/` stops git descending at all, which would swallow code silently.
+# RULE FOR THIS FILE: ignore only what is too big for git or forbidden to
+# leave this machine. Where an ignore rule covers a directory that could ever
+# hold a .py, the rule is written as `dir/*` with an explicit `!dir/*.py` so
+# git can still descend and see the source. A bare `dir/` stops git descending
+# at all, which would swallow code silently.
+#
+# THE CLINICAL STREAM IS FULLY TRACKED. dataset/raw/ (752 MB of ADNI tables,
+# ~115 MB packed), dataset/processed/, models/ and catboost_info/ are all in
+# the repo so the whole clinical pipeline -- inputs, intermediates, trained
+# CatBoost model, SHAP artefacts, training curves -- reproduces from a clone
+# alone, with no ADNI re-download. This repo is PRIVATE and must stay private:
+# dataset/raw/ is DUA-restricted subject data.
 
-# Pipeline inputs/outputs -- regenerate with preprocessing.py
-dataset/raw/
-dataset/processed/*
-models/
-catboost_info/
+# CatBoost scratch dir. Everything else under catboost_info/ (the loss curves
+# and tfevents) is tracked; only the empty scratch area is not.
+catboost_info/tmp/
 
-# EXCEPTION: the train/val/test split. These three files are 4 KB total and
-# are the ONE clinical artefact the MRI stream cannot do without -- m2_index.py
-# reads them to assign each scan a split, and both streams must use the same
-# assignment or fusion leaks across splits. Everything else in dataset/processed/
-# is rebuildable from dataset/raw/, but dataset/raw/ is 752 MB of ADNI tables
-# that a machine set up only for the MRI work will not have. Tracking them makes
-# the repo clonable onto an MRI-only machine.
-!dataset/processed/train_rids.csv
-!dataset/processed/val_rids.csv
-!dataset/processed/test_rids.csv
+# --- MRI stream: too big for git, transfer out of band ---
 
-# Preprocessed MRI volumes: ~1.8 GB now, ~4.6 GB at the full cohort, and
+# Preprocessed MRI volumes: ~30 MB now but ~4.6 GB at the full cohort, and
 # DUA-restricted subject data. Written as `*` rather than `mri_prep/` so that
 # any helper script dropped in here stays visible to git.
 dataset/mri_prep/*
 !dataset/mri_prep/*.py
 
 # MRI download area.
-# Deny by default: this directory fills with ~27 GB of zips and, after
-# unpacking, one NIfTI per subject in dataset/mri_raw/<PTID>/. Only the
-# small provenance artefacts below are worth tracking, so new files are
-# ignored unless explicitly allowed.
+# Deny by default: this directory holds ~27 GB of zips and, after unpacking,
+# one NIfTI per subject in dataset/mri_raw/<PTID>/. Only the small provenance
+# artefacts below are worth tracking, so new files are ignored unless
+# explicitly allowed.
 dataset/mri_raw/*
 !dataset/mri_raw/*.py
 !dataset/mri_raw/selected_scans.csv

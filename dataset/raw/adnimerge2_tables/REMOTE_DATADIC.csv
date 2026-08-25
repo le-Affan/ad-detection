@@ -1,0 +1,322 @@
+"PHASE","CRFNAME","TBLNAME","FLDNAME","TEXT","TYPE","LENGTH","CODE","UNITS","STATUS","CODE_CHANGES","MAPPING_NOTES"
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","ADNIOnlineID","Participant Identifier for the Remote Cohort","T","16",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","PTID","Participant Identifier for the in-clinic ADNI study (if applicable)","T","20",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_CONCERN","Are you concerned that you have a memory or other thinking problem?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt1","Remembering where you have placed personal items or objects","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt10","Managing bill payments","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt11","Doing two things at once","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt12","Working on a particular task while talking to someone at the same time","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt2","Remembering the current date or day of the week","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt3","Communicating or expressing ideas in a conversation","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt4","Understanding spoken directions or instructions","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt5","Difficulty calculating distances when driving or driving too close to another vehicle","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt6","Finding your way around a familiar home","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt7","Anticipating weather changes and planning accordingly","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt8","Planning a trip, vacation, or outing","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt9","Keeping living and work space (such as a home office, garage, or pantry) organized","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_ecogpt_Duration","Amount of time elapsed between beginning and completing the assessment (seconds)","N",NA,NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_MEMREF","Compared to one year ago, do you feel that your memory has declined substantially?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_PHASE","Phase of the study in which this observation was collected","T","5",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_StatusDate","Date of completion","D",NA,NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Participant-Report Version","RMT_ECOG12PT","RMT_Timepoint","Timepoint of observation","S","10",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","ADNIOnlineID","Participant Identifier for the Remote Cohort","T","16",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","PTID","Participant Identifier for the in-clinic ADNI study (if applicable)","T","20",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp1","Remembering where they have placed personal items or objects","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp10","Managing bill payments","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp11","Doing two things at once","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp12","Working on a particular task while talking to someone at the same time","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp2","Remembering the current date or day of the week","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp3","Communicating or expressing ideas in a conversation","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp4","Understanding spoken directions or instructions","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp5","Difficulty calculating distances when driving or driving too close to another vehicle","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp6","Finding their way around a familiar home","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp7","Anticipating weather changes and planning accordingly","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp8","Planning a trip, vacation, or outing","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp9","Keeping a living and work space (such as a home office, garage, or pantry) organized","N",NA,"1=Better or no change; 2=Questionable / Occasionally worse; 3=Consistently a little worse; 4=Consistently much worse; 9=Don't know / Not applicable",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_ecogsp_Duration","Amount of time elapsed between beginning and completing the assessment (seconds)","N",NA,NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_PHASE","Phase of the study in which this observation was collected","T","5",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_SP_CONCERN","Are you concerned that they have a memory or other thinking problem?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_SP_MEMREF","Compared to one year ago, do you feel that their memory has declined substantially?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_StatusDate","Date of completion","D",NA,NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered Assessment of Everyday Cognition (Ecog) Questionnaire – Informant-Report Version","RMT_ECOG12SP","RMT_Timepoint","Timepoint of observation","S","10",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","ADNIOnlineID","Participant Identifier for the Remote Cohort","T","16",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Age_Baseline","The participant's de-identified age at their baseline date in this dataset. Ages 90 and above are represented simply as 90.","N","10",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Gender","Gender of the participant","N","10","0=Male; 1=Female; 2=Other; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","LatinoEthnicity","Do you consider yourself Hispanic/Latino or not Hispanic/Latino? Check all that apply.","N","10","0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Latino_CB","Did the participant select Cuban","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Latino_MX","Did the participant select Mexican, Mexican American, Chicano/a","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Latino_Other","Did the participant select another Hispanic, Latino/a, or Spanish origin","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Latino_PR","Did the participant select Puerto Rican","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","PTID","Participant Identifier for the in-clinic ADNI study (if applicable)","T","20",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Race_AfricanAmerican","Did the participant select African American","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Race_AmerIndian","Did the participant select American Indian or Alaska Native","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Race_Asian","Did the participant select Asian","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Race_PacificIslander","Did the participant select Pacific Islander","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Race_PreferNotSay","Did the participant select Prefer Not to Say?","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Race_Unknown","Did the participant select Unknown?","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","Race_White","Did the participant select White","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","RMT_ADI_NATRANK_v2021","National percentile of block group ADI score","N","10",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","RMT_ADI_STATERANK_v2021","State-specific decile of block group ADI score","N","10",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","RMT_Education","Participant Years of Education","N",NA,"99=Prefer Not to Say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","RMT_PHASE","Phase of the study in which this observation was collected","T","5",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","RMT_StatusDate","Date of completion","D",NA,NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered participant demographics questionnaire","RMT_PTDEMOG","RMT_Timepoint","Timepoint of observation","S","10",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","ADNIOnlineID","Participant Identifier for the Remote Cohort","T","16",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","PTID","Participant Identifier for the in-clinic ADNI study (if applicable)","T","20",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","Referral_BLD","Has this participant been referred to the remote blood cohort?","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","Referral_CLIN","Has this participant been referred to the in-clinic ADNI study?","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_AD_Dx","Have you been diagnosed with Alzheimer's Disease (AD) by a healthcare provider?","N",NA,"0=No; 1=Yes; 2=I don't know; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_AlchlDrug","In the past two years, have you been diagnosed by a healthcare provider as having alcohol use disorder or drug use disorder?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_BLDwill","Are you willing to have a blood draw at a nearby local clinic (Quest Diagnostics Patient Service Center) at no cost to you?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_BrainCndtn","Have you ever been diagnosed with any of the following conditions: Parkinson's disease, Huntington's disease, a brain tumor, a seizure disorder, or multiple sclerosis?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_CImed","Have you ever been prescribed a medication for cognitive impairment or memory problems by a healthcare provider?","N",NA,"0=No; 1=Yes; 2=I don't know; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_Clausphba","Do you experience claustrophobia (fear of confined spaces) that would prevent you from completing a MRI or PET scan (pictures of your brain)?","N",NA,"0=No; 1=Yes; 2=I don't know; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_DEM_Dx","Have you been diagnosed with dementia by a healthcare provider?","N",NA,"0=No; 1=Yes; 2=I don't know; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_Device","Do you have a computer, smartphone, or tablet device (such as an iPad, Chromebook, etc.)?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_FamAD","Have any of your biological parents, full sibling(s), or biological children ever been diagnosed with Alzheimer's Disease or dementia by a healthcare provider?","N",NA,"0=No; 1=Yes; 2=I don't know; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_MCI_Dx","Have you been diagnosed with Mild Cognitive Impairment (MCI) or a memory problem by a healthcare provider?","N",NA,"0=No; 1=Yes; 2=I don't know; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_MemStudy","Are you willing to participate in a 5-year study that includes memory and thinking tests?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_Metal","Do you have a pacemaker, an implanted medical device (such as aneurysm clips, artificial heart valve, IUD, etc.), metal fragments (for example, due to military service or metal working), or other foreign object(s) in your body?Note: if the foreign object is an artificial knee or hip replacement, please answer no","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_Metal_other","Do you have any other metal in your body (such as pacemaker, aneurysm clips, metal fragments, etc.)?","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_Metal_rplc","Is the metal in your body an artificial knee or hip replacement?","N",NA,"0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_MntlHlth","In the past year, have you been diagnosed with any of the following conditions: schizophrenia, bipolar disorder, or major depression?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_MRIPET","Are you willing to participate in a 5-year study that includes MRI and PET scans (pictures of your brain, at no cost to you)?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_NursHm","Do you reside in a skilled nursing facility?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_PHASE","Phase of the study in which this observation was collected","T","5",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_StatusDate","Date of completion","D",NA,NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_Timepoint","Timepoint of observation","S","10",NA,NA,NA,NA,NA
+"ADNI4","[DIG] Remotely administered screening questionnaire","RMT_Screening","RMT_Web","Do you regularly have access to the internet?","N",NA,"0=No; 1=Yes; 3=Prefer not to say",NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","ADNIOnlineID","Participant Identifier for the Remote Cohort","T","16",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","EXAMDATE","Date of examination","D",NA,NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","PTID","Participant Identifier for the in-clinic ADNI study (if applicable)","T","20",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","QC_ATTEMPTS","Number of attempts at the quality control task","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","QC_PASSED","Whether the quality control task was passed","N","1","0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","RMT_PHASE","Phase of the study in which this observation was collected","T","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","RMT_Timepoint","Timepoint of observation","T","10",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","SCREENER_RECOMMEND","Overall recommendation for the screener","N","1","0=No; 1=Yes",NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","SCREENER_SCORE","Overall G-match score for the screener","N","20",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_AMPLITUDE_SD","Standard deviation of the amplitude for story 1 delayed recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_APQ11_SHIMMER","Shimmer (APQ11) for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_APQ3_SHIMMER","Shimmer (APQ3) for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_APQ5_SHIMMER","Shimmer (APQ5) for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_ARTICULATION_RATE","Articulation rate for story 1 delayed recall","N","2",NA,"/second",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_AUDIO_LENGTH","Participant audio length for story 1 delayed recall","N","4",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_DDP_JITTER","Jitter (DDP) for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_F0_MEAN","Formant F0 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_F0_SD","Formant F0 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_FORMANTS_1_MEAN","Formant F1 mean for story 1 delayed recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_FORMANTS_1_SD","Formant F1 standard deviation for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_FORMANTS_2_MEAN","Formant F2 mean for story 1 delayed recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_FORMANTS_2_SD","Formant F2 standard deviation for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_FORMANTS_3_MEAN","Formant F3 mean for story 1 delayed recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_FORMANTS_3_SD","Formant F3 standard deviation for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_FORMANTS_4_MEAN","Formant F4 mean for story 1 delayed recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_FORMANTS_4_SD","Formant F4 standard deviation for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_GMATCH","G-match score (source text vs transcript) for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_GMATCH_IMM_DEL","G-match score (immediate transcript vs delayed transcript) for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_IDEA_DENSITY","Idea density for story 1 delayed recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_INTENSITY_MEAN","Intensity mean for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_INTENSITY_SD","Intensity standard deviation for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_LANGUAGE","Language for story 1 delayed recall","T","35",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_LOCAL_ABS_JITTER","Jitter (local, absolute) for story 1 delayed recall","N","2",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_LOCAL_DB_SHIMMER","Shimmer (local, dB) for story 1 delayed recall","N","2",NA,"dB",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_LOCAL_JITTER","Jitter (local) for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_LOCAL_SHIMMER","Shimmer (local) for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MEAN_LETTER_PER_WORD","Mean number of letters per word for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MEAN_PAUSE_LENGTH","Mean length of pauses for story 1 delayed recall","N","2",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_10_MEAN","MFCC 10 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_10_SD","MFCC 10 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_11_MEAN","MFCC 11 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_11_SD","MFCC 11 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_12_MEAN","MFCC 12 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_12_SD","MFCC 12 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_13_MEAN","MFCC 13 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_13_SD","MFCC 13 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_1_MEAN","MFCC 1 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_1_SD","MFCC 1 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_2_MEAN","MFCC 2 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_2_SD","MFCC 2 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_3_MEAN","MFCC 3 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_3_SD","MFCC 3 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_4_MEAN","MFCC 4 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_4_SD","MFCC 4 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_5_MEAN","MFCC 5 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_5_SD","MFCC 5 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_6_MEAN","MFCC 6 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_6_SD","MFCC 6 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_7_MEAN","MFCC 7 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_7_SD","MFCC 7 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_8_MEAN","MFCC 8 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_8_SD","MFCC 8 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_9_MEAN","MFCC 9 mean for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_MFCC_9_SD","MFCC 9 standard deviation for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_NONSPEECH_PROPORTION","Non-speech proportion of time for story 1 delayed recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_NUM_ADJECTIVES","Number of adjectives for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_NUM_ADVERBS","Number of adverbs for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_NUM_NOUNS","Number of nouns for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_NUM_PAUSES","Number of pauses for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_NUM_PRONOUNS","Number of pronouns for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_NUM_PROPER_NOUNS","Number of proper nouns for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_NUM_VERBS","Number of verbs for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_NUM_WORDS","Number of words for story 1 delayed recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_PLAYBACK_COUNT","Audio stimulus playback count for story 1 delayed recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_PPQ5_JITTER","Jitter (PPQ5) for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_RAP_JITTER","Jitter (rap) for story 1 delayed recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_SPEECH_DURATION","Speech duration for story 1 delayed recall","N","4",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_SPEECH_RATE","Speech rate for story 1 delayed recall","N","2",NA,"/second",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1DEL_UNIQUE_WORDS_RATIO","Unique words ratio for story 1 delayed recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_AMPLITUDE_SD","Standard deviation of the amplitude for story 1 immediate recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_APQ11_SHIMMER","Shimmer (APQ11) for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_APQ3_SHIMMER","Shimmer (APQ3) for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_APQ5_SHIMMER","Shimmer (APQ5) for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_ARTICULATION_RATE","Articulation rate for story 1 immediate recall","N","2",NA,"/second",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_AUDIO_LENGTH","Participant audio length for story 1 immediate recall","N","4",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_DDP_JITTER","Jitter (DDP) for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_F0_MEAN","Formant F0 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_F0_SD","Formant F0 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_FORMANTS_1_MEAN","Formant F1 mean for story 1 immediate recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_FORMANTS_1_SD","Formant F1 standard deviation for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_FORMANTS_2_MEAN","Formant F2 mean for story 1 immediate recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_FORMANTS_2_SD","Formant F2 standard deviation for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_FORMANTS_3_MEAN","Formant F3 mean for story 1 immediate recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_FORMANTS_3_SD","Formant F3 standard deviation for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_FORMANTS_4_MEAN","Formant F4 mean for story 1 immediate recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_FORMANTS_4_SD","Formant F4 standard deviation for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_GMATCH","G-match score (source text vs transcript) for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_IDEA_DENSITY","Idea density for story 1 immediate recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_INTENSITY_MEAN","Intensity mean for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_INTENSITY_SD","Intensity standard deviation for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_LANGUAGE","Language for story 1 immediate recall","T","35",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_LOCAL_ABS_JITTER","Jitter (local, absolute) for story 1 immediate recall","N","2",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_LOCAL_DB_SHIMMER","Shimmer (local, dB) for story 1 immediate recall","N","2",NA,"dB",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_LOCAL_JITTER","Jitter (local) for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_LOCAL_SHIMMER","Shimmer (local) for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MEAN_LETTER_PER_WORD","Mean number of letters per word for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MEAN_PAUSE_LENGTH","Mean length of pauses for story 1 immediate recall","N","2",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_10_MEAN","MFCC 10 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_10_SD","MFCC 10 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_11_MEAN","MFCC 11 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_11_SD","MFCC 11 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_12_MEAN","MFCC 12 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_12_SD","MFCC 12 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_13_MEAN","MFCC 13 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_13_SD","MFCC 13 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_1_MEAN","MFCC 1 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_1_SD","MFCC 1 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_2_MEAN","MFCC 2 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_2_SD","MFCC 2 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_3_MEAN","MFCC 3 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_3_SD","MFCC 3 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_4_MEAN","MFCC 4 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_4_SD","MFCC 4 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_5_MEAN","MFCC 5 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_5_SD","MFCC 5 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_6_MEAN","MFCC 6 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_6_SD","MFCC 6 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_7_MEAN","MFCC 7 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_7_SD","MFCC 7 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_8_MEAN","MFCC 8 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_8_SD","MFCC 8 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_9_MEAN","MFCC 9 mean for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_MFCC_9_SD","MFCC 9 standard deviation for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_NONSPEECH_PROPORTION","Non-speech proportion of time for story 1 immediate recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_NUM_ADJECTIVES","Number of adjectives for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_NUM_ADVERBS","Number of adverbs for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_NUM_NOUNS","Number of nouns for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_NUM_PAUSES","Number of pauses for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_NUM_PRONOUNS","Number of pronouns for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_NUM_PROPER_NOUNS","Number of proper nouns for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_NUM_VERBS","Number of verbs for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_NUM_WORDS","Number of words for story 1 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_PLAYBACK_COUNT","Audio stimulus playback count for story 1 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_PPQ5_JITTER","Jitter (PPQ5) for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_RAP_JITTER","Jitter (rap) for story 1 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_SPEECH_DURATION","Speech duration for story 1 immediate recall","N","4",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_SPEECH_RATE","Speech rate for story 1 immediate recall","N","2",NA,"/second",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY1IMM_UNIQUE_WORDS_RATIO","Unique words ratio for story 1 immediate recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_AMPLITUDE_SD","Standard deviation of the amplitude for story 2 immediate recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_APQ11_SHIMMER","Shimmer (APQ11) for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_APQ3_SHIMMER","Shimmer (APQ3) for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_APQ5_SHIMMER","Shimmer (APQ5) for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_ARTICULATION_RATE","Articulation rate for story 2 immediate recall","N","2",NA,"/second",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_AUDIO_LENGTH","Participant audio length for story 2 immediate recall","N","4",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_DDP_JITTER","Jitter (DDP) for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_F0_MEAN","Formant F0 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_F0_SD","Formant F0 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_FORMANTS_1_MEAN","Formant F1 mean for story 2 immediate recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_FORMANTS_1_SD","Formant F1 standard deviation for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_FORMANTS_2_MEAN","Formant F2 mean for story 2 immediate recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_FORMANTS_2_SD","Formant F2 standard deviation for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_FORMANTS_3_MEAN","Formant F3 mean for story 2 immediate recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_FORMANTS_3_SD","Formant F3 standard deviation for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_FORMANTS_4_MEAN","Formant F4 mean for story 2 immediate recall","N","5",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_FORMANTS_4_SD","Formant F4 standard deviation for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_GMATCH","G-match score (source text vs transcript) for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_IDEA_DENSITY","Idea density for story 2 immediate recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_INTENSITY_MEAN","Intensity mean for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_INTENSITY_SD","Intensity standard deviation for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_LANGUAGE","Language for story 2 immediate recall","T","35",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_LOCAL_ABS_JITTER","Jitter (local, absolute) for story 2 immediate recall","N","2",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_LOCAL_DB_SHIMMER","Shimmer (local, dB) for story 2 immediate recall","N","2",NA,"dB",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_LOCAL_JITTER","Jitter (local) for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_LOCAL_SHIMMER","Shimmer (local) for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MEAN_LETTER_PER_WORD","Mean number of letters per word for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MEAN_PAUSE_LENGTH","Mean length of pauses for story 2 immediate recall","N","2",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_10_MEAN","MFCC 10 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_10_SD","MFCC 10 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_11_MEAN","MFCC 11 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_11_SD","MFCC 11 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_12_MEAN","MFCC 12 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_12_SD","MFCC 12 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_13_MEAN","MFCC 13 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_13_SD","MFCC 13 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_1_MEAN","MFCC 1 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_1_SD","MFCC 1 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_2_MEAN","MFCC 2 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_2_SD","MFCC 2 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_3_MEAN","MFCC 3 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_3_SD","MFCC 3 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_4_MEAN","MFCC 4 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_4_SD","MFCC 4 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_5_MEAN","MFCC 5 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_5_SD","MFCC 5 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_6_MEAN","MFCC 6 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_6_SD","MFCC 6 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_7_MEAN","MFCC 7 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_7_SD","MFCC 7 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_8_MEAN","MFCC 8 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_8_SD","MFCC 8 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_9_MEAN","MFCC 9 mean for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_MFCC_9_SD","MFCC 9 standard deviation for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_NONSPEECH_PROPORTION","Non-speech proportion of time for story 2 immediate recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_NUM_ADJECTIVES","Number of adjectives for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_NUM_ADVERBS","Number of adverbs for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_NUM_NOUNS","Number of nouns for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_NUM_PAUSES","Number of pauses for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_NUM_PRONOUNS","Number of pronouns for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_NUM_PROPER_NOUNS","Number of proper nouns for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_NUM_VERBS","Number of verbs for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_NUM_WORDS","Number of words for story 2 immediate recall","N","4",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_PLAYBACK_COUNT","Audio stimulus playback count for story 2 immediate recall","N","3",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_PPQ5_JITTER","Jitter (PPQ5) for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_RAP_JITTER","Jitter (rap) for story 2 immediate recall","N","2",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_SPEECH_DURATION","Speech duration for story 2 immediate recall","N","4",NA,"seconds",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_SPEECH_RATE","Speech rate for story 2 immediate recall","N","2",NA,"/second",NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","STORY2IMM_UNIQUE_WORDS_RATIO","Unique words ratio for story 2 immediate recall","N","1",NA,NA,NA,NA,NA
+"ADNI4","Novoic Storyteller Data","RMT_STORYTELLER","USER_AGENT","User agent string","T","512",NA,NA,NA,NA,NA
+"ADNI4","ApoE Genotyping - Results","RMT_APOERES","APGEN1","Genotype - Allele 1",NA,NA,NA,NA,"Mapped",NA,"Mapped to GENOTYPE"
+"ADNI4","ApoE Genotyping - Results","RMT_APOERES","APGEN2","Genotype - Allele 2",NA,NA,NA,NA,"Mapped",NA,"Mapped to GENOTYPE"
+"ADNI4","ApoE Genotyping - Results","RMT_APOERES","GENOTYPE","Apolipoprotein E (Apo-E) Genotype",NA,NA,NA,NA,"Derived",NA,"Formatted from APGEN1/APGEN2, sorted low to high"
+"ADNI4","ApoE Genotyping - Results","RMT_APOERES","ADNIOnlineID","Participant Identifier for the Remote Cohort","T","16",NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","PHASE",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","CRFNAME",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","TBLNAME",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","FLDNAME",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","TEXT",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","TYPE",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","LENGTH",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","CODE",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","UNITS",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","STATUS",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","CODE_CHANGES",NA,NA,NA,NA,NA,NA,NA,NA
+NA,"REMOTE_DATADIC","REMOTE_DATADIC","MAPPING_NOTES",NA,NA,NA,NA,NA,NA,NA,NA

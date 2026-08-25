@@ -1,0 +1,85 @@
+{
+  "k": 20,
+  "features": [
+    {
+      "feature": "CDRSB",
+      "mean_abs_shap": 0.5658046729908602
+    },
+    {
+      "feature": "CogIndex",
+      "mean_abs_shap": 0.28039248124443517
+    },
+    {
+      "feature": "MMSE",
+      "mean_abs_shap": 0.143508882604118
+    },
+    {
+      "feature": "ADAS13",
+      "mean_abs_shap": 0.11051201399567141
+    },
+    {
+      "feature": "ADAS11",
+      "mean_abs_shap": 0.09751092618273444
+    },
+    {
+      "feature": "RAVLT_perc_forgetting",
+      "mean_abs_shap": 0.09379747616699226
+    },
+    {
+      "feature": "EcogSPMem",
+      "mean_abs_shap": 0.08085912264976654
+    },
+    {
+      "feature": "FAQ",
+      "mean_abs_shap": 0.07183059622280318
+    },
+    {
+      "feature": "Fusiform",
+      "mean_abs_shap": 0.0704735040199408
+    },
+    {
+      "feature": "EcogSPDivatt",
+      "mean_abs_shap": 0.06694185384821659
+    },
+    {
+      "feature": "Hippocampus",
+      "mean_abs_shap": 0.0657945312949015
+    },
+    {
+      "feature": "PTEDUCAT",
+      "mean_abs_shap": 0.0630041183692689
+    },
+    {
+      "feature": "RAVLT_learning",
+      "mean_abs_shap": 0.06251046194588147
+    },
+    {
+      "feature": "EcogSPPlan",
+      "mean_abs_shap": 0.06160732546500239
+    },
+    {
+      "feature": "Entorhinal",
+      "mean_abs_shap": 0.05589070683470082
+    },
+    {
+      "feature": "MOCA",
+      "mean_abs_shap": 0.04790924430360806
+    },
+    {
+      "feature": "EcogPtMem",
+      "mean_abs_shap": 0.042746223046047485
+    },
+    {
+      "feature": "RAVLT_immediate",
+      "mean_abs_shap": 0.04016471345079688
+    },
+    {
+      "feature": "EcogPtLang",
+      "mean_abs_shap": 0.03407593535314393
+    },
+    {
+      "feature": "EcogSPTotal",
+      "mean_abs_shap": 0.033648384897183144
+    }
+  ]
+}

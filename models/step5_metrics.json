@@ -1,0 +1,220 @@
+{
+  "train_accuracy": 0.9701230228471002,
+  "val_accuracy": 0.8360655737704918,
+  "test_accuracy": 0.8130081300813008,
+  "test_per_class": {
+    "CN": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 29
+    },
+    "EMCI": {
+      "precision": 0.7735849056603774,
+      "recall": 0.8723404255319149,
+      "f1": 0.82,
+      "support": 47
+    },
+    "LMCI": {
+      "precision": 0.5625,
+      "recall": 0.375,
+      "f1": 0.45,
+      "support": 24
+    },
+    "AD": {
+      "precision": 0.84,
+      "recall": 0.9130434782608695,
+      "f1": 0.875,
+      "support": 23
+    }
+  },
+  "selected_params": {
+    "depth": 6,
+    "l2_leaf_reg": 10,
+    "learning_rate": 0.1
+  },
+  "selected_trees": 265,
+  "selection_criterion": "highest val accuracy; test not consulted",
+  "sweep": [
+    {
+      "params": {
+        "depth": 4,
+        "l2_leaf_reg": 3,
+        "learning_rate": 0.03
+      },
+      "train_accuracy": 0.9349736379613357,
+      "val_accuracy": 0.8032786885245902,
+      "trees": 529
+    },
+    {
+      "params": {
+        "depth": 4,
+        "l2_leaf_reg": 3,
+        "learning_rate": 0.1
+      },
+      "train_accuracy": 0.9121265377855887,
+      "val_accuracy": 0.7868852459016393,
+      "trees": 145
+    },
+    {
+      "params": {
+        "depth": 4,
+        "l2_leaf_reg": 5,
+        "learning_rate": 0.03
+      },
+      "train_accuracy": 0.9244288224956063,
+      "val_accuracy": 0.8114754098360656,
+      "trees": 611
+    },
+    {
+      "params": {
+        "depth": 4,
+        "l2_leaf_reg": 5,
+        "learning_rate": 0.1
+      },
+      "train_accuracy": 0.8998242530755711,
+      "val_accuracy": 0.8114754098360656,
+      "trees": 161
+    },
+    {
+      "params": {
+        "depth": 4,
+        "l2_leaf_reg": 10,
+        "learning_rate": 0.03
+      },
+      "train_accuracy": 0.8963093145869947,
+      "val_accuracy": 0.819672131147541,
+      "trees": 643
+    },
+    {
+      "params": {
+        "depth": 4,
+        "l2_leaf_reg": 10,
+        "learning_rate": 0.1
+      },
+      "train_accuracy": 0.9209138840070299,
+      "val_accuracy": 0.8114754098360656,
+      "trees": 250
+    },
+    {
+      "params": {
+        "depth": 5,
+        "l2_leaf_reg": 3,
+        "learning_rate": 0.03
+      },
+      "train_accuracy": 0.9402460456942003,
+      "val_accuracy": 0.7950819672131147,
+      "trees": 433
+    },
+    {
+      "params": {
+        "depth": 5,
+        "l2_leaf_reg": 3,
+        "learning_rate": 0.1
+      },
+      "train_accuracy": 0.9332161687170475,
+      "val_accuracy": 0.7950819672131147,
+      "trees": 125
+    },
+    {
+      "params": {
+        "depth": 5,
+        "l2_leaf_reg": 5,
+        "learning_rate": 0.03
+      },
+      "train_accuracy": 0.9525483304042179,
+      "val_accuracy": 0.8114754098360656,
+      "trees": 618
+    },
+    {
+      "params": {
+        "depth": 5,
+        "l2_leaf_reg": 5,
+        "learning_rate": 0.1
+      },
+      "train_accuracy": 0.9121265377855887,
+      "val_accuracy": 0.8114754098360656,
+      "trees": 122
+    },
+    {
+      "params": {
+        "depth": 5,
+        "l2_leaf_reg": 10,
+        "learning_rate": 0.03
+      },
+      "train_accuracy": 0.9349736379613357,
+      "val_accuracy": 0.8114754098360656,
+      "trees": 716
+    },
+    {
+      "params": {
+        "depth": 5,
+        "l2_leaf_reg": 10,
+        "learning_rate": 0.1
+      },
+      "train_accuracy": 0.9349736379613357,
+      "val_accuracy": 0.8032786885245902,
+      "trees": 228
+    },
+    {
+      "params": {
+        "depth": 6,
+        "l2_leaf_reg": 3,
+        "learning_rate": 0.03
+      },
+      "train_accuracy": 0.9666080843585237,
+      "val_accuracy": 0.8278688524590164,
+      "trees": 431
+    },
+    {
+      "params": {
+        "depth": 6,
+        "l2_leaf_reg": 3,
+        "learning_rate": 0.1
+      },
+      "train_accuracy": 0.9753954305799648,
+      "val_accuracy": 0.8360655737704918,
+      "trees": 132
+    },
+    {
+      "params": {
+        "depth": 6,
+        "l2_leaf_reg": 5,
+        "learning_rate": 0.03
+      },
+      "train_accuracy": 0.9437609841827768,
+      "val_accuracy": 0.8114754098360656,
+      "trees": 440
+    },
+    {
+      "params": {
+        "depth": 6,
+        "l2_leaf_reg": 5,
+        "learning_rate": 0.1
+      },
+      "train_accuracy": 0.9666080843585237,
+      "val_accuracy": 0.819672131147541,
+      "trees": 163
+    },
+    {
+      "params": {
+        "depth": 6,
+        "l2_leaf_reg": 10,
+        "learning_rate": 0.03
+      },
+      "train_accuracy": 0.9402460456942003,
+      "val_accuracy": 0.8278688524590164,
+      "trees": 636
+    },
+    {
+      "params": {
+        "depth": 6,
+        "l2_leaf_reg": 10,
+        "learning_rate": 0.1
+      },
+      "train_accuracy": 0.9701230228471002,
+      "val_accuracy": 0.8360655737704918,
+      "trees": 265
+    }
+  ]
+}
