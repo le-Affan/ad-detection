@@ -1,0 +1,51 @@
+{
+  "data_root": "/kaggle/input/datasets/l0affan/adni-mri-prep",
+  "out_dir": "/kaggle/working/lr_5e-5",
+  "epochs": 60,
+  "batch_size": 32,
+  "probe_sizes": "4,8,16,24,32",
+  "probe_safety": 0.85,
+  "lr": 5e-05,
+  "weight_decay": 0.01,
+  "warmup_epochs": 3,
+  "arch": "resnet18w",
+  "dropout": 0.3,
+  "no_aug": false,
+  "aug_rot_deg": 5.0,
+  "aug_trans_vox": 2.0,
+  "aug_brightness": 0.05,
+  "aug_contrast": 0.05,
+  "aug_flip_lr": false,
+  "lam_demo": 0.4228115488211225,
+  "lam_alz": 1.5771884511788774,
+  "balance_batches": 16,
+  "alz_pos_weight": 4.451923076923077,
+  "patience": 15,
+  "ckpt_every": 0,
+  "num_workers": 4,
+  "seed": 42,
+  "no_amp": false,
+  "resume": false,
+  "limit": 0,
+  "device": "cuda",
+  "amp": true,
+  "params": 8298402,
+  "train_counts": {
+    "0": 133,
+    "1": 216,
+    "2": 114,
+    "3": 104
+  },
+  "augment": {
+    "rot_deg": 5.0,
+    "trans_vox": 2.0,
+    "brightness": 0.05,
+    "contrast": 0.05,
+    "flip_lr": false
+  },
+  "grad_balance": {
+    "trunk_grad_norm_demo": 11.169893605945012,
+    "trunk_grad_norm_alz": 2.994417066753635,
+    "ratio_demo_over_alz": 3.730239761842772
+  }
+}

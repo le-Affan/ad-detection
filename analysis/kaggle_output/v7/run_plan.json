@@ -1,0 +1,10 @@
+{
+  "batch_size": 32,
+  "sec_per_step": 0.2915165710449219,
+  "sec_per_volume": 0.056441158056259155,
+  "steps_per_epoch": 18,
+  "est_epoch_sec": 11.16406106352806,
+  "epochs": 60,
+  "budget_sec": 34200.0,
+  "gpu": "Tesla T4"
+}

@@ -1,0 +1,16 @@
+{
+  "batch_size": 32,
+  "sec_per_step": 0.15635548400878907,
+  "sec_per_volume": 0.04037889838218689,
+  "steps_per_epoch": 18,
+  "est_epoch_sec": 7.986946099996566,
+  "epochs": 60,
+  "arch": "resnet18w",
+  "lrs": [
+    "1e-4",
+    "5e-5",
+    "3e-5"
+  ],
+  "budget_sec": 34200.0,
+  "gpu": "Tesla T4"
+}
