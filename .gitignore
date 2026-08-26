@@ -27,8 +27,19 @@ catboost_info/tmp/
 # Preprocessed MRI volumes: ~30 MB now but ~4.6 GB at the full cohort, and
 # DUA-restricted subject data. Written as `*` rather than `mri_prep/` so that
 # any helper script dropped in here stays visible to git.
+#
+# THE VOLUMES ARE THE ONLY THING EXCLUDED HERE. vol96/ (550 MB) and mni/
+# (4.0 GB) stay out; everything else in this directory is small and is what
+# makes the MRI stream reproducible from a clone -- mri_index.csv above all,
+# since dataset.py reads it to resolve every split and target, and without it
+# the MRI code cannot even enumerate the cohort. The m1 reports, params and
+# log are the preprocessing audit trail, and qc/ is its visual evidence.
 dataset/mri_prep/*
 !dataset/mri_prep/*.py
+!dataset/mri_prep/*.csv
+!dataset/mri_prep/*.json
+!dataset/mri_prep/*.log
+!dataset/mri_prep/qc/
 
 # MRI download area.
 # Deny by default: this directory holds ~27 GB of zips and, after unpacking,
@@ -50,3 +61,21 @@ dataset/mri_raw/_zips/
 # Outbound data bundles (multi-GB, ADNI DUA-restricted - never commit)
 dataset/*.tar
 dataset/*.tar.*
+
+# --- MRI training checkpoints: fetched artefacts, not sources ---
+
+# Weights pulled back from the Kaggle kernel's output (v7/v8/v9). 20 files,
+# 2.42 GB, and INDIVIDUALLY up to 398 MB -- past GitHub's hard 100 MB
+# per-file limit, so a push carrying them is rejected outright rather than
+# merely bloating history. They are regenerable: every one is still served by
+# the kernel's own output, addressed by version.
+#
+# What survives in the repo instead is everything derived from them that is
+# small -- the per-checkpoint val predictions under analysis/threshold_refit/
+# and the run artefacts under analysis/kaggle_output/ -- so the analysis
+# reproduces from a clone even though the weights do not travel with it.
+analysis/kaggle_output/**/*.pt
+
+# Pickled cache of the refit results, rebuilt by refit_thresholds.py from the
+# per-checkpoint CSVs beside it. Derived, so not tracked.
+analysis/threshold_refit/_results.npy
