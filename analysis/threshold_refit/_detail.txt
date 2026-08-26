@@ -1,0 +1,660 @@
+==============================================================================
+v7__best   arch=resnet18  epoch=9  params=33,161,026  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.2893  macroF1=0.2174
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       15    12     1     0  |    28
+   true EMCI     24    17     5     0  |    46
+   true LMCI     10    11     3     0  |    24
+   true AD        2    11    10     0  |    23
+   pred tot       51    51    19     0
+   per-class F1: CN=0.380  EMCI=0.351  LMCI=0.140  AD=0.000
+
+FITTED   (0.05/0.48/0.64)   acc4=0.4711  macroF1=0.4382
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        7    17     2     2  |    28
+   true EMCI      7    29     5     5  |    46
+   true LMCI      5     8     6     5  |    24
+   true AD        0     6     2    15  |    23
+   pred tot       19    60    15    27
+   per-class F1: CN=0.298  EMCI=0.547  LMCI=0.308  AD=0.600
+
+   Spearman(demo_pred, true_class) = 0.4261   p = 1.100e-06
+   grid points=162  optimal triples=1
+   demo_pred > 1.50 : 0/121 = 0.0000
+
+   group     n      min      max     mean      std
+   ALL     121  -0.1629   1.4331   0.3908   0.3427
+   CN       28  -0.1629   0.7787   0.2404   0.2312
+   EMCI     46  -0.0750   1.1226   0.3018   0.2851
+   LMCI     24  -0.0085   0.9604   0.3964   0.3055
+   AD       23   0.1630   1.4331   0.7462   0.3510
+
+==============================================================================
+v7__epoch_004   arch=resnet18  epoch=4  params=33,161,026  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.2231  macroF1=0.1784
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0     1    24     3  |    28
+   true EMCI      0     0    41     5  |    46
+   true LMCI      0     0    16     8  |    24
+   true AD        0     0    12    11  |    23
+   pred tot        0     1    93    27
+   per-class F1: CN=0.000  EMCI=0.000  LMCI=0.274  AD=0.440
+
+FITTED   (1.13/1.42/1.51)   acc4=0.3719  macroF1=0.3397
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       12    11     2     3  |    28
+   true EMCI     18    20     4     4  |    46
+   true LMCI      8     6     2     8  |    24
+   true AD        4     6     2    11  |    23
+   pred tot       42    43    10    26
+   per-class F1: CN=0.343  EMCI=0.449  LMCI=0.118  AD=0.449
+
+   Spearman(demo_pred, true_class) = 0.2571   p = 4.418e-03
+   grid points=222  optimal triples=6
+   demo_pred > 1.50 : 27/121 = 0.2231
+
+   group     n      min      max     mean      std
+   ALL     121   0.5289   2.7232   1.2800   0.3218
+   CN       28   0.5289   1.8711   1.2145   0.2654
+   EMCI     46   0.7680   1.7890   1.1894   0.2484
+   LMCI     24   0.7577   2.0147   1.3324   0.3541
+   AD       23   0.9983   2.7232   1.4861   0.3713
+
+==============================================================================
+v7__epoch_009   arch=resnet18  epoch=9  params=33,161,026  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.2893  macroF1=0.2174
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       15    12     1     0  |    28
+   true EMCI     24    17     5     0  |    46
+   true LMCI     10    11     3     0  |    24
+   true AD        2    11    10     0  |    23
+   pred tot       51    51    19     0
+   per-class F1: CN=0.380  EMCI=0.351  LMCI=0.140  AD=0.000
+
+FITTED   (0.05/0.48/0.64)   acc4=0.4711  macroF1=0.4382
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        7    17     2     2  |    28
+   true EMCI      7    29     5     5  |    46
+   true LMCI      5     8     6     5  |    24
+   true AD        0     6     2    15  |    23
+   pred tot       19    60    15    27
+   per-class F1: CN=0.298  EMCI=0.547  LMCI=0.308  AD=0.600
+
+   Spearman(demo_pred, true_class) = 0.4261   p = 1.100e-06
+   grid points=162  optimal triples=1
+   demo_pred > 1.50 : 0/121 = 0.0000
+
+   group     n      min      max     mean      std
+   ALL     121  -0.1629   1.4331   0.3908   0.3427
+   CN       28  -0.1629   0.7787   0.2404   0.2312
+   EMCI     46  -0.0750   1.1226   0.3018   0.2851
+   LMCI     24  -0.0085   0.9604   0.3964   0.3055
+   AD       23   0.1630   1.4331   0.7462   0.3510
+
+==============================================================================
+v7__epoch_014   arch=resnet18  epoch=14  params=33,161,026  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.4132  macroF1=0.2917
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0    21     7     0  |    28
+   true EMCI      0    35    11     0  |    46
+   true LMCI      0    12    12     0  |    24
+   true AD        0     5    15     3  |    23
+   pred tot        0    73    45     3
+   per-class F1: CN=0.000  EMCI=0.588  LMCI=0.348  AD=0.231
+
+FITTED   (0.61/0.81/1.00)   acc4=0.4215  macroF1=0.4216
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       18     5     5     0  |    28
+   true EMCI     21    15     7     3  |    46
+   true LMCI      7     5    10     2  |    24
+   true AD        3     6     6     8  |    23
+   pred tot       49    31    28    13
+   per-class F1: CN=0.468  EMCI=0.390  LMCI=0.385  AD=0.444
+
+   Spearman(demo_pred, true_class) = 0.3654   p = 3.774e-05
+   grid points=184  optimal triples=1
+   demo_pred > 1.50 : 3/121 = 0.0248
+
+   group     n      min      max     mean      std
+   ALL     121   0.2712   2.0986   0.7260   0.2935
+   CN       28   0.3123   0.9894   0.6278   0.1750
+   EMCI     46   0.2712   1.3103   0.6488   0.2252
+   LMCI     24   0.3143   1.2039   0.7372   0.2304
+   AD       23   0.3044   2.0986   0.9883   0.4081
+
+==============================================================================
+v7__epoch_019   arch=resnet18  epoch=19  params=33,161,026  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.4132  macroF1=0.3217
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0    22     6     0  |    28
+   true EMCI      2    33    11     0  |    46
+   true LMCI      1    11    12     0  |    24
+   true AD        0     7    11     5  |    23
+   pred tot        3    73    40     5
+   per-class F1: CN=0.000  EMCI=0.555  LMCI=0.375  AD=0.357
+
+FITTED   (0.50/0.77/1.04)   acc4=0.4628  macroF1=0.4628
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       17     6     5     0  |    28
+   true EMCI     19    19     3     5  |    46
+   true LMCI      9     3    10     2  |    24
+   true AD        2     5     6    10  |    23
+   pred tot       47    33    24    17
+   per-class F1: CN=0.453  EMCI=0.481  LMCI=0.417  AD=0.500
+
+   Spearman(demo_pred, true_class) = 0.3964   p = 6.781e-06
+   grid points=192  optimal triples=3
+   demo_pred > 1.50 : 5/121 = 0.0413
+
+   group     n      min      max     mean      std
+   ALL     121   0.2224   2.1206   0.6874   0.3609
+   CN       28   0.2917   0.9103   0.5376   0.1829
+   EMCI     46   0.2224   1.4440   0.6024   0.2824
+   LMCI     24   0.2452   1.2721   0.6814   0.2855
+   AD       23   0.2545   2.1206   1.0461   0.4789
+
+==============================================================================
+v7__epoch_024   arch=resnet18  epoch=24  params=33,161,026  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.4132  macroF1=0.2286
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        1    25     2     0  |    28
+   true EMCI      0    44     2     0  |    46
+   true LMCI      0    19     5     0  |    24
+   true AD        0    19     4     0  |    23
+   pred tot        1   107    13     0
+   per-class F1: CN=0.069  EMCI=0.575  LMCI=0.270  AD=0.000
+
+FITTED   (0.48/0.75/0.83)   acc4=0.3967  macroF1=0.3569
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       12    14     1     1  |    28
+   true EMCI     17    27     0     2  |    46
+   true LMCI      7    12     5     0  |    24
+   true AD        3    16     0     4  |    23
+   pred tot       39    69     6     7
+   per-class F1: CN=0.358  EMCI=0.470  LMCI=0.333  AD=0.267
+
+   Spearman(demo_pred, true_class) = 0.1741   p = 5.609e-02
+   grid points=94  optimal triples=1
+   demo_pred > 1.50 : 0/121 = 0.0000
+
+   group     n      min      max     mean      std
+   ALL     121   0.2464   1.1651   0.5573   0.1668
+   CN       28   0.2464   0.8420   0.5282   0.1432
+   EMCI     46   0.2610   1.0101   0.5331   0.1494
+   LMCI     24   0.2689   0.8219   0.5484   0.1483
+   AD       23   0.2754   1.1651   0.6502   0.2073
+
+==============================================================================
+v7__last   arch=resnet18  epoch=24  params=33,161,026  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.4132  macroF1=0.2286
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        1    25     2     0  |    28
+   true EMCI      0    44     2     0  |    46
+   true LMCI      0    19     5     0  |    24
+   true AD        0    19     4     0  |    23
+   pred tot        1   107    13     0
+   per-class F1: CN=0.069  EMCI=0.575  LMCI=0.270  AD=0.000
+
+FITTED   (0.48/0.75/0.83)   acc4=0.3967  macroF1=0.3569
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       12    14     1     1  |    28
+   true EMCI     17    27     0     2  |    46
+   true LMCI      7    12     5     0  |    24
+   true AD        3    16     0     4  |    23
+   pred tot       39    69     6     7
+   per-class F1: CN=0.358  EMCI=0.470  LMCI=0.333  AD=0.267
+
+   Spearman(demo_pred, true_class) = 0.1741   p = 5.609e-02
+   grid points=94  optimal triples=1
+   demo_pred > 1.50 : 0/121 = 0.0000
+
+   group     n      min      max     mean      std
+   ALL     121   0.2464   1.1651   0.5573   0.1668
+   CN       28   0.2464   0.8420   0.5282   0.1432
+   EMCI     46   0.2610   1.0101   0.5331   0.1494
+   LMCI     24   0.2689   0.8219   0.5484   0.1483
+   AD       23   0.2754   1.1651   0.6502   0.2073
+
+==============================================================================
+v8__best   arch=resnet18w  epoch=9  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.3471  macroF1=0.2245
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0    21     7     0  |    28
+   true EMCI      0    30    16     0  |    46
+   true LMCI      0    13    11     0  |    24
+   true AD        0     6    16     1  |    23
+   pred tot        0    70    50     1
+   per-class F1: CN=0.000  EMCI=0.517  LMCI=0.297  AD=0.083
+
+FITTED   (0.66/0.89/0.99)   acc4=0.4545  macroF1=0.4319
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       20     7     0     1  |    28
+   true EMCI     18    21     3     4  |    46
+   true LMCI     11     5     6     2  |    24
+   true AD        4     7     4     8  |    23
+   pred tot       53    40    13    15
+   per-class F1: CN=0.494  EMCI=0.488  LMCI=0.324  AD=0.421
+
+   Spearman(demo_pred, true_class) = 0.3368   p = 1.584e-04
+   grid points=127  optimal triples=1
+   demo_pred > 1.50 : 1/121 = 0.0083
+
+   group     n      min      max     mean      std
+   ALL     121   0.3474   1.5991   0.7358   0.2373
+   CN       28   0.3618   1.0015   0.6319   0.1511
+   EMCI     46   0.3474   1.0905   0.7042   0.1819
+   LMCI     24   0.3615   1.2737   0.7220   0.2510
+   AD       23   0.4423   1.5991   0.9398   0.2820
+
+==============================================================================
+v8__epoch_004   arch=resnet18w  epoch=4  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.3223  macroF1=0.2428
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        6    17     5     0  |    28
+   true EMCI      8    25    13     0  |    46
+   true LMCI      3    13     8     0  |    24
+   true AD        0    11    12     0  |    23
+   pred tot       17    66    38     0
+   per-class F1: CN=0.267  EMCI=0.446  LMCI=0.258  AD=0.000
+
+FITTED   (0.40/0.67/1.03)   acc4=0.3802  macroF1=0.3836
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        9     8    11     0  |    28
+   true EMCI     13    19    11     3  |    46
+   true LMCI     10     3     9     2  |    24
+   true AD        1     7     6     9  |    23
+   pred tot       33    37    37    14
+   per-class F1: CN=0.295  EMCI=0.458  LMCI=0.295  AD=0.486
+
+   Spearman(demo_pred, true_class) = 0.2642   p = 3.409e-03
+   grid points=146  optimal triples=2
+   demo_pred > 1.50 : 0/121 = 0.0000
+
+   group     n      min      max     mean      std
+   ALL     121   0.0085   1.4454   0.6160   0.3111
+   CN       28   0.0085   0.9741   0.5325   0.2504
+   EMCI     46   0.0706   1.2614   0.5744   0.2990
+   LMCI     24   0.0351   1.1033   0.5711   0.3098
+   AD       23   0.3025   1.4454   0.8476   0.2935
+
+==============================================================================
+v8__epoch_009   arch=resnet18w  epoch=9  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.3471  macroF1=0.2245
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0    21     7     0  |    28
+   true EMCI      0    30    16     0  |    46
+   true LMCI      0    13    11     0  |    24
+   true AD        0     6    16     1  |    23
+   pred tot        0    70    50     1
+   per-class F1: CN=0.000  EMCI=0.517  LMCI=0.297  AD=0.083
+
+FITTED   (0.66/0.89/0.99)   acc4=0.4545  macroF1=0.4319
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       20     7     0     1  |    28
+   true EMCI     18    21     3     4  |    46
+   true LMCI     11     5     6     2  |    24
+   true AD        4     7     4     8  |    23
+   pred tot       53    40    13    15
+   per-class F1: CN=0.494  EMCI=0.488  LMCI=0.324  AD=0.421
+
+   Spearman(demo_pred, true_class) = 0.3368   p = 1.584e-04
+   grid points=127  optimal triples=1
+   demo_pred > 1.50 : 1/121 = 0.0083
+
+   group     n      min      max     mean      std
+   ALL     121   0.3474   1.5991   0.7358   0.2373
+   CN       28   0.3618   1.0015   0.6319   0.1511
+   EMCI     46   0.3474   1.0905   0.7042   0.1819
+   LMCI     24   0.3615   1.2737   0.7220   0.2510
+   AD       23   0.4423   1.5991   0.9398   0.2820
+
+==============================================================================
+v8__epoch_014   arch=resnet18w  epoch=14  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.2397  macroF1=0.1682
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0     1    13    14  |    28
+   true EMCI      0     1    11    34  |    46
+   true LMCI      0     0     7    17  |    24
+   true AD        0     0     2    21  |    23
+   pred tot        0     2    33    86
+   per-class F1: CN=0.000  EMCI=0.042  LMCI=0.246  AD=0.385
+
+FITTED   (1.39/2.04/2.28)   acc4=0.5372  macroF1=0.5259
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       12    12     4     0  |    28
+   true EMCI      8    30     2     6  |    46
+   true LMCI      6     7    10     1  |    24
+   true AD        2     6     2    13  |    23
+   pred tot       28    55    18    20
+   per-class F1: CN=0.429  EMCI=0.594  LMCI=0.476  AD=0.605
+
+   Spearman(demo_pred, true_class) = 0.4234   p = 1.307e-06
+   grid points=255  optimal triples=60
+   demo_pred > 1.50 : 86/121 = 0.7107
+
+   group     n      min      max     mean      std
+   ALL     121   0.6814   3.2185   1.7998   0.5070
+   CN       28   0.6814   2.2707   1.5304   0.4100
+   EMCI     46   0.7478   2.6539   1.7318   0.4183
+   LMCI     24   0.9958   2.5485   1.8013   0.4587
+   AD       23   1.1550   3.2185   2.2625   0.5163
+
+==============================================================================
+v8__epoch_019   arch=resnet18w  epoch=19  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.4132  macroF1=0.2608
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        6    22     0     0  |    28
+   true EMCI      2    41     3     0  |    46
+   true LMCI      3    18     3     0  |    24
+   true AD        0    16     7     0  |    23
+   pred tot       11    97    13     0
+   per-class F1: CN=0.308  EMCI=0.573  LMCI=0.162  AD=0.000
+
+FITTED   (0.30/0.51/0.82)   acc4=0.4463  macroF1=0.4247
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       13    14     1     0  |    28
+   true EMCI      9    27     9     1  |    46
+   true LMCI      7     9     7     1  |    24
+   true AD        2    10     4     7  |    23
+   pred tot       31    60    21     9
+   per-class F1: CN=0.441  EMCI=0.509  LMCI=0.311  AD=0.438
+
+   Spearman(demo_pred, true_class) = 0.3533   p = 7.041e-05
+   grid points=119  optimal triples=4
+   demo_pred > 1.50 : 0/121 = 0.0000
+
+   group     n      min      max     mean      std
+   ALL     121   0.1865   1.3513   0.4353   0.2202
+   CN       28   0.1865   0.7075   0.3222   0.0977
+   EMCI     46   0.2318   0.9042   0.4159   0.1585
+   LMCI     24   0.2061   0.9137   0.4291   0.1943
+   AD       23   0.2504   1.3513   0.6184   0.3223
+
+==============================================================================
+v8__epoch_024   arch=resnet18w  epoch=24  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.3719  macroF1=0.2777
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0    23     4     1  |    28
+   true EMCI      0    31    12     3  |    46
+   true LMCI      0    13     9     2  |    24
+   true AD        0     7    11     5  |    23
+   pred tot        0    74    36    11
+   per-class F1: CN=0.000  EMCI=0.517  LMCI=0.300  AD=0.294
+
+FITTED   (0.52/0.71/0.87)   acc4=0.4132  macroF1=0.4095
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       13    10     3     2  |    28
+   true EMCI     15    15     6    10  |    46
+   true LMCI      5     6     6     7  |    24
+   true AD        2     5     0    16  |    23
+   pred tot       35    36    15    35
+   per-class F1: CN=0.413  EMCI=0.366  LMCI=0.308  AD=0.552
+
+   Spearman(demo_pred, true_class) = 0.3924   p = 8.507e-06
+   grid points=208  optimal triples=2
+   demo_pred > 1.50 : 11/121 = 0.0909
+
+   group     n      min      max     mean      std
+   ALL     121   0.4115   2.4752   0.8013   0.4048
+   CN       28   0.4200   1.7346   0.6267   0.2474
+   EMCI     46   0.4404   1.9744   0.7591   0.3765
+   LMCI     24   0.4115   1.8154   0.8047   0.3633
+   AD       23   0.4863   2.4752   1.0950   0.4893
+
+==============================================================================
+v8__last   arch=resnet18w  epoch=24  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.3719  macroF1=0.2777
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0    23     4     1  |    28
+   true EMCI      0    31    12     3  |    46
+   true LMCI      0    13     9     2  |    24
+   true AD        0     7    11     5  |    23
+   pred tot        0    74    36    11
+   per-class F1: CN=0.000  EMCI=0.517  LMCI=0.300  AD=0.294
+
+FITTED   (0.52/0.71/0.87)   acc4=0.4132  macroF1=0.4095
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       13    10     3     2  |    28
+   true EMCI     15    15     6    10  |    46
+   true LMCI      5     6     6     7  |    24
+   true AD        2     5     0    16  |    23
+   pred tot       35    36    15    35
+   per-class F1: CN=0.413  EMCI=0.366  LMCI=0.308  AD=0.552
+
+   Spearman(demo_pred, true_class) = 0.3924   p = 8.507e-06
+   grid points=208  optimal triples=2
+   demo_pred > 1.50 : 11/121 = 0.0909
+
+   group     n      min      max     mean      std
+   ALL     121   0.4115   2.4752   0.8013   0.4048
+   CN       28   0.4200   1.7346   0.6267   0.2474
+   EMCI     46   0.4404   1.9744   0.7591   0.3765
+   LMCI     24   0.4115   1.8154   0.8047   0.3633
+   AD       23   0.4863   2.4752   1.0950   0.4893
+
+==============================================================================
+v9__lr_1e-4__best   arch=resnet18w  epoch=6  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.2479  macroF1=0.2157
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0     8    20     0  |    28
+   true EMCI      0     5    39     2  |    46
+   true LMCI      0     5    19     0  |    24
+   true AD        0     1    16     6  |    23
+   pred tot        0    19    94     8
+   per-class F1: CN=0.000  EMCI=0.154  LMCI=0.322  AD=0.387
+
+FITTED   (0.72/1.07/1.42)   acc4=0.4463  macroF1=0.4238
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        8    13     7     0  |    28
+   true EMCI      3    28    11     4  |    46
+   true LMCI      5     9    10     0  |    24
+   true AD        1     6     8     8  |    23
+   pred tot       17    56    36    12
+   per-class F1: CN=0.356  EMCI=0.549  LMCI=0.333  AD=0.457
+
+   Spearman(demo_pred, true_class) = 0.3035   p = 7.133e-04
+   grid points=122  optimal triples=1
+   demo_pred > 1.50 : 8/121 = 0.0661
+
+   group     n      min      max     mean      std
+   ALL     121   0.4783   1.6727   1.0124   0.2802
+   CN       28   0.5142   1.3270   0.8872   0.2161
+   EMCI     46   0.5756   1.5914   1.0014   0.2433
+   LMCI     24   0.4783   1.4194   0.9762   0.2719
+   AD       23   0.6431   1.6727   1.2247   0.3081
+
+==============================================================================
+v9__lr_1e-4__last   arch=resnet18w  epoch=21  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.2562  macroF1=0.2101
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        0    10    13     5  |    28
+   true EMCI      0     5    19    22  |    46
+   true LMCI      0     5     8    11  |    24
+   true AD        0     1     4    18  |    23
+   pred tot        0    21    44    56
+   per-class F1: CN=0.000  EMCI=0.149  LMCI=0.235  AD=0.456
+
+FITTED   (1.00/1.95/2.24)   acc4=0.5041  macroF1=0.4927
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       16    11     1     0  |    28
+   true EMCI     11    26     4     5  |    46
+   true LMCI      8     8     7     1  |    24
+   true AD        3     5     3    12  |    23
+   pred tot       38    50    15    18
+   per-class F1: CN=0.485  EMCI=0.542  LMCI=0.359  AD=0.585
+
+   Spearman(demo_pred, true_class) = 0.4310   p = 8.014e-07
+   grid points=293  optimal triples=12
+   demo_pred > 1.50 : 56/121 = 0.4628
+
+   group     n      min      max     mean      std
+   ALL     121   0.2671   3.1771   1.4492   0.6848
+   CN       28   0.3432   1.9690   1.0249   0.4573
+   EMCI     46   0.5130   2.6296   1.4181   0.5934
+   LMCI     24   0.2671   2.6731   1.4185   0.6347
+   AD       23   0.3883   3.1771   2.0602   0.7020
+
+==============================================================================
+v9__lr_3e-5__best   arch=resnet18w  epoch=15  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.3636  macroF1=0.3493
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        3    12    12     1  |    28
+   true EMCI      2    20    18     6  |    46
+   true LMCI      1    11     9     3  |    24
+   true AD        0     4     7    12  |    23
+   pred tot        6    47    46    22
+   per-class F1: CN=0.176  EMCI=0.430  LMCI=0.257  AD=0.533
+
+FITTED   (0.52/1.22/1.46)   acc4=0.5289  macroF1=0.5015
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       13    14     0     1  |    28
+   true EMCI      8    31     1     6  |    46
+   true LMCI      8     7     6     3  |    24
+   true AD        0     7     2    14  |    23
+   pred tot       29    59     9    24
+   per-class F1: CN=0.456  EMCI=0.590  LMCI=0.364  AD=0.596
+
+   Spearman(demo_pred, true_class) = 0.4154   p = 2.163e-06
+   grid points=228  optimal triples=6
+   demo_pred > 1.50 : 22/121 = 0.1818
+
+   group     n      min      max     mean      std
+   ALL     121   0.0786   2.3302   0.9396   0.5010
+   CN       28   0.0786   1.6644   0.6799   0.3596
+   EMCI     46   0.1836   1.9653   0.8667   0.4174
+   LMCI     24   0.1200   1.7610   0.9105   0.5039
+   AD       23   0.6080   2.3302   1.4319   0.4626
+
+==============================================================================
+v9__lr_3e-5__last   arch=resnet18w  epoch=30  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.4298  macroF1=0.3646
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        7    19     2     0  |    28
+   true EMCI      4    32     9     1  |    46
+   true LMCI      2    12    10     0  |    24
+   true AD        0     5    15     3  |    23
+   pred tot       13    68    36     4
+   per-class F1: CN=0.341  EMCI=0.561  LMCI=0.333  AD=0.222
+
+FITTED   (0.30/0.62/1.10)   acc4=0.4793  macroF1=0.4654
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       12    11     5     0  |    28
+   true EMCI      8    27     7     4  |    46
+   true LMCI      5     8     9     2  |    24
+   true AD        0     4     9    10  |    23
+   pred tot       25    50    30    16
+   per-class F1: CN=0.453  EMCI=0.562  LMCI=0.333  AD=0.513
+
+   Spearman(demo_pred, true_class) = 0.4841   p = 1.848e-08
+   grid points=175  optimal triples=14
+   demo_pred > 1.50 : 4/121 = 0.0331
+
+   group     n      min      max     mean      std
+   ALL     121   0.1614   1.8984   0.6207   0.3878
+   CN       28   0.1837   1.0909   0.4034   0.2138
+   EMCI     46   0.1614   1.7578   0.5480   0.3267
+   LMCI     24   0.2258   1.2483   0.6285   0.3356
+   AD       23   0.3614   1.8984   1.0225   0.4185
+
+==============================================================================
+v9__lr_5e-5__best   arch=resnet18w  epoch=7  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.3471  macroF1=0.2972
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        2    16    10     0  |    28
+   true EMCI      0    23    21     2  |    46
+   true LMCI      4     7    13     0  |    24
+   true AD        0     2    17     4  |    23
+   pred tot        6    48    61     6
+   per-class F1: CN=0.118  EMCI=0.489  LMCI=0.306  AD=0.276
+
+FITTED   (0.67/1.02/1.23)   acc4=0.4298  macroF1=0.4302
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       17     7     3     1  |    28
+   true EMCI     17    17     7     5  |    46
+   true LMCI      9     6     8     1  |    24
+   true AD        2     6     5    10  |    23
+   pred tot       45    36    23    17
+   per-class F1: CN=0.466  EMCI=0.415  LMCI=0.340  AD=0.500
+
+   Spearman(demo_pred, true_class) = 0.3380   p = 1.493e-04
+   grid points=177  optimal triples=1
+   demo_pred > 1.50 : 6/121 = 0.0496
+
+   group     n      min      max     mean      std
+   ALL     121   0.1663   1.9174   0.8262   0.3831
+   CN       28   0.2372   1.2462   0.6673   0.2920
+   EMCI     46   0.2957   1.6564   0.7993   0.3381
+   LMCI     24   0.1663   1.3667   0.7422   0.3713
+   AD       23   0.3402   1.9174   1.1608   0.3798
+
+==============================================================================
+v9__lr_5e-5__last   arch=resnet18w  epoch=22  params=8,298,402  n=121
+==============================================================================
+
+CURRENT  (0.25/0.75/1.50)   acc4=0.3719  macroF1=0.2243
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN        3    24     1     0  |    28
+   true EMCI      3    39     4     0  |    46
+   true LMCI      1    21     2     0  |    24
+   true AD        0    16     6     1  |    23
+   pred tot        7   100    13     1
+   per-class F1: CN=0.171  EMCI=0.534  LMCI=0.108  AD=0.083
+
+FITTED   (0.31/0.51/0.64)   acc4=0.4628  macroF1=0.4425
+        pred:   CN  EMCI  LMCI    AD  |  true tot
+   true CN       15    12     0     1  |    28
+   true EMCI     11    26     5     4  |    46
+   true LMCI      5    11     6     2  |    24
+   true AD        0     9     5     9  |    23
+   pred tot       31    58    16    16
+   per-class F1: CN=0.508  EMCI=0.500  LMCI=0.300  AD=0.462
+
+   Spearman(demo_pred, true_class) = 0.5176   p = 1.203e-09
+   grid points=146  optimal triples=8
+   demo_pred > 1.50 : 1/121 = 0.0083
+
+   group     n      min      max     mean      std
+   ALL     121   0.1607   1.6075   0.4574   0.2401
+   CN       28   0.1607   0.8201   0.3270   0.1157
+   EMCI     46   0.1852   1.0619   0.4232   0.1823
+   LMCI     24   0.2355   1.0658   0.4592   0.2141
+   AD       23   0.3117   1.6075   0.6824   0.3148
+
