@@ -6,7 +6,7 @@ PTID,RID,split,DX_bl,n_present,pattern,has_bl
 002_S_4219,4219,train,LMCI,3,1110,True
 002_S_4225,4225,train,CN,4,1111,True
 002_S_4229,4229,train,LMCI,4,1111,True
-002_S_4237,4237,train,EMCI,4,1111,True
+002_S_4237,4237,train,EMCI,3,1011,True
 002_S_4262,4262,train,CN,4,1111,True
 002_S_4270,4270,train,CN,4,1111,True
 002_S_4447,4447,train,EMCI,4,1111,True

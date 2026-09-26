@@ -63,7 +63,13 @@ PINNED = {("082_S_4224", "m24"): "I1051225"}
 #   123_S_4806 m12: exact VISCODE2 match, but scanned 2012-08-27 -- two months
 #   after bl and before m06 (2013-01-10). Most likely a VISCODE mislabel
 #   upstream; slot order and time order cannot both hold, so the slot is masked.
-MASKED = {("123_S_4806", "m12"): "DATE_OUT_OF_ORDER"}
+#   002_S_4237 m06: its NIfTI stores the thick (1.2 mm) axis second, not first
+#   (256x169x256), one of only two such scans in the cohort. The m1 chain's
+#   affine cannot recover the resulting ~90-degree misorientation (the other
+#   such scan, 128_S_4842 bl, failed deterministically: corr_vs_mni 0.15/0.12).
+#   m06 is non-critical, so it is masked rather than given a special path.
+MASKED = {("123_S_4806", "m12"): "DATE_OUT_OF_ORDER",
+          ("002_S_4237", "m06"): "REG_FAILED_LAYOUT"}
 
 
 def raw_abspath(relpath, patha_root=PATHA_ROOT):

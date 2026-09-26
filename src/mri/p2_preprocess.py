@@ -52,7 +52,48 @@ QC_DIR = os.path.join(OUT_DIR, "qc")
 SUSPECT_CORR = 0.30
 SUSPECT_FILL = 0.90
 
+# Raw files whose voxel data disagrees with their own header, corrected before
+# the unchanged chain runs. Named one by one, never inferred.
+#
+# 128_S_4842 bl (I322940): voxel axes 0 and 1 are swapped relative to the
+# affine -- slicing axis 0 gives a coronal view, axis 1 a sagittal one -- and
+# axis 0 is mirrored. As delivered it registers at corr_vs_mni 0.15 (0.12 on a
+# rerun; a full-sphere affine_initializer search made it worse, 0.06-0.09,
+# since a swap is a reflection no rotation reaches). Swapping alone fixes the
+# template fit (0.49) but leaves the brain left-right mirrored, invisible to
+# that metric; against the subject's own correctly-labelled GradWarp baseline
+# from the original cohort it scores r = 0.57, and with the mirror undone
+# 0.91 (other cross-pipeline baselines: 0.95-0.97). Decided 2026-09-26.
+RAW_FIXES = {"128_S_4842__bl": "swap01_flip0"}
+FIX_DIR = os.path.join(OUT_DIR, "raw_fixed")
+
 _template = None
+
+
+def apply_raw_fix(key, path, fix):
+    """Write a header-consistent copy of a raw NIfTI and return its path.
+
+    swap01_flip0: exchange voxel axes 0 and 1 (each keeps its header
+    direction but takes the other's spacing), then reverse axis 0.
+    """
+    import nibabel as nib
+    import numpy as np
+    if fix != "swap01_flip0":
+        raise ValueError(f"unknown raw fix {fix!r} for {key}")
+    im = nib.load(path)
+    a = np.swapaxes(np.asarray(im.dataobj), 0, 1)[::-1]
+    aff = im.affine.copy()
+    zoom = np.linalg.norm(aff[:3, :3], axis=0)
+    direc = aff[:3, :3] / zoom
+    aff[:3, 0] = direc[:, 0] * zoom[1]
+    aff[:3, 1] = direc[:, 1] * zoom[0]
+    out = nib.Nifti1Image(np.ascontiguousarray(a), aff)
+    out.set_qform(aff, 1)
+    out.set_sform(aff, 1)
+    os.makedirs(FIX_DIR, exist_ok=True)
+    dest = os.path.join(FIX_DIR, f"{key}.nii.gz")
+    nib.save(out, dest)
+    return dest
 
 
 def _init_worker():
@@ -65,6 +106,8 @@ def _work(job):
     from m1_preprocess import process_one
     key, path, qc_dir = job
     try:
+        if key in RAW_FIXES:
+            path = apply_raw_fix(key, path, RAW_FIXES[key])
         res = process_one(path, key, MNI_DIR, VOL_DIR, qc_dir, _template)
     except Exception as e:  # noqa: BLE001 -- e.g. an unreadable header, before process_one's own guard
         res = {"native": "", "ok": False, "seconds": 0.0, "error": f"{type(e).__name__}: {e}"}
@@ -128,7 +171,8 @@ def run(keys=None, workers=4, threads=4, force=False, qc=True, tag="patha", limi
         for n, (key, res) in enumerate(pool.imap_unordered(_work, jobs), 1):
             r = info.loc[key]
             row = {"prep_key": key, "RID": int(r.RID), "PTID": r.PTID, "slot": r.slot,
-                   "image_id": r.image_id, "pipeline": r.pipeline, "DX_bl": r.DX_bl, **res}
+                   "image_id": r.image_id, "pipeline": r.pipeline, "DX_bl": r.DX_bl,
+                   "raw_fix": RAW_FIXES.get(key, ""), **res}
             row["suspect"] = suspect_reason(res) if res["ok"] else ""
             rows.append(row)
             # append as we go: an interrupted run keeps every finished row

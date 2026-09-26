@@ -1,0 +1,1 @@
+prep_key,RID,PTID,slot,image_id,pipeline,DX_bl,raw_fix,native,ok,seconds,error,shape,min,max,mean,std,frac_zero,brain_mean,brain_std,mask_fill,frac_outside_mask,corr_vs_mni,in_unit_range,png,suspect

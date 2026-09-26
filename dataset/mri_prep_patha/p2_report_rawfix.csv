@@ -1,0 +1,2 @@
+prep_key,RID,PTID,slot,image_id,pipeline,DX_bl,raw_fix,native,ok,seconds,error,shape,min,max,mean,std,frac_zero,brain_mean,brain_std,mask_fill,frac_outside_mask,corr_vs_mni,in_unit_range,png,suspect
+128_S_4842__bl,4842,128_S_4842,bl,I322940,MT1__N3m,LMCI,swap01_flip0,173.0x240.0x256.0,True,19.8,,96x96x96,0.0,1.0,0.12548387050628662,0.27698248624801636,0.7824616608796297,0.5830808281898499,0.3013395071029663,0.9825954536353002,0.031041990345494132,0.4878701824316698,True,dataset/mri_prep_patha/qc/rawfix/128_S_4842__bl.png,

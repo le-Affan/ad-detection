@@ -1,0 +1,27 @@
+{
+  "orientation": "IAL",
+  "work_spacing": [
+    1.0,
+    1.0,
+    1.2
+  ],
+  "transform": "Affine x2 (head->head, then brain->brain)",
+  "clip_negative": "after mask, before truncate (b-spline undershoot)",
+  "truncate": [
+    0.05,
+    0.95
+  ],
+  "normalise": "min-max to [0,1] before downsample",
+  "downsample": {
+    "size": 96,
+    "interp": "linear"
+  },
+  "n4": "first, in native space",
+  "template": "ICBM152 2009a whole-head T1 + published brain mask (via nilearn)",
+  "workers": 1,
+  "itk_threads_per_worker": 16,
+  "suspect": {
+    "corr_vs_mni_lt": 0.3,
+    "mask_fill_lt": 0.9
+  }
+}
