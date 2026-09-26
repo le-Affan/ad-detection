@@ -1,0 +1,34 @@
+# Line endings. Every text file in the repository is stored with LF; this file
+# makes that hold regardless of how a checkout is configured.
+#
+# WHY. A copy of this repo made on Windows (core.autocrlf=true) and unpacked on
+# Linux arrived with CRLF in every text file, and git reported 308 modified
+# files -- ~2.8M lines "changed" with no content difference, including the
+# large tables under dataset/raw/. With `text=auto`, git normalises line
+# endings before comparing, so a CRLF working copy no longer reads as modified
+# and a CRLF file cannot be committed as such.
+#
+# Windows checkouts still get CRLF in the working tree if they ask for it;
+# only what is stored in the repository is fixed.
+* text=auto
+
+# Binary formats: never line-ending-normalised or text-diffed. Listed
+# explicitly rather than trusting auto-detection, since a mangled byte in any
+# of these corrupts the file silently. The first group is tracked today; the
+# rest are formats this project produces or handles and may track later.
+*.png       binary
+*.npz       binary
+*.cbm       binary
+*.tfevents* binary
+*.jpg       binary
+*.jpeg      binary
+*.pdf       binary
+*.npy       binary
+*.pkl       binary
+*.pt        binary
+*.pth       binary
+*.nii       binary
+*.nii.gz    binary
+*.gz        binary
+*.zip       binary
+*.tar       binary
