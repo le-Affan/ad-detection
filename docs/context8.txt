@@ -1,0 +1,133 @@
+# ADNI MRI — Session 8 Handoff: Path A Multi-Visit Cohort Build
+
+Continuation of `docs/context.txt` (original spec), `context2.txt` (clinical
+audit + step0/1/2 rebuild), `context3.txt` (step3/4/5 + master runner),
+`context4.txt` (MRI acquisition + baseline IDA cohort), `context5.txt` (MRI
+preprocessing + model code), `context6.txt` (full-cohort m1/m2 run) and
+`context7.txt` (dual-head training, v7/v8/v9 Kaggle runs). Read context4.txt
+§4-5 first if you have not — this file assumes familiarity with how the
+811-subject *baseline* IDA cohort was built, and documents what changed when
+that same process was extended to follow-up visits for Path A (multi-visit
+temporal modeling).
+
+Session 8 did no work on the clinical pipeline or the MRI training loop; both
+are untouched. The work here is entirely: (1) a feasibility check on how many
+subjects have usable multi-visit T1 data, (2) a small sample-check against the
+live IDA site to confirm processed-derivative availability at follow-up
+visits, and (3) building the real full-scale multi-visit cohort on IDA.
+
+---
+
+## 1. WHERE THE TARGET LIST LIVES
+
+`dataset/mri_raw/followup/patha_target_scans.csv` — 2,573 rows, one per
+(subject, slot) pair, columns `Subject ID, Slot, VISCODE2, Match Type,
+Image/Series ID, Scan Date`. This is the **source of truth** for what the
+Path A cohort is supposed to contain: 690 subjects (of the 811-subject
+baseline cohort) × up to 4 slots (`bl, m06, m12, m24` — `m36` was evaluated
+and dropped, see §2), each row marked `exact` (matched by literal VISCODE2)
+or `fallback` (matched by nearest scan within ±60 days of the slot's nominal
+date, used for only 9/2,573 rows).
+
+Built by a local pass over `dataset/mri_prep/mri_index.csv` (the 811-cohort)
+cross-referenced against `dataset/raw/adnimerge2_tables/MRIQC.csv` (T1w rows,
+ADNI-wide raw acquisition metadata). Minimum-viable-subject rule: baseline
+present + at least 2 of {m06, m12, m24} filled.
+
+The corresponding IDA cohort built from this list is `patha_bl_m6_m12_m24`
+(collection ID 521634), 5,227 images, 2,566/2,573 target rows matched
+(99.73%) — 7 rows not found, all explainable by phase exclusion (subject
+data recatalogued under ADNI3 or, in one case, ADNI1), not a search defect.
+
+---
+
+## 2. WHY m36 WAS DROPPED
+
+The original agreed schedule was `bl, m06, m12, m24, m36`. Before touching
+IDA, a local check of `MRIQC.csv` found only 118 subjects (of 811) with an
+m36 T1w scan — dramatically below m24's 523, and even below m48's 289. Split
+by ORIGPROT: ADNI2 subjects (681/811 of the cohort) hit m36 only 7% of the
+time (48/681) vs. ADNIGO subjects (130/811) at 54% (70/130). This is ADNI's
+real protocol change — ADNI2 moved to annual visits from year 2 onward and
+mostly skipped year 3 — not a data gap. Keeping m36 in the schedule would
+have silently skewed the cohort toward the smaller ADNIGO subgroup. Schedule
+was changed to `bl, m06, m12, m24` before the IDA search was built.
+
+---
+
+## 3. THE TRAP — IDA VISIT LABELS ARE NOT A FLAT VISCODE2 SCHEME
+
+**READ THIS BEFORE REBUILDING OR EXTENDING THIS SEARCH.**
+
+The baseline cohort (context4.txt §4) only ever needed three visit labels
+(`ADNIGO Screening MRI`, `ADNI2 Screening MRI-New Pt`, `ADNI2 Baseline-New
+Pt`), all unambiguous. Follow-up visits are not that simple: IDA's `Visit`
+field label for a given VISCODE2 depends on **which phase the subject is in
+AND whether they are a New-Pt or a Continuing-Pt** (a "Continuing-Pt" is a
+subject who enrolled under ADNI1/ADNIGO and rolled over into ADNI2, as
+opposed to a fresh ADNI2 enrollee). The same VISCODE2 surfaces under
+different Visit strings, and — this is the actual trap — **the same Visit
+string wording ("Year 1 Visit") means a different VISCODE2 depending on
+patient type**:
+
+    VISCODE2   New-Pt label                        Continuing-Pt label
+    m03        ADNI2 Month 3 MRI-New Pt             ADNIGO Month 3 MRI
+    m06        (ADNI2/ADNIGO) Month 6 MRI[-New Pt]  same pattern
+    m12        Year 1 Visit                         ADNI2 Initial Visit-Cont Pt
+    m24        Year 2 Visit                         Year 1 Visit   <-- NOT "Year 2 Visit"
+
+The m12/m24 row is the dangerous one. A Continuing-Pt's "Year 1 Visit" is
+**not** their first year in the study — it is their first year *under
+ADNI2*, which lands on VISCODE2 `m24` for New-Pt subjects but on the
+Continuing-Pt's own m12-equivalent clinical timepoint. Searching IDA for
+"Year 1 Visit" and assuming it always means `m12` will silently pull the
+wrong slot for every Continuing-Pt subject matched that way, and searching
+for "Year 2 Visit" will simply miss every Continuing-Pt subject's `m24` scan
+(their m24 is filed as "Year 1 Visit", not "Year 2 Visit").
+
+There is a second, smaller trap discovered in the same session: a subset of
+subjects (both New-Pt and Continuing-Pt) have an **extra, unscheduled
+"Month 3" visit** (`ADNI2 Month 3 MRI-New Pt` / `ADNIGO Month 3 MRI`,
+VISCODE2 `m03`) that does not correspond to any of the four target slots on
+its own — it only matters as a fallback fill-in when a subject has no true
+`m06`-coded scan but does have an `m03` scan inside the m06 target's ±60-day
+window (5 of the 9 fallback rows in `patha_target_scans.csv` are exactly
+this). A search built only around the four planned slot labels will miss
+these and undercount the cohort; a fifth, targeted search on the Month-3
+label was needed to close the gap in session 8's build.
+
+**Why it matters:** anyone rebuilding this search from scratch, or adding a
+new visit slot (e.g. m48), without checking the New-Pt/Continuing-Pt split
+first will get a cohort with silently wrong or missing slot assignments for
+whichever fraction of subjects are Continuing-Pts — and the error will not
+be obvious from row counts alone, since Continuing-Pt subjects still return
+*a* result, just filed under the wrong slot. Cross-check any new IDA visit
+search against `patha_target_scans.csv`'s Scan Date column per subject
+before trusting a label match, the way session 8 did for the 9 fallback
+rows and the 5 Month-3 recoveries.
+
+---
+
+## 4. STANDING GOTCHAS (session 8 additions)
+
+Everything in context4.txt §4/§8, context5-7's standing gotchas sections
+still applies. New:
+
+- **IDA "Image ID" search does not work for cross-referencing the
+  Pre-processed derivative from `MRIQC.csv`.** `MRIQC.csv`'s `image_id`
+  column is the *original* DICOM series ID; IDA's `MT1;*` derivative gets
+  its own, different Image ID. Matching must be done by Subject + Visit
+  label + Scan Date, not by pasting `MRIQC.csv` image IDs into an IDA
+  Image-ID search — that will return nothing.
+- **Collection names are capped at 25 characters** (confirmed live again
+  this session, same as context4.txt). Plan short names up front.
+- IDA's results table is virtualized and renders ~20 rows at a time with
+  uneven pagination; verification extraction at the ~2,500-row scale missed
+  a handful of already-present rows on the first pass (3 `135_S_*`
+  subjects, 8 rows) — always re-verify a "missing" result against a second,
+  narrower search before concluding it is actually absent.
+- A handful of expected rows (7 of 2,573 this session) can be genuinely
+  absent from an ADNIGO+ADNI2-restricted search because the underlying
+  image was recatalogued under a different phase (ADNI3, or in one case
+  ADNI1) in IDA's own system — this is a phase-filter exclusion, not a
+  pipeline or search defect, and does not need to be "fixed."

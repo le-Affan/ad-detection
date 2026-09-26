@@ -79,3 +79,20 @@ analysis/kaggle_output/**/*.pt
 # Pickled cache of the refit results, rebuilt by refit_thresholds.py from the
 # per-checkpoint CSVs beside it. Derived, so not tracked.
 analysis/threshold_refit/_results.npy
+
+# --- Path A (multi-visit) outputs ---
+
+# Same shape as the dataset/mri_prep/ rule above, for the same reasons: the
+# preprocessed follow-up volumes (mni/, vol96/, ~2.5k scans) are too big for
+# git and DUA-restricted, while the small tables beside them -- visits.csv
+# above all, which every later Path A stage reads -- are what make the stream
+# reproducible from a clone. Written as `dir/*` so git still descends.
+dataset/mri_prep_patha/*
+!dataset/mri_prep_patha/*.py
+!dataset/mri_prep_patha/*.csv
+!dataset/mri_prep_patha/*.json
+!dataset/mri_prep_patha/*.log
+
+# Windows "downloaded from the internet" alternate-stream stubs, which appear
+# as `<name>:Zone.Identifier` files when a download is copied into WSL.
+*:Zone.Identifier
