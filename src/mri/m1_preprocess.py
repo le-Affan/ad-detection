@@ -227,6 +227,41 @@ def save_qc_png(ptid, small, mask_o, out_dir):
     return path
 
 
+def process_one(path, key, mni_dir, vol_dir, qc_dir, template, size=OUT_SIZE):
+    """Preprocess one raw image to <mni_dir>/<key>.nii.gz and <vol_dir>/<key>.nii.gz.
+
+    `template` is the tuple load_template() returns. Never raises on a bad
+    image: the result dict carries ok/error instead, so a caller looping over
+    thousands of scans records a failure and moves on rather than dying on it.
+    `qc_dir=None` skips the QC render. Shared by m1 (key = PTID) and Path A's
+    p2 (key = PTID__slot).
+    """
+    head_w, mask_w, brain_w, tmpl_o, mask_o = template
+    native = "x".join(str(s) for s in ants.image_header_info(path)["dimensions"])
+    t0 = time.time()
+    try:
+        full, small = preprocess(path, head_w, mask_w, brain_w, size)
+    except Exception as e:
+        return {"native": native, "ok": False, "seconds": round(time.time() - t0, 1),
+                "error": f"{type(e).__name__}: {e}"}
+
+    # Write atomically so an interrupted run cannot leave a half-written
+    # volume that a later run would skip as "already done". The temp name
+    # has to keep the .nii.gz suffix -- ITK picks its writer from the
+    # extension and refuses anything it does not recognise.
+    for img, d in ((full, mni_dir), (small, vol_dir)):
+        dest = os.path.join(d, f"{key}.nii.gz")
+        tmp = os.path.join(d, f".tmp_{key}.nii.gz")
+        ants.image_write(img, tmp)
+        os.replace(tmp, dest)
+
+    dt = time.time() - t0
+    met = qc_metrics(small, tmpl_o, mask_o)
+    png = save_qc_png(key, small, mask_o, qc_dir) if qc_dir else ""
+    return {"native": native, "ok": True, "seconds": round(dt, 1), "error": "",
+            **met, "png": os.path.relpath(png, ROOT) if png else ""}
+
+
 def subjects_on_disk():
     """Subjects with a raw NIfTI present, read from the manifest at run time."""
     dm = pd.read_csv(MANIFEST, dtype=str)
@@ -257,45 +292,20 @@ def run(ptids=None, size=OUT_SIZE, force=False, qc=True, tag="qc"):
 
     rows = []
     for i, r in todo.iterrows():
-        out_small = os.path.join(VOL_DIR, f"{r.PTID}.nii.gz")
-        out_full = os.path.join(MNI_DIR, f"{r.PTID}.nii.gz")
-        if os.path.exists(out_small) and not force:
+        if os.path.exists(os.path.join(VOL_DIR, f"{r.PTID}.nii.gz")) and not force:
             print(f"[{i + 1}/{len(todo)}] {r.PTID}  skip (exists)")
             continue
 
-        native = ants.image_header_info(r.path)["dimensions"]
-        t0 = time.time()
-        try:
-            full, small = preprocess(r.path, head_w, mask_w, brain_w, size)
-        except Exception as e:
-            dt = time.time() - t0
-            print(f"[{i + 1}/{len(todo)}] {r.PTID}  FAILED in {dt:.1f}s -- {type(e).__name__}: {e}")
-            rows.append({"RID": r.RID, "PTID": r.PTID, "DX_bl": r.DX_bl,
-                         "native": "x".join(str(s) for s in native),
-                         "ok": False, "seconds": round(dt, 1),
-                         "error": f"{type(e).__name__}: {e}"})
+        res = process_one(r.path, r.PTID, MNI_DIR, VOL_DIR, qc_dir if qc else None,
+                          (head_w, mask_w, brain_w, tmpl_o, mask_o), size)
+        rows.append({"RID": r.RID, "PTID": r.PTID, "DX_bl": r.DX_bl, **res})
+        if not res["ok"]:
+            print(f"[{i + 1}/{len(todo)}] {r.PTID}  FAILED in {res['seconds']:.1f}s -- {res['error']}")
             continue
-
-        # Write atomically so an interrupted run cannot leave a half-written
-        # volume that a later run would skip as "already done". The temp name
-        # has to keep the .nii.gz suffix -- ITK picks its writer from the
-        # extension and refuses anything it does not recognise.
-        for img, dest in ((full, out_full), (small, out_small)):
-            tmp = os.path.join(os.path.dirname(dest), f".tmp_{os.path.basename(dest)}")
-            ants.image_write(img, tmp)
-            os.replace(tmp, dest)
-
-        dt = time.time() - t0
-        met = qc_metrics(small, tmpl_o, mask_o)
-        png = save_qc_png(r.PTID, small, mask_o, qc_dir) if qc else ""
-        rows.append({"RID": r.RID, "PTID": r.PTID, "DX_bl": r.DX_bl,
-                     "native": "x".join(str(s) for s in native),
-                     "ok": True, "seconds": round(dt, 1), "error": "",
-                     **met, "png": os.path.relpath(png, ROOT) if png else ""})
         print(f"[{i + 1}/{len(todo)}] {r.PTID}  {r.DX_bl:<4s} "
-              f"{rows[-1]['native']:>12s} -> {met['shape']}  {dt:6.1f}s  "
-              f"fill={met['mask_fill']:.3f} corr={met['corr_vs_mni']:.3f} "
-              f"range=[{met['min']:.3f},{met['max']:.3f}]")
+              f"{res['native']:>12s} -> {res['shape']}  {res['seconds']:6.1f}s  "
+              f"fill={res['mask_fill']:.3f} corr={res['corr_vs_mni']:.3f} "
+              f"range=[{res['min']:.3f},{res['max']:.3f}]")
 
     if not rows:
         print("nothing to do")
@@ -307,16 +317,20 @@ def run(ptids=None, size=OUT_SIZE, force=False, qc=True, tag="qc"):
     print(f"\nwrote {out}")
 
     with open(os.path.join(PREP, f"m1_params_{tag}.json"), "w") as f:
-        json.dump({"orientation": ORIENTATION, "work_spacing": WORK_SPACING,
-                   "transform": "Affine x2 (head->head, then brain->brain)",
-                   "clip_negative": "after mask, before truncate (b-spline undershoot)",
-                   "truncate": [TRUNC_LO, TRUNC_HI],
-                   "normalise": "min-max to [0,1] before downsample",
-                   "downsample": {"size": size, "interp": "linear"},
-                   "n4": "first, in native space",
-                   "template": "ICBM152 2009a whole-head T1 + published brain mask (via nilearn)"},
-                  f, indent=2)
+        json.dump(chain_params(size), f, indent=2)
     return df
+
+
+def chain_params(size=OUT_SIZE):
+    """The preprocessing chain's settings, recorded beside every run's report."""
+    return {"orientation": ORIENTATION, "work_spacing": WORK_SPACING,
+            "transform": "Affine x2 (head->head, then brain->brain)",
+            "clip_negative": "after mask, before truncate (b-spline undershoot)",
+            "truncate": [TRUNC_LO, TRUNC_HI],
+            "normalise": "min-max to [0,1] before downsample",
+            "downsample": {"size": size, "interp": "linear"},
+            "n4": "first, in native space",
+            "template": "ICBM152 2009a whole-head T1 + published brain mask (via nilearn)"}
 
 
 def main():
