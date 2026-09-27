@@ -1,0 +1,46 @@
+device      : cuda (NVIDIA GeForce RTX 5060 Laptop GPU)
+amp         : True
+out-dir     : analysis/mv/bl_inv_s44
+data-root   : (repo layout)
+subjects    : train 567  val 121  test 123
+train counts: CN=133  EMCI=216  LMCI=114  AD=104
+class weight: DEMO MSE  CN=1.0658  EMCI=0.6562  LMCI=1.2434  AD=1.3630  [inverse, train rows]
+alz balance : 104/567 positive (18.34%)  pos_weight = 4.451923  [auto (train neg/pos)]
+batch size  : 32  [explicit]
+arch        : resnet18w  (8,298,402 params, 4.0x smaller than resnet18)
+dropout     : 0.3
+weight decay: 0.01
+grad norms  : demo 15.4151   alz 2.3922   ratio 6.444x  (16 batches, fp32)
+lambdas     : demo 0.2687   alz 1.7313   [auto, gradient-balanced]
+loss        : 0.2687 * class-weighted MSE(DEMO) + 1.7313 * BCE(ALZ, pos_weight=4.4519)
+augment     : rot +-5.0deg  trans +-2.0vox  bright +-0.05  contrast +-0.05  flip_lr False  [TRAIN SPLIT ONLY]
+
+ ep       lr    train      val    mae   acc4    mF1    auc    sec
+  0 1.00e-05   2.5561   2.4561  0.963  0.231  0.094  0.417    6.8  *best
+  1 2.00e-05   2.2685   2.3906  0.873  0.231  0.094  0.604    4.5  *best
+  2 3.00e-05   2.1434   2.1839  0.570  0.372  0.151  0.625    4.9  *best
+  3 3.00e-05   2.0250   1.9731  0.555  0.256  0.167  0.733    4.3  *best
+  4 3.00e-05   1.9900   1.9579  0.597  0.223  0.138  0.732    4.4  *best
+  5 2.99e-05   1.8837   2.3964  0.718  0.256  0.208  0.746    4.5
+  6 2.98e-05   1.8514   2.1708  0.666  0.256  0.228  0.742    4.2
+  7 2.96e-05   1.8227   1.8201  0.546  0.322  0.261  0.741    4.5  *best
+  8 2.94e-05   1.7120   1.8857  0.566  0.289  0.259  0.713    4.4
+  9 2.92e-05   1.6151   2.0538  0.639  0.306  0.277  0.763    4.7
+ 10 2.89e-05   1.4840   1.8964  0.529  0.314  0.298  0.756    4.7
+ 11 2.86e-05   1.3892   1.9667  0.580  0.298  0.288  0.780    4.4
+ 12 2.82e-05   1.3809   2.3733  0.667  0.281  0.253  0.776    4.5
+ 13 2.78e-05   1.2746   2.5403  0.692  0.273  0.243  0.781    4.6
+ 14 2.73e-05   1.2418   2.0266  0.485  0.421  0.414  0.764    4.6
+ 15 2.68e-05   1.2570   2.0061  0.500  0.388  0.391  0.794    4.7
+ 16 2.63e-05   1.2387   3.7618  0.789  0.289  0.230  0.799    4.6
+ 17 2.58e-05   1.0858   2.0547  0.503  0.298  0.270  0.782    4.7
+ 18 2.52e-05   1.0934   2.5273  0.532  0.314  0.305  0.767    4.7
+ 19 2.45e-05   0.9304   2.4633  0.514  0.364  0.345  0.755    4.9
+ 20 2.39e-05   0.9178   2.4378  0.527  0.364  0.376  0.760    4.6
+ 21 2.32e-05   0.9785   2.9168  0.534  0.339  0.298  0.768    4.4
+ 22 2.25e-05   0.8748   3.1164  0.518  0.339  0.302  0.731    4.4
+
+early stop: no val-loss improvement in 15 epochs
+
+best val loss: 1.8201
+artefacts    : analysis/mv/bl_inv_s44

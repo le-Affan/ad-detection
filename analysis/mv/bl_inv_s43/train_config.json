@@ -1,0 +1,60 @@
+{
+  "data_root": null,
+  "out_dir": "analysis/mv/bl_inv_s43",
+  "epochs": 60,
+  "batch_size": 32,
+  "probe_sizes": "4,8,16,24,32",
+  "probe_safety": 0.85,
+  "lr": 3e-05,
+  "weight_decay": 0.01,
+  "warmup_epochs": 3,
+  "arch": "resnet18w",
+  "dropout": 0.3,
+  "no_aug": false,
+  "aug_rot_deg": 5.0,
+  "aug_trans_vox": 2.0,
+  "aug_brightness": 0.05,
+  "aug_contrast": 0.05,
+  "aug_flip_lr": false,
+  "lam_demo": 0.4316120333105494,
+  "lam_alz": 1.5683879666894507,
+  "balance_batches": 16,
+  "alz_pos_weight": 4.451923076923077,
+  "train_index": null,
+  "class_weight": "inverse",
+  "patience": 15,
+  "ckpt_every": 0,
+  "num_workers": 4,
+  "seed": 43,
+  "no_amp": false,
+  "resume": true,
+  "limit": 0,
+  "device": "cuda",
+  "amp": true,
+  "params": 8298402,
+  "train_counts": {
+    "0": 133,
+    "1": 216,
+    "2": 114,
+    "3": 104
+  },
+  "augment": {
+    "rot_deg": 5.0,
+    "trans_vox": 2.0,
+    "brightness": 0.05,
+    "contrast": 0.05,
+    "flip_lr": false
+  },
+  "grad_balance": {
+    "trunk_grad_norm_demo": 11.033830468944805,
+    "trunk_grad_norm_alz": 3.0364515062924657,
+    "ratio_demo_over_alz": 3.633791103226677
+  },
+  "train_index_info": null,
+  "class_weights": [
+    1.0657894611358643,
+    0.65625,
+    1.2434210777282715,
+    1.3629807233810425
+  ]
+}

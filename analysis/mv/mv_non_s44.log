@@ -1,0 +1,41 @@
+device      : cuda (NVIDIA GeForce RTX 5060 Laptop GPU)
+amp         : True
+out-dir     : analysis/mv/mv_non_s44
+data-root   : (repo layout)
+subjects    : train 567  val 121  test 123
+train index : dataset/mri_prep_mv/train_scans.csv  (1726 scans from 567 subjects, sha256 aeb66ec88890)
+train counts: CN=447  EMCI=704  LMCI=332  AD=243
+alz balance : 243/1726 positive (14.08%)  pos_weight = 6.102881  [auto (train neg/pos)]
+batch size  : 32  [explicit]
+arch        : resnet18w  (8,298,402 params, 4.0x smaller than resnet18)
+dropout     : 0.3
+weight decay: 0.01
+grad norms  : demo 12.0692   alz 4.9526   ratio 2.437x  (16 batches, fp32)
+lambdas     : demo 0.5819   alz 1.4181   [auto, gradient-balanced]
+loss        : 0.5819 * MSE(DEMO) + 1.4181 * BCE(ALZ, pos_weight=6.1029)
+augment     : rot +-5.0deg  trans +-2.0vox  bright +-0.05  contrast +-0.05  flip_lr False  [TRAIN SPLIT ONLY]
+
+ ep       lr    train      val    mae   acc4    mF1    auc    sec
+  0 1.00e-05   2.2744   2.3836  0.663  0.215  0.126  0.549   13.3  *best
+  1 2.00e-05   1.8951   1.9825  0.536  0.347  0.215  0.721   10.5  *best
+  2 3.00e-05   1.7484   1.8341  0.550  0.264  0.170  0.754   11.1  *best
+  3 3.00e-05   1.5360   2.0402  0.512  0.355  0.236  0.737   10.4
+  4 3.00e-05   1.3389   2.0599  0.539  0.298  0.259  0.727   10.5
+  5 2.99e-05   1.1118   1.9795  0.524  0.347  0.342  0.781   10.5
+  6 2.98e-05   1.0509   2.4572  0.497  0.380  0.305  0.792   10.9
+  7 2.96e-05   0.9595   3.2115  0.540  0.388  0.278  0.772   10.5
+  8 2.94e-05   0.8883   1.9764  0.527  0.322  0.292  0.803   10.6
+  9 2.92e-05   0.7880   4.0241  0.489  0.397  0.248  0.770   10.9
+ 10 2.89e-05   0.7781   2.0747  0.462  0.355  0.279  0.811   10.4
+ 11 2.86e-05   0.7840   3.9099  0.520  0.388  0.260  0.737   10.7
+ 12 2.82e-05   0.7787   2.1637  0.488  0.347  0.307  0.780   10.9
+ 13 2.78e-05   0.6550   3.4273  0.477  0.347  0.175  0.774   10.3
+ 14 2.73e-05   0.6856   5.6288  0.522  0.380  0.157  0.784   10.6
+ 15 2.68e-05   0.5920   2.5489  0.450  0.355  0.247  0.810   11.0
+ 16 2.63e-05   0.5531   3.5035  0.458  0.397  0.253  0.787   10.3
+ 17 2.58e-05   0.5531   4.8119  0.497  0.388  0.217  0.734   11.0
+
+early stop: no val-loss improvement in 15 epochs
+
+best val loss: 1.8341
+artefacts    : analysis/mv/mv_non_s44

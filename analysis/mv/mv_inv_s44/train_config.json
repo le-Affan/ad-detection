@@ -1,0 +1,65 @@
+{
+  "data_root": null,
+  "out_dir": "analysis/mv/mv_inv_s44",
+  "epochs": 60,
+  "batch_size": 32,
+  "probe_sizes": "4,8,16,24,32",
+  "probe_safety": 0.85,
+  "lr": 3e-05,
+  "weight_decay": 0.01,
+  "warmup_epochs": 3,
+  "arch": "resnet18w",
+  "dropout": 0.3,
+  "no_aug": false,
+  "aug_rot_deg": 5.0,
+  "aug_trans_vox": 2.0,
+  "aug_brightness": 0.05,
+  "aug_contrast": 0.05,
+  "aug_flip_lr": false,
+  "lam_demo": 0.471393667603533,
+  "lam_alz": 1.5286063323964671,
+  "balance_batches": 16,
+  "alz_pos_weight": 6.102880658436214,
+  "train_index": "dataset/mri_prep_mv/train_scans.csv",
+  "class_weight": "inverse",
+  "patience": 15,
+  "ckpt_every": 0,
+  "num_workers": 4,
+  "seed": 44,
+  "no_amp": false,
+  "resume": true,
+  "limit": 0,
+  "device": "cuda",
+  "amp": true,
+  "params": 8298402,
+  "train_counts": {
+    "0": 447,
+    "1": 704,
+    "2": 332,
+    "3": 243
+  },
+  "augment": {
+    "rot_deg": 5.0,
+    "trans_vox": 2.0,
+    "brightness": 0.05,
+    "contrast": 0.05,
+    "flip_lr": false
+  },
+  "grad_balance": {
+    "trunk_grad_norm_demo": 16.059943417519186,
+    "trunk_grad_norm_alz": 4.9525868555188275,
+    "ratio_demo_over_alz": 3.2427383680556905
+  },
+  "train_index_info": {
+    "path": "dataset/mri_prep_mv/train_scans.csv",
+    "sha256": "aeb66ec88890faefb5db2c5dc28b04c99cb16e60e7041c46846f69b880915ebe",
+    "scans": 1726,
+    "subjects": 567
+  },
+  "class_weights": [
+    0.9653244018554688,
+    0.6129261255264282,
+    1.299698829650879,
+    1.7757201194763184
+  ]
+}
