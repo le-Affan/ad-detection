@@ -231,3 +231,75 @@ Validation only; the test split is not read. Added 2026-09-27.
    macro-F1; a tie counts as not a win.
 
 Otherwise the result is reported as **"no reliable gain"**.
+
+## Step 3 — runs
+
+- 16 runs: R0 and R2 × seeds 42–49. The 10 new runs (seeds 45–49) took
+  about 2.5 min each, locally on the RTX 5060, with the same config as seeds
+  42–44.
+- The queue is `SEEDS="45 46 47 48 49" ARMS="bl:none bl:inverse"
+  analysis/mv/run_queue.sh`.
+- The rules are applied by `analysis/mv/seeds8.py`. Its outputs are
+  `seeds8_runs.csv` and `seeds8_paired.csv`.
+
+## Step 4 — results
+
+All numbers are mean ± SD over 8 seeds, at the best-val-loss epoch, on the
+121-subject validation set.
+
+| Arm | acc4 | Macro-F1 | Bal. acc | F1 CN | F1 EMCI | F1 LMCI | F1 AD | AD AUC | Best epoch |
+|---|---|---|---|---|---|---|---|---|---|
+| R0 (v9 settings) | 0.332 ± 0.035 | 0.284 ± 0.047 | 0.302 ± 0.033 | 0.190 ± 0.132 | 0.451 ± 0.054 | 0.267 ± 0.050 | 0.226 ± 0.122 | 0.788 ± 0.027 | 11.3 |
+| R2 (+ class weighting) | 0.351 ± 0.045 | 0.316 ± 0.071 | 0.336 ± 0.046 | 0.190 ± 0.192 | 0.456 ± 0.060 | 0.299 ± 0.039 | 0.317 ± 0.132 | 0.787 ± 0.037 | 11.4 |
+| v9 Kaggle run (historical, 1 run) | 0.364 | 0.349 | 0.360 | 0.176 | 0.430 | 0.257 | 0.533 | 0.819 | 15 |
+
+Paired macro-F1, R2 − R0, same seed:
+
+| Seed | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 |
+|---|---|---|---|---|---|---|---|---|
+| R0 | 0.304 | 0.211 | 0.247 | 0.244 | 0.314 | 0.272 | 0.333 | 0.344 |
+| R2 | 0.338 | 0.239 | 0.261 | 0.354 | 0.259 | 0.374 | 0.436 | 0.263 |
+| R2 − R0 | +0.033 | +0.028 | +0.013 | +0.110 | −0.055 | +0.102 | +0.104 | −0.080 |
+
+- Mean difference: +0.032 (SD 0.072).
+- 95% CI: [−0.029, +0.092], two-sided t, df = 7.
+- R2 wins on 6 of 8 seeds.
+
+## Verdicts (against the Step 2 rules)
+
+**Class weighting: no reliable gain.**
+- Rule (1) is not met. The mean gain is +0.032, below 0.05, and the 95% CI
+  includes zero.
+- Rule (2) is not met: R2 wins on 6 of 8 seeds, and 7 were required.
+- R2's means are higher on acc4, macro-F1, balanced accuracy, LMCI F1 and
+  AD F1 (+0.09). But the seed-to-seed variation, including two seeds where
+  R2 loses by 0.055 and 0.080, is as large as the effect.
+- This result supersedes point 3 of the "Reading" section above.
+
+**v9 reproduction: the 0.349 is a real checkpoint score and an upper-tail
+run, not the config's expected performance.**
+- The checkpoint reproduces exactly (Step 1b), on the same validation set
+  (Step 1a), at the correct selection epoch (Step 1c).
+- Eight local runs of the same settings give 0.284 ± 0.047, ranging from
+  0.211 to 0.344.
+- None of the 8 reaches 0.349; it sits at z = +1.38.
+- Whether Kaggle-vs-local hardware adds to that gap cannot be separated from
+  seed variance with one Kaggle run. The variance alone (SD 0.047) is enough
+  to produce it.
+- The 3-seed R0 figure used earlier in this report (0.254 ± 0.047) is
+  superseded by the 8-seed figure.
+
+## The number to use in place of 0.349
+
+**Static 4-class MRI model (v9 lr_3e-5 settings): validation macro-F1
+0.284 ± 0.047.** This is the mean ± SD over 8 seeds, at the best-val-loss
+epoch, on the 121-subject validation split (`mri_index.csv`, CN 28 / EMCI 46
+/ LMCI 24 / AD 23).
+
+The companion numbers on the same basis are:
+- acc4 0.332 ± 0.035
+- balanced accuracy 0.302 ± 0.033
+- AD AUC 0.788 ± 0.027
+
+Where the single run is cited, label it as "one Kaggle run, macro-F1 0.349;
+upper tail of an 8-seed distribution".

@@ -5,10 +5,16 @@
 # Config is v9 lr_3e-5's (resnet18w, batch 32, lr 3e-5, wd 1e-2, 60 epochs,
 # patience 15, default augmentation). Rerunning resumes each run from its
 # last.pt and skips runs that already finished.
+#
+# SEEDS and ARMS override the grid, e.g. the 8-seed R0/R2 follow-up:
+#   SEEDS="45 46 47 48 49" ARMS="bl:none bl:inverse" analysis/mv/run_queue.sh
 cd "$(dirname "$0")/../.."
 PY=/home/ankon/projects/LYP/.venv-mri/bin/python
-for seed in 42 43 44; do
-  for cfg in "bl none" "mv none" "bl inverse" "mv inverse"; do
+SEEDS=${SEEDS:-"42 43 44"}
+ARMS=${ARMS:-"bl:none mv:none bl:inverse mv:inverse"}
+for seed in $SEEDS; do
+  for arm in $ARMS; do
+    cfg=${arm/:/ }
     set -- $cfg
     name="${1}_${2:0:3}_s${seed}"
     log="analysis/mv/${name}.log"
