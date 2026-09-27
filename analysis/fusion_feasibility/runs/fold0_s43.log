@@ -1,0 +1,42 @@
+device      : cuda (NVIDIA GeForce RTX 5060 Laptop GPU)
+amp         : True
+out-dir     : analysis/fusion_feasibility/runs/fold0_s43
+data-root   : analysis/fusion_feasibility/folds/fold0
+subjects    : train 385  val 68  test 114
+train counts: CN=90  EMCI=146  LMCI=78  AD=71
+alz balance : 71/385 positive (18.44%)  pos_weight = 4.422535  [auto (train neg/pos)]
+batch size  : 32  [explicit]
+arch        : resnet18w  (8,298,402 params, 4.0x smaller than resnet18)
+dropout     : 0.3
+weight decay: 0.01
+grad norms  : demo 13.0535   alz 3.9786   ratio 3.281x  (16 batches, fp32)
+lambdas     : demo 0.4672   alz 1.5328   [auto, gradient-balanced]
+loss        : 0.4672 * MSE(DEMO) + 1.5328 * BCE(ALZ, pos_weight=4.4225)
+augment     : rot +-5.0deg  trans +-2.0vox  bright +-0.05  contrast +-0.05  flip_lr False  [TRAIN SPLIT ONLY]
+
+ ep       lr    train      val    mae   acc4    mF1    auc    sec
+  0 1.00e-05   2.3025   2.1008  0.685  0.235  0.095  0.478    6.7  *best
+  1 2.00e-05   2.0448   2.0482  0.624  0.294  0.182  0.459    3.8  *best
+  2 3.00e-05   1.9473   1.9964  0.584  0.382  0.140  0.664    4.0  *best
+  3 3.00e-05   1.8879   1.9064  0.504  0.382  0.138  0.702    3.7  *best
+  4 3.00e-05   1.8936   1.7576  0.507  0.368  0.216  0.743    3.9  *best
+  5 2.99e-05   1.7435   1.8637  0.604  0.250  0.184  0.683    3.9
+  6 2.98e-05   1.7332   1.7733  0.551  0.324  0.236  0.692    3.7
+  7 2.96e-05   1.6587   1.7599  0.500  0.368  0.258  0.704    3.5
+  8 2.94e-05   1.5334   1.8851  0.547  0.338  0.288  0.717    3.6
+  9 2.92e-05   1.5301   2.0291  0.601  0.309  0.273  0.718    4.0
+ 10 2.89e-05   1.4234   1.8995  0.551  0.353  0.278  0.714    4.1
+ 11 2.86e-05   1.4708   1.8210  0.497  0.397  0.300  0.704    3.3
+ 12 2.82e-05   1.3687   2.2377  0.659  0.324  0.287  0.696    3.6
+ 13 2.78e-05   1.2938   1.8578  0.541  0.382  0.345  0.711    4.0
+ 14 2.73e-05   1.1442   1.8232  0.504  0.397  0.364  0.710    3.6
+ 15 2.68e-05   1.1913   2.2977  0.609  0.309  0.270  0.738    3.6
+ 16 2.63e-05   1.0982   1.7704  0.487  0.412  0.371  0.759    3.7
+ 17 2.58e-05   1.1330   2.0796  0.471  0.456  0.414  0.710    3.6
+ 18 2.52e-05   1.0310   1.8623  0.480  0.412  0.402  0.725    4.1
+ 19 2.45e-05   0.8697   2.1300  0.518  0.353  0.348  0.713    3.7
+
+early stop: no val-loss improvement in 15 epochs
+
+best val loss: 1.7576
+artefacts    : analysis/fusion_feasibility/runs/fold0_s43

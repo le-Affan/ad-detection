@@ -1,0 +1,44 @@
+scoring: 567 train (cross-fit), 121 val (fold-model ensemble)
+fold0: scored 114 held-out + 121 val
+fold1: scored 114 held-out + 121 val
+fold2: scored 113 held-out + 121 val
+fold3: scored 113 held-out + 121 val
+fold4: scored 113 held-out + 121 val
+
+ALZ AUC, AD vs rest
+  train (cross-fitted, n=567): 0.7643
+  val   (5-fold ensemble, n=121): 0.7777
+    train fold0 (n=114): 0.7593
+    train fold1 (n=114): 0.7087
+    train fold2 (n=113): 0.8059
+    train fold3 (n=113): 0.8659
+    train fold4 (n=113): 0.7774
+  single-seed, single-fold-model AUCs:
+    fold0 s42 ep33: held-out 0.764  val 0.748
+    fold0 s43 ep 4: held-out 0.658  val 0.725
+    fold0 s44 ep22: held-out 0.692  val 0.631
+    fold1 s42 ep 5: held-out 0.699  val 0.746
+    fold1 s43 ep14: held-out 0.683  val 0.717
+    fold1 s44 ep23: held-out 0.729  val 0.719
+    fold2 s42 ep11: held-out 0.790  val 0.760
+    fold2 s43 ep13: held-out 0.752  val 0.741
+    fold2 s44 ep40: held-out 0.770  val 0.800
+    fold3 s42 ep12: held-out 0.880  val 0.764
+    fold3 s43 ep15: held-out 0.831  val 0.747
+    fold3 s44 ep13: held-out 0.834  val 0.772
+    fold4 s42 ep 4: held-out 0.733  val 0.733
+    fold4 s43 ep 4: held-out 0.801  val 0.734
+    fold4 s44 ep 5: held-out 0.760  val 0.724
+
+per-class ALZ / DEMO (mean ± sd)
+                    ALZ          DEMO       
+                   mean    std   mean    std
+clin_split label                            
+train      0      0.379  0.172  0.665  0.238
+           1      0.386  0.191  0.690  0.259
+           2      0.490  0.220  0.841  0.329
+           3      0.617  0.209  1.008  0.355
+val        0      0.380  0.126  0.669  0.182
+           1      0.427  0.156  0.737  0.213
+           2      0.423  0.168  0.738  0.235
+           3      0.596  0.183  0.987  0.268
