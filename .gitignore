@@ -79,3 +79,20 @@ analysis/kaggle_output/**/*.pt
 # Pickled cache of the refit results, rebuilt by refit_thresholds.py from the
 # per-checkpoint CSVs beside it. Derived, so not tracked.
 analysis/threshold_refit/_results.npy
+
+# --- Multi-visit static experiment (mv*) ---
+
+# This branch reads Path A's follow-up volumes but owns none of Path A's
+# outputs. Only visits_index.csv is tracked here (it says which volume is
+# which); the volumes are too big for git and DUA-restricted, and the rest of
+# the directory -- and analysis/patha/ -- belong to the path-a-multivisit branch.
+dataset/mri_prep_patha/*
+!dataset/mri_prep_patha/visits_index.csv
+analysis/patha/
+
+# Windows "downloaded from the internet" alternate-stream stubs, which appear
+# as `<name>:Zone.Identifier` files when a download is copied into WSL.
+*:Zone.Identifier
+
+# mv runs (m3_train.py --train-index): weights, not sources.
+analysis/mv/**/*.pt
