@@ -1,0 +1,19 @@
+gru_dx_bl_all_s44: train 480 / val 104 subjects, 60 steps/epoch, lam_demo 0.423 lam_alz 1.577 pos_weight 4.452, trunk lr 3e-05 head lr 0.0001
+ep  0  train 1.9430  val 1.9595  auc 0.847  macro_f1 0.103 demo_mae 0.645  11s+2s  *best
+ep  1  train 1.5864  val 1.7167  auc 0.807  macro_f1 0.230 demo_mae 0.503  9s+3s  *best
+ep  2  train 1.2798  val 1.7771  auc 0.783  macro_f1 0.128 demo_mae 0.617  9s+1s
+ep  3  train 1.1171  val 1.8444  auc 0.799  macro_f1 0.140 demo_mae 0.631  9s+1s
+ep  4  train 1.0911  val 2.2001  auc 0.784  macro_f1 0.201 demo_mae 0.469  9s+2s
+ep  5  train 0.8936  val 1.5914  auc 0.829  macro_f1 0.231 demo_mae 0.498  11s+1s  *best
+ep  6  train 0.9501  val 3.3148  auc 0.651  macro_f1 0.181 demo_mae 0.513  8s+1s
+ep  7  train 0.9779  val 1.7508  auc 0.766  macro_f1 0.204 demo_mae 0.549  9s+1s
+ep  8  train 0.8768  val 1.8884  auc 0.766  macro_f1 0.232 demo_mae 0.609  11s+1s
+ep  9  train 0.9072  val 2.2943  auc 0.705  macro_f1 0.246 demo_mae 0.632  8s+1s
+ep 10  train 0.7829  val 2.2928  auc 0.742  macro_f1 0.206 demo_mae 0.494  9s+2s
+ep 11  train 0.7169  val 2.2437  auc 0.775  macro_f1 0.247 demo_mae 0.683  11s+1s
+ep 12  train 0.6939  val 2.5659  auc 0.763  macro_f1 0.232 demo_mae 0.478  8s+1s
+ep 13  train 0.7090  val 1.9161  auc 0.771  macro_f1 0.279 demo_mae 0.508  8s+1s
+ep 14  train 0.5983  val 2.1034  auc 0.749  macro_f1 0.248 demo_mae 0.521  11s+1s
+ep 15  train 0.5910  val 1.9892  auc 0.801  macro_f1 0.287 demo_mae 0.514  9s+1s
+early stop: no val-loss improvement for 10 epochs
+done. best val loss 1.5914 -> /home/ankon/projects/LYP/extracted/ad-detection/analysis/patha/gru_dx_bl_all_s44/best.pt

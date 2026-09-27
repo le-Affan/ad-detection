@@ -1,0 +1,19 @@
+gru_dx_last_last_s44: train 480 / val 104 subjects, 60 steps/epoch, lam_demo 0.000 lam_alz 1.000 pos_weight 3.211, trunk lr 3e-05 head lr 0.0001
+ep  0  train 1.0674  val 1.0255  auc 0.817  bal_acc 0.500  10s+1s  *best
+ep  1  train 0.9941  val 0.8843  auc 0.838  bal_acc 0.798  6s+1s  *best
+ep  2  train 0.8891  val 0.9002  auc 0.839  bal_acc 0.677  5s+1s
+ep  3  train 0.7899  val 0.8493  auc 0.799  bal_acc 0.762  5s+1s  *best
+ep  4  train 0.7735  val 0.9086  auc 0.817  bal_acc 0.727  7s+1s
+ep  5  train 0.6664  val 0.7716  auc 0.822  bal_acc 0.771  5s+1s  *best
+ep  6  train 0.6808  val 0.7809  auc 0.819  bal_acc 0.773  5s+1s
+ep  7  train 0.6586  val 0.8308  auc 0.815  bal_acc 0.756  5s+1s
+ep  8  train 0.6894  val 1.4031  auc 0.799  bal_acc 0.565  6s+1s
+ep  9  train 0.7223  val 1.2612  auc 0.830  bal_acc 0.623  7s+1s
+ep 10  train 0.5938  val 0.9314  auc 0.832  bal_acc 0.723  5s+1s
+ep 11  train 0.5612  val 0.7887  auc 0.844  bal_acc 0.760  5s+1s
+ep 12  train 0.5944  val 0.9976  auc 0.839  bal_acc 0.706  5s+1s
+ep 13  train 0.5042  val 1.0960  auc 0.847  bal_acc 0.644  5s+1s
+ep 14  train 0.4764  val 0.8821  auc 0.824  bal_acc 0.779  5s+1s
+ep 15  train 0.5455  val 0.8975  auc 0.838  bal_acc 0.756  6s+1s
+early stop: no val-loss improvement for 10 epochs
+done. best val loss 0.7716 -> /home/ankon/projects/LYP/extracted/ad-detection/analysis/patha/gru_dx_last_last_s44/best.pt

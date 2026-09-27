@@ -96,3 +96,6 @@ dataset/mri_prep_patha/*
 # Windows "downloaded from the internet" alternate-stream stubs, which appear
 # as `<name>:Zone.Identifier` files when a download is copied into WSL.
 *:Zone.Identifier
+
+# Path A end-to-end runs (p5_train_temporal.py): weights, not sources.
+analysis/patha/**/*.pt
