@@ -95,19 +95,48 @@ def build_cache(run, device, path):
 
 
 @torch.no_grad()
-def static_metrics(run, device, ptids):
-    """v9 as trained, on its own baseline volumes, restricted to `ptids`."""
+def static_scores(run, device, ptids):
+    """v9 as trained, on its own baseline volumes: (demo, alz_logit) per ptid, in order."""
     net, _ = load_static(run, device)
     ds = ADNIVolumes("val")
-    ds.df = ds.df[ds.df.PTID.isin(ptids)].reset_index(drop=True)
-    demo, logit, lab = [], [], []
+    ds.df = ds.df[ds.df.PTID.isin(ptids)].set_index("PTID").loc[list(ptids)].reset_index()
+    demo, logit = [], []
     for i in range(len(ds)):
-        it = ds[i]
-        o = net(it["volume"].unsqueeze(0).to(device))
+        o = net(ds[i]["volume"].unsqueeze(0).to(device))
         demo.append(float(o["demo"]))
         logit.append(float(o["alz_logit"]))
-        lab.append(int(it["label"]))
-    return compute_metrics(np.array(demo), np.array(logit), np.array(lab)), len(ds)
+    return np.array(demo), np.array(logit)
+
+
+def binary_metrics(demo_pred, logit, y):
+    """For binary targets: the ALZ head's score against y. demo_pred is unused."""
+    from sklearn.metrics import roc_auc_score
+    y = np.asarray(y).astype(int)
+    pred = (np.asarray(logit) >= 0).astype(int)
+    sens = float(((pred == 1) & (y == 1)).sum() / max(y.sum(), 1))
+    spec = float(((pred == 0) & (y == 0)).sum() / max((y == 0).sum(), 1))
+    return {"alz_auc": float(roc_auc_score(y, logit)), "alz_sens": sens, "alz_spec": spec,
+            "bal_acc": (sens + spec) / 2, "n_pos": int(y.sum()), "n": len(y)}
+
+
+def dx_last_labels(ptids):
+    """1 if DXSUM says Dementia at the subject's LAST usable MRI visit, else 0.
+
+    The visit is matched by the scan's own VISCODE2 (so an m06 slot filled from
+    an m03 visit takes the m03 diagnosis); the bl slot is matched to DXSUM's
+    `bl` row. Subjects with no diagnosis at that visit get NaN and are dropped.
+    """
+    v = pd.read_csv(os.path.join(OUT_DIR, "visits_index.csv"))
+    last = v[v.present].sort_values("slot_idx").groupby("PTID").last()
+    code = last.apply(lambda r: "bl" if r.slot == "bl" else r.viscode2, axis=1)
+    dx = pd.read_csv(os.path.join(ROOT, "dataset", "raw", "adnimerge2_tables", "DXSUM.csv"),
+                     dtype=str, usecols=["PTID", "VISCODE2", "DIAGNOSIS"]).dropna()
+    # DXSUM repeats a few (subject, visit) rows verbatim; any that disagree are an error
+    if dx.groupby(["PTID", "VISCODE2"]).DIAGNOSIS.nunique().gt(1).any():
+        raise ValueError("DXSUM has conflicting diagnoses for one (PTID, VISCODE2)")
+    dx = dx.drop_duplicates(["PTID", "VISCODE2"]).set_index(["PTID", "VISCODE2"]).DIAGNOSIS
+    lab = {p: dx.get((p, code[p])) for p in ptids}
+    return np.array([np.nan if lab[p] is None else float(lab[p] == "Dementia") for p in ptids])
 
 
 def restrict(mask, mode):
@@ -120,7 +149,8 @@ def restrict(mask, mode):
     return torch.nn.functional.one_hot(pick, 4).bool()
 
 
-def fit(mode, data, arch, cfg, seed, device, lr=1e-3, hidden=128, epochs=300, patience=40, bs=64):
+def fit(mode, data, arch, cfg, seed, device, lr=1e-3, hidden=128, epochs=300, patience=40, bs=64,
+        metric_fn=compute_metrics):
     torch.manual_seed(seed)
     np.random.seed(seed)
     kind = "delta" if mode in ("first", "last") else mode   # one visit: delta is a plain MLP
@@ -173,7 +203,7 @@ def fit(mode, data, arch, cfg, seed, device, lr=1e-3, hidden=128, epochs=300, pa
             dp.append(o["demo"].cpu())
             lg.append(o["alz_logit"].cpu())
             lb.append(lab)
-    met = compute_metrics(torch.cat(dp).numpy(), torch.cat(lg).numpy(), torch.cat(lb).numpy())
+    met = metric_fn(torch.cat(dp).numpy(), torch.cat(lg).numpy(), torch.cat(lb).numpy())
     met.update(val_loss=best, best_epoch=best_ep)
     return met
 
@@ -185,6 +215,8 @@ def main():
     ap.add_argument("--modes", default=",".join(MODES))
     ap.add_argument("--lr", type=float, default=1e-3)
     ap.add_argument("--hidden", type=int, default=128)
+    ap.add_argument("--target", default="dx_bl", choices=["dx_bl", "dx_last"],
+                    help="dx_bl: v9's own targets; dx_last: Dementia at the last usable visit (binary)")
     a = ap.parse_args()
     device = "cuda" if torch.cuda.is_available() else "cpu"
     from dataset import DEMO_BY_LABEL, ALZ_BY_LABEL
@@ -203,39 +235,66 @@ def main():
     mu, sd = usable.mean(0), usable.std(0).clamp_min(1e-6)
     emb = torch.where(mask.unsqueeze(-1), (emb - mu) / sd, torch.zeros_like(emb))
 
+    binary = a.target != "dx_bl"
+    ptid_all = z["ptid"]
+    if binary:
+        y_all = dx_last_labels(list(ptid_all))
+        keep = ~np.isnan(y_all)
+        print(f"target {a.target}: {int(keep.sum())} of {len(keep)} subjects labelled, "
+              f"dropped {list(ptid_all[~keep])}")
+        ytr = y_all[keep & (z["split"] == "train")]
+        # binary target: ALZ head only, class-weighted from this target's train split
+        cfg = {"lam_demo": 0.0, "lam_alz": 1.0,
+               "alz_pos_weight": float((ytr == 0).sum() / max((ytr == 1).sum(), 1))}
+        metric_fn = binary_metrics
+    else:
+        keep = np.ones(len(ptid_all), dtype=bool)
+        metric_fn = compute_metrics
+
     data = {}
     for s in SPLITS:
-        k = torch.tensor(z["split"] == s)
+        sel = keep & (z["split"] == s)
+        k = torch.tensor(sel)
         lab = torch.tensor(z["label"])[k]
-        data[s] = (emb[k], mask[k], torch.tensor(z["days"])[k],
-                   torch.tensor([DEMO_BY_LABEL[int(x)] for x in lab], dtype=torch.float32),
-                   torch.tensor([ALZ_BY_LABEL[int(x)] for x in lab], dtype=torch.float32), lab)
-    val_ptids = list(z["ptid"][z["split"] == "val"])
-    print(f"train {int(tr.sum())} / val {len(val_ptids)} subjects; objective from {a.run}: "
+        if binary:
+            y = torch.tensor(y_all[sel], dtype=torch.float32)
+            data[s] = (emb[k], mask[k], torch.tensor(z["days"])[k], torch.zeros_like(y), y, y.long())
+        else:
+            data[s] = (emb[k], mask[k], torch.tensor(z["days"])[k],
+                       torch.tensor([DEMO_BY_LABEL[int(x)] for x in lab], dtype=torch.float32),
+                       torch.tensor([ALZ_BY_LABEL[int(x)] for x in lab], dtype=torch.float32), lab)
+    val_sel = keep & (z["split"] == "val")
+    val_ptids = list(ptid_all[val_sel])
+    print(f"train {int((keep & tr).sum())} / val {len(val_ptids)} subjects; objective: "
           f"lam_demo {cfg['lam_demo']:.3f}, lam_alz {cfg['lam_alz']:.3f}, pos_weight {cfg['alz_pos_weight']:.3f}")
 
     rows = []
     for run in ("lr_1e-4", "lr_5e-5", "lr_3e-5"):
-        m, n = static_metrics(run, device, val_ptids)
-        rows.append({"model": f"static v9 {run}", "seed": 0, **m})
-    print(f"static baselines evaluated on {n} val subjects (their original baseline volumes)")
+        demo, logit = static_scores(run, device, val_ptids)
+        truth = y_all[val_sel] if binary else z["label"][val_sel]
+        rows.append({"model": f"static v9 {run}", "seed": 0, **metric_fn(demo, logit, truth)})
+    print(f"static baselines evaluated on {len(val_ptids)} val subjects (their original baseline volumes)")
 
     for mode in a.modes.split(","):
         for seed in range(a.seeds):
-            m = fit(mode, data, str(z["arch"]), cfg, seed, device, lr=a.lr, hidden=a.hidden)
+            m = fit(mode, data, str(z["arch"]), cfg, seed, device, lr=a.lr, hidden=a.hidden,
+                    metric_fn=metric_fn)
             rows.append({"model": mode, "seed": seed, **m})
         r = pd.DataFrame([x for x in rows if x["model"] == mode])
         print(f"  {mode:<6s} alz_auc {r.alz_auc.mean():.3f}±{r.alz_auc.std():.3f}  "
-              f"macro_f1 {r.macro_f1.mean():.3f}±{r.macro_f1.std():.3f}  "
-              f"demo_mae {r.demo_mae.mean():.3f}  best_epoch ~{r.best_epoch.median():.0f}", flush=True)
+              f"bal_acc {r.bal_acc.mean():.3f}  best_epoch ~{r.best_epoch.median():.0f}", flush=True)
 
     df = pd.DataFrame(rows)
-    tag = f"{a.run}_lr{a.lr:g}_h{a.hidden}"
+    tag = f"{a.run}_lr{a.lr:g}_h{a.hidden}" + ("" if a.target == "dx_bl" else f"_{a.target}")
     df.to_csv(os.path.join(OUT_DIR, f"c1_results_{tag}.csv"), index=False)
-    g = df.groupby("model", sort=False)[REPORT]
+    cols = (["alz_auc", "bal_acc", "alz_sens", "alz_spec"] if binary else
+            ["alz_auc", "macro_f1", "bal_acc", "demo_mae", "alz_sens", "alz_spec"])
+    g = df.groupby("model", sort=False)[cols]
     summ = g.mean().round(3).astype(str) + " ± " + g.std().fillna(0).round(3).astype(str)
-    print("\n" + summ[["alz_auc", "macro_f1", "bal_acc", "demo_mae", "alz_sens", "alz_spec"]].to_string())
-    print("\nper-class F1 (mean):\n" + g.mean()[["f1_CN", "f1_EMCI", "f1_LMCI", "f1_AD"]].round(3).to_string())
+    print("\n" + summ.to_string())
+    if not binary:
+        f1 = df.groupby("model", sort=False)[["f1_CN", "f1_EMCI", "f1_LMCI", "f1_AD"]].mean()
+        print("\nper-class F1 (mean):\n" + f1.round(3).to_string())
     print(f"\nwrote {os.path.join(OUT_DIR, f'c1_results_{tag}.csv')}")
 
 
