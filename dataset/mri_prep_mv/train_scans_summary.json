@@ -1,0 +1,30 @@
+{
+  "policy": "consistent",
+  "rows": 1726,
+  "subjects": 567,
+  "rows_by_source": {
+    "mri_prep_patha": 1159,
+    "mri_prep": 567
+  },
+  "class_counts": {
+    "CN": 447,
+    "EMCI": 704,
+    "LMCI": 332,
+    "AD": 243
+  },
+  "scans_per_subject": {
+    "1": 104,
+    "2": 36,
+    "3": 158,
+    "4": 269
+  },
+  "excluded": {
+    "AD:no_visit_dx": 1,
+    "AD:visit_dx_disagrees": 2,
+    "CN:no_visit_dx": 1,
+    "CN:visit_dx_disagrees": 23,
+    "EMCI:no_visit_dx": 1,
+    "EMCI:visit_dx_disagrees": 42,
+    "LMCI:visit_dx_disagrees": 72
+  }
+}
