@@ -96,3 +96,8 @@ analysis/patha/
 
 # mv runs (m3_train.py --train-index): weights, not sources.
 analysis/mv/**/*.pt
+
+# Fusion feasibility cross-fit runs: weights, and each fold's vol96 symlink
+# into dataset/mri_prep/vol96 (a machine-local path, not data).
+analysis/fusion_feasibility/**/*.pt
+analysis/fusion_feasibility/folds/*/vol96
