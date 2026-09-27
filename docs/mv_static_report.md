@@ -158,3 +158,76 @@ the last visit).
   DEMO head fix (roadmap stage F), is a separate decision.
 - **Branch.** Whether to push `multivisit-static-augmentation`, and whether
   the `m3_train.py` changes (the guard in particular) should reach `master`.
+
+---
+
+# Follow-up: v9 reproducibility and class weighting (8 seeds)
+
+Validation only; the test split is not read. Added 2026-09-27.
+
+## Step 1 — checks before training
+
+**a. Validation set identity.**
+- v9 lr_3e-5's logged macro-F1 0.349 was computed on the **same 121-subject
+  validation set** the mv_static runs use (`mri_index.csv`, split `val`).
+- Its epoch log records class supports CN 28 / EMCI 46 / LMCI 24 / AD 23 at
+  every epoch, identical to the local set.
+- Re-scoring the checkpoint locally reproduces every logged metric to three
+  decimals (see b), which a different subject set could not do.
+- Path A's 104 subjects are a subset of these 121.
+- So 0.349 and R0's 0.254 are directly comparable, and the validation set
+  stays unchanged.
+
+**b. The v9 checkpoint scored locally, with no training.**
+`analysis/kaggle_output/v9/lr_3e-5/best.pt` is the epoch-15 checkpoint.
+
+| Val set | acc4 | Macro-F1 | Bal. acc | AD AUC | F1 CN | F1 EMCI | F1 LMCI | F1 AD |
+|---|---|---|---|---|---|---|---|---|
+| 121 (v9's own) | 0.364 | 0.349 | 0.360 | 0.820 | 0.176 | 0.430 | 0.257 | 0.533 |
+| 104 (Path A subset) | 0.346 | 0.344 | 0.352 | 0.804 | 0.182 | 0.415 | 0.233 | 0.545 |
+
+- fp32 and AMP give the same results.
+- The logged number is real for that checkpoint. The gap to R0 therefore
+  lies in training (run-to-run variance), not in evaluation or data.
+
+**c. Which epoch 0.349 came from.**
+- It is epoch 15, the best-val-loss epoch, i.e. m3's selection rule.
+  All metrics are read from that one checkpoint; there was no per-metric
+  epoch picking.
+- Per-metric maxima in the same run would have given:
+  - macro-F1 0.385 at epoch 29
+  - acc4 0.430 at epoch 30
+  - bal_acc 0.383 at epoch 23
+  - AD AUC 0.832 at epoch 23
+
+  None of these was reported.
+
+## Step 2 — pre-registered decision rules (committed before any Step 3 run)
+
+**Arms.**
+- R0 is baseline scans only, no class weighting, at exact v9 lr_3e-5 settings.
+- R2 is the same, with `--class-weight inverse`.
+- Both run on the same 8 seeds: 42–49. Seeds 42–44 are reused from the
+  mv_static runs. Their configs match v9 in every setting; the only
+  differences are data location, a no-op `--resume`, and the runtime-measured
+  auto-lambdas.
+
+**Metrics.**
+- Every metric comes from the best-val-loss epoch of each run.
+- All metrics are scored on the 121-subject validation set.
+
+**v9 reproduction.**
+- The reportable number for this config is R0's 8-seed mean ± SD of
+  macro-F1 at the best-val-loss epoch, on the 121-subject validation set.
+- The single Kaggle run (0.349) is reported only as a historical reference.
+  Its position within the R0 distribution is stated descriptively: its
+  z-score and how many of the 8 seeds reach it.
+
+**Class weighting.** It counts as a real gain only if BOTH hold:
+1. The mean paired macro-F1 gain (R2 − R0, same seed) is ≥ 0.05, **or**
+   the two-sided 95% t-interval of the 8 paired differences (df = 7,
+   t = 2.365) excludes zero.
+2. R2 beats R0 on at least 7 of 8 paired seeds. A win is strictly higher
+   macro-F1; a tie counts as not a win.
+
+Otherwise the result is reported as **"no reliable gain"**.
