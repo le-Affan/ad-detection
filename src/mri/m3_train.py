@@ -70,6 +70,21 @@ spacing there changes it here too. This is a reporting convenience for
 watching CN/EMCI/LMCI/AD separately -- the KAN downstream consumes the raw
 DEMO/ALZ outputs, not these bins.
 
+MULTI-VISIT TRAINING (`--train-index`, `--class-weight`). The train split can
+be swapped for mv1_index.py's one-row-per-scan index, which adds the train
+subjects' Path A follow-ups as independent examples. Val and test are never
+affected: they still come from mri_index.csv, one baseline scan per subject,
+so val metrics stay comparable with every earlier run. Because the follow-ups
+dilute AD, `--class-weight inverse` weights the DEMO MSE per sample by
+N / (4 * n_class) from the train rows (mean weight 1.0, so the loss scale is
+unchanged); the ALZ pos_weight already adapts, being computed from the rows.
+Both flags default off, and with them off training is unchanged.
+
+SUBJECT DISJOINTNESS IS CHECKED ON EVERY RUN, default mode included: train,
+val and test must share no PTID and no RID, or the run aborts before a volume
+is read. This reads index metadata only -- no test volume is ever opened, and
+the test loader is never iterated.
+
 CHECKPOINTS ASSUME INTERRUPTION. Kaggle sessions get killed. `last.pt` is
 written every epoch, `best.pt` on every val-loss improvement, and
 `epoch_XXX.pt` every `--ckpt-every`. Each carries optimizer, scheduler, AMP
@@ -79,6 +94,7 @@ killed at epoch 40 keeps 40 rows.
 """
 import argparse
 import csv
+import hashlib
 import json
 import math
 import os
@@ -109,6 +125,47 @@ def set_seed(seed):
 def demo_to_label(demo):
     """Snap continuous DEMO predictions to the nearest class target."""
     return np.abs(np.asarray(demo)[:, None] - DEMO_VALUES[None, :]).argmin(1)
+
+
+def demo_mse(pred, target, label, class_w=None):
+    """DEMO MSE, optionally weighted per sample by its class.
+
+    Unweighted it is exactly F.mse_loss, so default runs are unchanged. The
+    weighted form is a plain mean of w * err^2, not a weight-normalised one:
+    the weights average 1.0 over the train rows, so the loss keeps its scale in
+    expectation and val loss stays on the same footing epoch to epoch.
+    """
+    if class_w is None:
+        return torch.nn.functional.mse_loss(pred, target)
+    return (class_w[label] * (pred.float() - target.float()) ** 2).mean()
+
+
+def inverse_class_weights(counts):
+    """N / (4 * n_c) per class: balanced classes, mean sample weight 1.0.
+
+    A class with no rows (only possible in a --limit smoke test) gets 0, since
+    no sample can ever carry it.
+    """
+    n = sum(counts.values())
+    return [n / (len(CLASSES) * counts[i]) if counts.get(i, 0) else 0.0
+            for i in range(len(CLASSES))]
+
+
+def assert_subject_disjoint(sets):
+    """Abort unless no PTID or RID is shared between any two splits.
+
+    Reads index metadata only. Holds for the default one-scan-per-subject
+    index trivially; it is the guard that makes a one-row-per-scan train index
+    safe, since a single leaked follow-up would inflate every val number.
+    """
+    names = list(sets)
+    for i, a in enumerate(names):
+        for b in names[i + 1:]:
+            for key in ("PTID", "RID"):
+                shared = set(sets[a].df[key]) & set(sets[b].df[key])
+                if shared:
+                    raise RuntimeError("SUBJECT LEAK: {} {} shared between {} and {}: {}".format(
+                        len(shared), key, a, b, sorted(shared)[:5]))
 
 
 def _rotation_matrices(angles):
@@ -223,11 +280,12 @@ def compute_metrics(demo_pred, alz_logit, labels):
 
 
 def run_epoch(model, loader, device, lam_demo, lam_alz, pos_weight,
-              optimizer=None, scaler=None, amp=False, aug=None):
+              optimizer=None, scaler=None, amp=False, aug=None, class_w=None):
     """One pass. Training when `optimizer` is given, evaluation otherwise.
 
     `aug` is a kwargs dict for augment_batch and is applied only when training,
     so val/test are structurally incapable of receiving augmentation.
+    `class_w` is a (4,) tensor of DEMO weights, or None for plain MSE.
     """
     train = optimizer is not None
     model.train(train)
@@ -250,11 +308,13 @@ def run_epoch(model, loader, device, lam_demo, lam_alz, pos_weight,
         with torch.set_grad_enabled(train):
             with torch.amp.autocast("cuda", enabled=amp):
                 out = model(vol)
-                if pw is None:
+                if pw is None and class_w is None:
                     loss, parts = dual_head_loss(out, tgt, lam_demo, lam_alz)
                 else:
                     # same objective, but BCE carries a positive-class weight
-                    mse = torch.nn.functional.mse_loss(out["demo"], tgt["demo"])
+                    # and/or MSE a per-class weight
+                    mse = demo_mse(out["demo"], tgt["demo"],
+                                   batch["label"].to(device), class_w)
                     bce = torch.nn.functional.binary_cross_entropy_with_logits(
                         out["alz_logit"], tgt["alz"], pos_weight=pw)
                     loss = lam_demo * mse + lam_alz * bce
@@ -282,7 +342,7 @@ def run_epoch(model, loader, device, lam_demo, lam_alz, pos_weight,
     return metrics
 
 
-def measure_grad_balance(model, loader, device, pos_weight, n_batches=8):
+def measure_grad_balance(model, loader, device, pos_weight, n_batches=8, class_w=None):
     """Per-task gradient norms over the shared trunk, on the initialised model.
 
     Returns (g_demo, g_alz): the L2 norm of the trunk gradient of each task's
@@ -313,18 +373,18 @@ def measure_grad_balance(model, loader, device, pos_weight, n_batches=8):
     for i, batch in enumerate(loader):
         if i >= n_batches:
             break
-        batches.append((batch["volume"].to(device),
-                        batch["demo"].to(device), batch["alz"].to(device)))
+        batches.append((batch["volume"].to(device), batch["demo"].to(device),
+                        batch["alz"].to(device), batch["label"].to(device)))
     if not batches:
         return 1.0, 1.0
 
     norms = {}
     for task in ("demo", "alz"):
         model.zero_grad(set_to_none=True)
-        for vol, d_t, a_t in batches:
+        for vol, d_t, a_t, lab in batches:
             out = model(vol)
             if task == "demo":
-                loss = torch.nn.functional.mse_loss(out["demo"], d_t)
+                loss = demo_mse(out["demo"], d_t, lab, class_w)
             else:
                 loss = torch.nn.functional.binary_cross_entropy_with_logits(
                     out["alz_logit"], a_t, pos_weight=pw)
@@ -421,6 +481,10 @@ def main():
                          "estimate converges from above, so do not lower this")
     ap.add_argument("--alz-pos-weight", default="auto",
                     help="float, 'auto' for train-split neg/pos, or 1.0 to disable")
+    ap.add_argument("--train-index", default=None,
+                    help="one-row-per-scan train index (mv1_index.py); val/test unchanged")
+    ap.add_argument("--class-weight", default="none", choices=["none", "inverse"],
+                    help="per-class DEMO MSE weights from the train rows")
     ap.add_argument("--patience", type=int, default=15, help="early stop on val loss")
     ap.add_argument("--ckpt-every", type=int, default=5)
     ap.add_argument("--num-workers", type=int, default=2)
@@ -442,20 +506,40 @@ def main():
     print("out-dir     : " + args.out_dir)
     print("data-root   : " + (args.data_root or "(repo layout)"))
 
-    sets = {s: ADNIVolumes(split=s, data_root=args.data_root, strict=True)
+    sets = {s: ADNIVolumes(split=s, data_root=args.data_root, strict=True,
+                           index_path=args.train_index if s == "train" else None)
             for s in ("train", "val", "test")}
     if args.limit:
         for s in sets:
-            sets[s].df = sets[s].df.head(args.limit).reset_index(drop=True)
+            # by subject, not by row: a multi-visit index has several per PTID
+            keep = sets[s].df.PTID.drop_duplicates().head(args.limit)
+            sets[s].df = sets[s].df[sets[s].df.PTID.isin(keep)].reset_index(drop=True)
         print("LIMIT       : {} subjects/split (smoke test, not a real run)".format(args.limit))
+    assert_subject_disjoint(sets)
 
     counts = sets["train"].class_counts()
     n_ad = counts.get(3, 0)
     n_tr = len(sets["train"])
+    n_tr_subj = sets["train"].df.PTID.nunique()
     print("subjects    : train {}  val {}  test {}".format(
-        n_tr, len(sets["val"]), len(sets["test"])))
+        n_tr_subj, len(sets["val"]), len(sets["test"])))
+    train_index = None
+    if args.train_index:
+        with open(args.train_index, "rb") as f:
+            sha = hashlib.sha256(f.read()).hexdigest()
+        train_index = {"path": args.train_index, "sha256": sha,
+                       "scans": n_tr, "subjects": int(n_tr_subj)}
+        print("train index : {}  ({} scans from {} subjects, sha256 {})".format(
+            args.train_index, n_tr, n_tr_subj, sha[:12]))
     print("train counts: " + "  ".join(
         "{}={}".format(c, counts.get(i, 0)) for i, c in enumerate(CLASSES)))
+
+    class_w = None
+    if args.class_weight == "inverse":
+        cw = inverse_class_weights(counts)
+        class_w = torch.tensor(cw, dtype=torch.float32, device=device)
+        print("class weight: DEMO MSE  " + "  ".join(
+            "{}={:.4f}".format(c, w) for c, w in zip(CLASSES, cw)) + "  [inverse, train rows]")
 
     # --- ALZ positive weight: measured from the split, never hardcoded --------
     if str(args.alz_pos_weight).lower() == "auto":
@@ -518,7 +602,8 @@ def main():
         gen = torch.Generator().manual_seed(args.seed)
         bl = DataLoader(sets["train"], batch_size=args.batch_size, shuffle=True,
                         generator=gen, num_workers=0)
-        g_d, g_a = measure_grad_balance(model, bl, device, pw, args.balance_batches)
+        g_d, g_a = measure_grad_balance(model, bl, device, pw, args.balance_batches,
+                                        class_w)
         lam_d, lam_a = balanced_lambdas(g_d, g_a)
         args.lam_demo = lam_d if args.lam_demo is None else args.lam_demo
         args.lam_alz = lam_a if args.lam_alz is None else args.lam_alz
@@ -532,8 +617,8 @@ def main():
     else:
         print("lambdas     : demo {:.4f}   alz {:.4f}   [explicit]".format(
             args.lam_demo, args.lam_alz))
-    print("loss        : {:.4f} * MSE(DEMO) + {:.4f} * BCE(ALZ, pos_weight={})".format(
-        args.lam_demo, args.lam_alz,
+    print("loss        : {:.4f} * {}MSE(DEMO) + {:.4f} * BCE(ALZ, pos_weight={})".format(
+        args.lam_demo, "" if class_w is None else "class-weighted ", args.lam_alz,
         "off" if pw is None else "{:.4f}".format(pw)))
 
     aug = None if args.no_aug else {
@@ -605,7 +690,9 @@ def main():
     with open(os.path.join(args.out_dir, "train_config.json"), "w") as f:
         json.dump({**vars(args), "device": str(device), "amp": amp,
                    "params": n_par, "train_counts": counts, "augment": aug,
-                   "grad_balance": grad_norms}, f, indent=2)
+                   "grad_balance": grad_norms, "train_index_info": train_index,
+                   "class_weights": None if class_w is None else class_w.tolist()},
+                  f, indent=2)
 
     print("\n{:>3} {:>8} {:>8} {:>8} {:>6} {:>6} {:>6} {:>6} {:>6}".format(
         "ep", "lr", "train", "val", "mae", "acc4", "mF1", "auc", "sec"))
@@ -613,10 +700,10 @@ def main():
         t0 = time.time()
         tr = run_epoch(model, loaders["train"], device, args.lam_demo,
                        args.lam_alz, pw, optimizer=opt, scaler=scaler,
-                       amp=amp, aug=aug)
+                       amp=amp, aug=aug, class_w=class_w)
         t1 = time.time()
         va = run_epoch(model, loaders["val"], device, args.lam_demo,
-                       args.lam_alz, pw, amp=amp)
+                       args.lam_alz, pw, amp=amp, class_w=class_w)
         t2 = time.time()
         lr_now = opt.param_groups[0]["lr"]
         sched.step()

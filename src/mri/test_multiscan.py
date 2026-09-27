@@ -86,6 +86,75 @@ def test_ptid_rid_one_to_one():
     assert (df.groupby("RID").PTID.nunique() == 1).all()
 
 
+def _sets(train_index=TRAIN_SCANS):
+    """The three splits exactly as m3_train.py builds them with --train-index."""
+    from dataset import ADNIVolumes
+    return {s: ADNIVolumes(split=s, index_path=train_index if s == "train" else None)
+            for s in ("train", "val", "test")}
+
+
+def test_m3_guard_passes_on_real_index():
+    from m3_train import assert_subject_disjoint
+    assert_subject_disjoint(_sets())
+
+
+def test_m3_guard_catches_an_injected_leak():
+    """The negative test: one val scan slipped into the train index must abort."""
+    import tempfile
+    from m3_train import assert_subject_disjoint
+    df, mi = _load()
+    victim = mi[mi.split == "val"].iloc[0]
+    leak = df.iloc[[0]].copy()
+    leak[["RID", "PTID", "scan_key"]] = [victim.RID, victim.PTID, victim.PTID]
+    leak["split"] = "train"          # a mislabelled split column must not hide it
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "leaky.csv")
+        pd.concat([df, leak]).to_csv(path, index=False)
+        try:
+            assert_subject_disjoint(_sets(path))
+        except RuntimeError as e:
+            assert "SUBJECT LEAK" in str(e)
+        else:
+            raise AssertionError("guard did not catch a val subject in the train index")
+
+
+def test_scan_key_resolves_under_data_root():
+    """Relocated (Kaggle) layout: vol96/<scan_key>.nii[.gz], one file per scan."""
+    import shutil
+    import tempfile
+    from dataset import ADNIVolumes
+    df, mi = _load()
+    with tempfile.TemporaryDirectory() as d:
+        os.makedirs(os.path.join(d, "vol96"))
+        rows = pd.concat([df[df.slot == "bl"].head(1), df[df.slot != "bl"].head(2)])
+        for r in rows.itertuples():
+            shutil.copy(os.path.join(ROOT, r.vol_path), os.path.join(d, "vol96", r.scan_key + ".nii.gz"))
+        rows.to_csv(os.path.join(d, "train_scans.csv"), index=False)
+        ds = ADNIVolumes("train", index_path=os.path.join(d, "train_scans.csv"), data_root=d)
+        paths = [ds.volume_path(r) for r in ds.df.itertuples()]
+        assert len(set(paths)) == 3 and all(os.path.exists(p) for p in paths)
+        assert ds[1]["volume"].shape == (1, 96, 96, 96)
+    # the default index has no scan_key and still resolves by PTID
+    ds = ADNIVolumes("val", index_path=MRI_INDEX, data_root="/x")
+    assert ds.volume_path(ds.df.iloc[0]).startswith("/x/vol96/" + ds.df.PTID.iloc[0])
+
+
+def test_class_weighting_math():
+    import torch
+    from m3_train import demo_mse, inverse_class_weights
+    df, _ = _load()
+    counts = df.label.value_counts().to_dict()
+    w = inverse_class_weights(counts)
+    per_row = torch.tensor(w)[torch.tensor(df.label.values)]
+    assert abs(float(per_row.mean()) - 1.0) < 1e-6          # loss scale unchanged
+    for i in range(4):                                     # each class sums equal
+        assert abs(w[i] * counts[i] - len(df) / 4) < 1e-6
+    p, t = torch.randn(16), torch.randn(16)
+    lab = torch.randint(0, 4, (16,))
+    assert torch.equal(demo_mse(p, t, lab), torch.nn.functional.mse_loss(p, t))
+    assert torch.allclose(demo_mse(p, t, lab, torch.ones(4)), torch.nn.functional.mse_loss(p, t))
+
+
 if __name__ == "__main__":
     tests = [(k, v) for k, v in dict(globals()).items() if k.startswith("test_") and callable(v)]
     failed = 0

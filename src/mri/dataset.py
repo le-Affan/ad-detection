@@ -105,7 +105,9 @@ class ADNIVolumes(Dataset):
         are ordinary filename characters on Linux and would not resolve.
         """
         if self.data_root:
-            base = os.path.join(self.data_root, "vol96", str(r.PTID))
+            # a one-row-per-scan index (mv1_index.py) names each file by
+            # scan_key, since PTID no longer identifies a single volume
+            base = os.path.join(self.data_root, "vol96", str(getattr(r, "scan_key", r.PTID)))
             # EXTENSION IS NOT ASSUMED. m1 writes .nii.gz, but a relocated copy
             # may be decompressed -- Kaggle, for one, gunzips every member of an
             # uploaded archive, so the same data arrives as plain .nii. nibabel
