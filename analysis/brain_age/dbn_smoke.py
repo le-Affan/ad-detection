@@ -99,8 +99,7 @@ def pick_subjects():
     assert len(first) == 20
     rest = df[~df.PTID.isin(p1.PTID)].copy()
     rest["q"] = rest.groupby("label").age_at_scan.transform(lambda a: pd.qcut(a, 5, labels=False))
-    extra = rest.groupby(["label", "q"], group_keys=False).apply(
-        lambda g: g.sample(2, random_state=1)).assign(source="added")
+    extra = rest.groupby(["label", "q"]).sample(2, random_state=1).assign(source="added")
     out = pd.concat([first, extra.drop(columns="q")]).reset_index(drop=True)
     assert out.RID.isin(train).all() and out.RID.is_unique
     return out

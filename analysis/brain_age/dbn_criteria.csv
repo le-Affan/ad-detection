@@ -1,0 +1,7 @@
+crit,measure,value,threshold,pass
+a1,"r(pred, age), CN",0.8297598404486364,>= 0.6,True
+a2,"SD(pred)/SD(age), CN",0.6161263774799828,>= 0.6,True
+b,"MAE, CN (years)",3.3615000000000004,<= 6,True
+c,mean gap AD - CN (years),4.122,>= 2,True
+d,"median |Δpred|, intensity x0.9 (years)",0.3100000000000023,<= 2,True
+d,"median |Δpred|, intensity x1.1 (years)",0.22999999999999687,<= 2,True

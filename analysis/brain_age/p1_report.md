@@ -267,3 +267,63 @@ own `185/p97` scaling. Scaling *before* it would be cancelled by the p97
 normalisation, making the test vacuous. This mirrors the SFCN diagnostic,
 where the perturbation was also applied after that model's normalisation.
 The max |Δ| is reported descriptively.
+
+## Step 3 — Results
+
+40 clinical-train subjects (`dbn_smoke_test.csv`): the 20 P1 subjects plus 20
+added across age quintiles. 7 are over 80 (4 CN, 3 AD). Per-subject age,
+prediction, gap and the two perturbed predictions are in the CSV; the plots
+are in `dbn_smoke_plots.png`. Scored by `dbn_evaluate.py` into
+`dbn_criteria.csv`.
+
+(Before the run, one code fix: pandas 3's `groupby.apply` drops the group
+columns, so the added-subject draw now uses `groupby.sample(2, random_state=1)`.
+Same rule; no results existed at that point.)
+
+| | Criterion | Value | Threshold | Result |
+|---|---|---|---|---|
+| a1 | r(predicted, chronological), CN | **0.830** | ≥ 0.6 | PASS |
+| a2 | SD(pred) / SD(age), CN | **0.616** (4.8 / 7.8) | ≥ 0.6 | PASS (narrowly) |
+| b | MAE, CN | **3.36 y** | ≤ 6 | PASS |
+| c | mean gap AD − CN | **+4.12 y** (+3.58 vs −0.54) | ≥ 2 | PASS |
+| d | median \|Δ\|, intensity × 0.9 | **0.31 y** (max 1.11) | ≤ 2 | PASS |
+| d | median \|Δ\|, intensity × 1.1 | **0.23 y** (max 0.94) | ≤ 2 | PASS |
+
+**Verdict: PASS.** All pre-registered criteria hold.
+
+**Descriptive (not criteria):**
+
+| | n | Age | Predicted | MAE | Gap |
+|---|---|---|---|---|---|
+| CN | 20 | 73.5 ± 7.8 (61.3–89.0) | 72.9 ± 4.8 (60.8–83.5) | 3.36 | −0.54 ± 4.68 |
+| AD | 20 | 72.6 ± 7.5 (56.0–83.2) | 76.2 ± 3.3 (70.5–80.6) | 5.27 | +3.58 ± 6.71 |
+
+- **CN MAE 3.36 matches the published 3.7.** For CN ≤ 80 it's 2.44
+  (r = 0.861).
+- **Regression toward the mean is present,** as expected before
+  correction: CN slope of predicted on chronological age is 0.51.
+  - The over-80s are under-predicted (mean gap −6.1, n = 7; predictions
+    75–84). This is milder than SFCN, which had a hard 81.5 ceiling and put
+    the same 89-year-old at 65.
+  - The youngest AD subjects get the largest gaps (56.0 → 78.4,
+    59.4 → 74.4).
+  - Both patterns are what the P2 bias correction (fitted on CN train only)
+    is for.
+- **The AD signal survives an age adjustment:** with gap regressed on age
+  within CN, the AD − CN residual gap is +3.71. This is descriptive; it is
+  not the criterion.
+- **Robust to intensity mis-scaling:** ×0.9 and ×1.1 correlate 0.997 with
+  the unperturbed predictions. SFCN correlated 0.46–0.71 under a larger
+  perturbation.
+- **Same 20 P1 subjects, head to head:** r with age is 0.673 for DeepBrainNet
+  vs 0.529 for SFCN; the two models' predictions correlate 0.58.
+
+**Caveats for P2:**
+- **Small set.** a2 cleared by 0.016, and 20 CN is a small set.
+- **Architecture.** The released model is VGG16, not the paper's
+  Inception-ResNet-v2 (see Step 1).
+- **Input differences.** Our input still differs from its training input: WM
+  plateau from m1 truncation, darker GM after 185/p97, template-mask skull
+  strip. The model tolerated them here.
+- **Runtime.** CPU only: ~5 s per scan, so ~70 min for 811 scans, or ~3.5 h
+  with the two perturbation passes (which P2 doesn't need).
