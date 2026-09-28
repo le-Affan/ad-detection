@@ -167,3 +167,103 @@ cohort is over 80; 25% of AD).
 4. **pyment 2025 weights**: whether to pursue verifying their training data
    (email the author, or read the medRxiv supplement in a browser). Only worth
    it if a FastSurfer route becomes acceptable.
+
+---
+
+# DeepBrainNet smoke test
+
+Added 2026-09-28. Clinical-train subjects only; no val/test subject read.
+
+## Step 1 — Weights and input
+
+### Which weight file, and how it was verified
+
+- Repo `vishnubashyam/DeepBrainNet` pinned at `505f4e4` (2020-09-04) in
+  `LYP/third_party/DeepBrainNet`. No licence file.
+- **The repo has one weight file, `Models/DBN_model.h5`** (Git LFS; fetched
+  from GitHub's LFS media endpoint because `git-lfs` isn't installed).
+  sha256 `9257e98e9aff88bfcd83acdb1e74ffde762967503ef6df16c9270aa39d9941ea`,
+  182,983,936 bytes, **identical to the oid in the LFS pointer**.
+- **It is the brain-age regressor, not an AD/MCI classifier:**
+  - README: "Convolutional Neural Network trained for age prediction using a
+    large (n=11,729) set of MRI scans". 11,729 is the LifespanCN count.
+  - `Script/test.sh` uses it to "perform brain age prediction".
+  - Its saved config: `Sequential[vgg16 → GlobalAveragePooling2D →
+    Dense(1024, relu) → Dropout(0.9) → Dense(1, linear)]`, trained with
+    `loss: mean_squared_error`, `metrics: [mae]`. A single linear output with
+    MSE is an age regression; an AD/MCI classifier would have a sigmoid or
+    softmax output with a cross-entropy loss.
+- **History:** the repo only ever held age-prediction files. Commit `5ffbbfd`
+  added `DeepBrainNet_{DenseNet169,InceptionResnetv2,Resnet50,VGG16}.h5`;
+  `505f4e4` moved those "other models to Box". The Box folder renders its file
+  list with JavaScript and couldn't be listed from here. No AD/MCI
+  transfer-learning weights were used or downloaded.
+- **Discrepancy to note:** the released model's backbone is **VGG16**, not
+  the Inception-ResNet-v2 the paper describes as DeepBrainNet. It's the
+  repo's official inference model, and its provenance (LifespanCN,
+  n = 11,729) is as above. Whether it is the exact network behind the paper's
+  published MAE isn't verifiable from the repo.
+
+### Environment
+
+`LYP/.venv-deepbrainnet`: Python 3.12, tensorflow 2.18.1 (CPU), tf_keras
+2.18.0 (`TF_USE_LEGACY_KERAS=1` loads the Keras 2.2.4 file), nibabel, scipy,
+pillow, matplotlib. **TensorFlow found no usable GPU** (CUDA libraries not
+installed for TF; the RTX 5060 is unused), so everything runs on CPU:
+**~5 s per scan** (80 slices), ~15 s per subject including the two
+perturbation runs.
+
+**Environment check:** the repo's 4 example inputs (`Data/`, ages in
+`Sample_Data.csv`) predict 58.1, 46.5, 56.7, 61.8 for ages 57.8, 45.4, 52.2,
+58.3 (MAE 2.3). The pipeline reproduces as intended. These examples may be
+training subjects, so this is a check of the code, not an accuracy estimate.
+
+### Expected input vs our `mni/` volumes
+
+| | DeepBrainNet (repo scripts + example inputs) | Our `mni/` |
+|---|---|---|
+| Grid | 182×218×182, 1 mm isotropic, affine diag(−1,−1,1), origin (90, 91, −72): the FSL MNI152 1 mm grid in L-P-S storage | 189×233×164, 1×1×1.2 mm, ICBM152 2009a world coords, S-P-R storage |
+| Registration | linear (paper: FLIRT affine to a common atlas) | ANTs affine ×2 to ICBM152 2009a |
+| Skull strip | subject-specific (paper: multi-atlas); example brains 26.7% of grid | ICBM152 template mask; 25.6% of the DBN grid after resampling |
+| Intensity | raw (int16), smooth bright tail; the script scales by 185/p97 | N4, 5–95% truncation, min–max [0,1]; top 5.3% of brain voxels flat at 1.0 |
+| Slices | axial 45–124 (z = −27…+52 mm) | — |
+
+**Adaptations applied: one.** A world-coordinate trilinear resample onto the
+example grid. Everything else is the repo's own pipeline, unchanged:
+- `× 185/p97`
+- slices 45–124
+- PIL float → RGB → JPEG
+- Keras `load_img` 256×256 nearest-neighbour, then ÷255
+- median over slices
+
+No preprocessing from raw is needed.
+
+**Residual differences** that can't be removed from `mni/` (single subject
+003_S_4644 vs repo Subject1, after 185/p97; see `dbn_input_compare.png`):
+- **Grey matter is darker:** brain median 125 vs 146.
+- **Top 3.5% of brain voxels form a plateau at the maximum (193);** the
+  example's tail runs smoothly to 273. This is the m1 truncation.
+- **The template mask leaves some skull-base tissue** in the lowest slices.
+- Anatomical level and orientation of slices 50, 85 and 120 match.
+
+## Step 2 — Pre-registered pass criteria (committed before the smoke test ran)
+
+Smoke-test set: the 20 P1 subjects (10 CN, 10 AD) plus 10 CN and 10 AD more,
+2 per within-class age quintile (seed 1). 40 clinical-train subjects,
+`corr_vs_mni ≥ 0.3`. Gap = predicted − chronological age at scan, uncorrected.
+
+The model **passes only if all four hold:**
+
+| | Criterion | Computed on |
+|---|---|---|
+| a1 | Pearson r(predicted, chronological) ≥ 0.6 | CN (n = 20) |
+| a2 | SD(predicted) ≥ 0.6 × SD(chronological) | CN (n = 20) |
+| b | MAE ≤ 6 years | CN (n = 20) |
+| c | mean gap(AD) − mean gap(CN) ≥ 2 years | all 40 |
+| d | median over subjects of \|Δ prediction\| ≤ 2 years, separately for intensity × 0.9 and × 1.1 | all 40 |
+
+**How d is applied.** The factor multiplies the volume *after* DeepBrainNet's
+own `185/p97` scaling. Scaling *before* it would be cancelled by the p97
+normalisation, making the test vacuous. This mirrors the SFCN diagnostic,
+where the perturbation was also applied after that model's normalisation.
+The max |Δ| is reported descriptively.
