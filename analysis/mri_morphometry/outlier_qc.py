@@ -67,9 +67,9 @@ def intensity(ptid, mask):
 
 def panel(ax_row, a, mask, title):
     views = ((a[AX], mask[AX]), (a[:, COR], mask[:, COR]), (a[:, :, SAG], mask[:, :, SAG]))
-    for ax, (img, m) in zip(ax_row[:3], views):
-        ax.imshow(np.rot90(img), cmap="gray", vmin=0, vmax=1)
-        ax.contour(np.rot90(m), levels=[0.5], colors="r", linewidths=0.5)
+    for ax, (img, m), org in zip(ax_row[:3], views, ("upper", "lower", "lower")):   # anterior / superior up
+        ax.imshow(img, cmap="gray", vmin=0, vmax=1, origin=org)
+        ax.contour(m, levels=[0.5], colors="r", linewidths=0.5, origin=org)
         ax.axis("off")
     ax_row[0].set_title(title, fontsize=8, loc="left")
 

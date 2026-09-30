@@ -47,7 +47,8 @@ def derive(v):
     d["ss_Ventricles"] = v[VENT].sum(1)
     for fs, ss in (("Entorhinal", "entorhinal"), ("Fusiform", "fusiform"), ("MidTemp", "middletemporal")):
         d[f"ss_{fs}"] = v[f"ctx-lh-{ss}"] + v[f"ctx-rh-{ss}"]
-    d["ss_WholeBrain"] = v.drop(columns=["subject"] + NON_BRAIN).sum(1)
+    seg_cols = [c for c in v.columns if c != "subject" and not c.startswith("ctx-")]   # parc re-splits cortex
+    d["ss_WholeBrain"] = v[[c for c in seg_cols if c not in NON_BRAIN]].sum(1)
     d["ss_ICV"] = v["total intracranial"]
     d["ss_InfLatVent"] = v[VENT[2:]].sum(1)
     d["ss_Amygdala"] = v["left amygdala"] + v["right amygdala"]
@@ -69,11 +70,12 @@ def overlay(ptid, title):
     fig, ax = plt.subplots(1, 3, figsize=(13, 4.6))
     for i, (sl, name) in enumerate(((np.s_[:, cor, :], f"coronal {cor}"), (np.s_[axi, :, :], f"axial {axi}"),
                                     (np.s_[:, :, sag], f"sagittal {sag} (left)"))):
-        ax[i].imshow(np.rot90(a[sl]), cmap="gray", vmin=0, vmax=1)
+        org = "upper" if i == 1 else "lower"          # superior up; axial: anterior up
+        ax[i].imshow(a[sl], cmap="gray", vmin=0, vmax=1, origin=org)
         rgba = np.zeros(a[sl].shape + (4,))
         for m, c in ((hip, (1, .8, 0)), (amy, (0, 1, 1)), (lat, (1, 0, 0)), (inf, (1, 0, 1))):
             rgba[m[sl]] = (*c, .55)
-        ax[i].imshow(np.rot90(rgba))
+        ax[i].imshow(rgba, origin=org)
         ax[i].set_title(name, fontsize=8)
         ax[i].axis("off")
     fig.suptitle(f"{title}   yellow hippocampus, cyan amygdala, red lateral ventricles, magenta inferior lateral",
@@ -101,7 +103,7 @@ def main():
          f"{len(sm)} clinical-train subjects ({(sm.DX_bl == 'CN').sum()} CN, {(sm.DX_bl == 'AD').sum()} AD) "
          f"+ {len(d) - len(sm)} brain-age outliers (CN, reported separately). "
          "Volumes in mm³ of affine-normalised ICBM152 space.\n",
-         "## QC scores (SynthSeg 2.0; the tool's docs treat < 0.65 as a likely failure)\n"]
+         "## QC scores (SynthSeg 2.0 automated QC, 0-1; 0.65 is the flagging cut-off used in the SynthSeg 2.0 paper, Billot et al. PNAS 2023, not stated in the tool's own help -- to verify)\n"]
     qcc = [c for c in qc.columns if c != "PTID"]
     L.append("| Structure group | min | median | max | n < 0.65 |")
     L.append("|---|---|---|---|---|")
@@ -117,8 +119,8 @@ def main():
     for c in fsc:
         x, y = sm[f"ss_{c}"], sm[f"fs_{c}"]
         ok = x.notna() & y.notna()
-        rn = spearmanr(x[ok], (y / sm.fs_ICV)[ok]).statistic if c != "ICV" else float("nan")
-        L.append(f"| {c} | {spearmanr(x[ok], y[ok]).statistic:+.2f} | {pearsonr(x[ok], y[ok])[0]:+.2f} | "
+        rn = spearmanr(x[ok], (y / sm.fs_ICV)[ok])[0] if c != "ICV" else float("nan")
+        L.append(f"| {c} | {spearmanr(x[ok], y[ok])[0]:+.2f} | {pearsonr(x[ok], y[ok])[0]:+.2f} | "
                  f"{rn:+.2f} | {x.mean():,.0f} | {y.mean():,.0f} |")
     L.append(f"\nSynthSeg ICV coefficient of variation {sm.ss_ICV.std() / sm.ss_ICV.mean():.3f} "
              f"vs FreeSurfer ICV {sm.fs_ICV.std() / sm.fs_ICV.mean():.3f}.\n")

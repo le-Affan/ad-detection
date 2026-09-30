@@ -1,0 +1,20 @@
+SynthSeg 2.0
+using 16 threads
+predicting 1/22
+SynthSeg 2.0
+using 16 threads
+predicting 1/16
+predicting 10/16    remaining time: 0:02:29
+
+segmentations saved in:    /home/ankon/projects/LYP/extracted/ad-detection/dataset/mri_prep/synthseg/seg
+volumes saved in:          /home/ankon/projects/LYP/extracted/ad-detection/dataset/mri_prep/synthseg/vol_smoke_20260930-183542.csv
+QC scores saved in:        /home/ankon/projects/LYP/extracted/ad-detection/dataset/mri_prep/synthseg/qc_smoke_20260930-183542.csv
+
+If you use this tool in a publication, please cite:
+SynthSeg: Segmentation of brain MRI scans of any contrast and resolution without retraining
+B. Billot, D.N. Greve, O. Puonti, A. Thielscher, K. Van Leemput, B. Fischl, A.V. Dalca, J.E. Iglesias
+Medical Image Analysis, accepted for publication.
+22 subjects, 16 to run
+/home/ankon/projects/LYP/.venv-synthseg/bin/python /home/ankon/projects/LYP/third_party/fs_synthseg/bin/mri_synthseg --i /home/ankon/projects/LYP/extracted/ad-detection/dataset/mri_prep/synthseg/batch_smoke --o /home/ankon/projects/LYP/extracted/ad-detection/dataset/mri_prep/synthseg/seg --parc --cpu --threads 16 --crop 160 192 160 --vol /home/ankon/projects/LYP/extracted/ad-detection/dataset/mri_prep/synthseg/vol_smoke_20260930-183542.csv --qc /home/ankon/projects/LYP/extracted/ad-detection/dataset/mri_prep/synthseg/qc_smoke_20260930-183542.csv
+SynthSeg exit 0, 340 s for 16 scans
+per-scan seconds (steady state): median 20.4, min 19.3, max 23.0
