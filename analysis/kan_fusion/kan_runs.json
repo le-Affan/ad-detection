@@ -1,0 +1,2852 @@
+[
+ {
+  "set": "C",
+  "seed": 42,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "RAVLT_perc_forgetting",
+   "MMSE",
+   "EcogSPMem",
+   "ADAS11",
+   "EcogSPDivatt",
+   "EcogSPPlan",
+   "MOCA",
+   "RAVLT_learning",
+   "PTEDUCAT"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7132867654475666,
+   "(3, 0.5, 0.001)": 0.7231403943956597,
+   "(3, 1.0, 0.0)": 0.7469899250022589,
+   "(3, 1.0, 0.001)": 0.7595757013393841,
+   "(5, 0.5, 0.0)": 0.7300234886909878,
+   "(5, 0.5, 0.001)": 0.7197170216895671,
+   "(5, 1.0, 0.0)": 0.741341299365596,
+   "(5, 1.0, 0.001)": 0.7287514505843005
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 80,
+   "stopped_step": 120,
+   "best_holdout_loss": 0.5484237670898438,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.7
+ },
+ {
+  "set": "C",
+  "seed": 42,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "ADAS11",
+   "MMSE",
+   "FAQ",
+   "RAVLT_perc_forgetting",
+   "EcogSPMem",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "MOCA",
+   "EcogSPOrgan"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7264949590031955,
+   "(3, 0.5, 0.001)": 0.7261930333511099,
+   "(3, 1.0, 0.0)": 0.721050066511979,
+   "(3, 1.0, 0.001)": 0.7190723462459996,
+   "(5, 0.5, 0.0)": 0.713085393271864,
+   "(5, 0.5, 0.001)": 0.7204809678861944,
+   "(5, 1.0, 0.0)": 0.6981630151143826,
+   "(5, 1.0, 0.001)": 0.7086321770090668
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 67,
+   "stopped_step": 107,
+   "best_holdout_loss": 0.6498510241508484,
+   "prior_loss": 1.5869072675704956,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 28.4
+ },
+ {
+  "set": "C",
+  "seed": 42,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPPlan",
+   "FAQ",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "MOCA",
+   "EcogSPOrgan",
+   "PTEDUCAT"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.692085312385824,
+   "(3, 0.5, 0.001)": 0.7150988335647671,
+   "(3, 1.0, 0.0)": 0.6862110166948452,
+   "(3, 1.0, 0.001)": 0.6908095878684114,
+   "(5, 0.5, 0.0)": 0.6937464087181417,
+   "(5, 0.5, 0.001)": 0.6880282940976443,
+   "(5, 1.0, 0.0)": 0.6869631836173042,
+   "(5, 1.0, 0.001)": 0.6994907035233948
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 58,
+   "stopped_step": 98,
+   "best_holdout_loss": 0.6859853267669678,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 28.0
+ },
+ {
+  "set": "C",
+  "seed": 42,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPPlan",
+   "RAVLT_perc_forgetting",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "EcogSPOrgan",
+   "FAQ",
+   "RAVLT_learning"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7253404606191347,
+   "(3, 0.5, 0.001)": 0.7234814753199502,
+   "(3, 1.0, 0.0)": 0.7259025969820405,
+   "(3, 1.0, 0.001)": 0.7124859828252722,
+   "(5, 0.5, 0.0)": 0.7246077501580647,
+   "(5, 0.5, 0.001)": 0.7394795670401281,
+   "(5, 1.0, 0.0)": 0.7249501298828158,
+   "(5, 1.0, 0.001)": 0.7384496265762471
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 83,
+   "stopped_step": 123,
+   "best_holdout_loss": 0.7654634714126587,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 28.9
+ },
+ {
+  "set": "C",
+  "seed": 42,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "ADAS13",
+   "EcogSPMem",
+   "EcogSPPlan",
+   "RAVLT_immediate",
+   "EcogSPDivatt",
+   "EcogSPOrgan"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6970073178734959,
+   "(3, 0.5, 0.001)": 0.7155627315061397,
+   "(3, 1.0, 0.0)": 0.6788836446063773,
+   "(3, 1.0, 0.001)": 0.677440788879244,
+   "(5, 0.5, 0.0)": 0.707203316617234,
+   "(5, 0.5, 0.001)": 0.7250757327921569,
+   "(5, 1.0, 0.0)": 0.7184091063157313,
+   "(5, 1.0, 0.001)": 0.710111461033639
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 73,
+   "stopped_step": 113,
+   "best_holdout_loss": 0.43153029680252075,
+   "prior_loss": 1.586891531944275,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.1
+ },
+ {
+  "set": "C",
+  "seed": 42,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7278771108819138,
+   "(3, 0.5, 0.001)": 0.7306951448613013,
+   "(3, 1.0, 0.0)": 0.7227227499656077,
+   "(3, 1.0, 0.001)": 0.7205454855413818,
+   "(5, 0.5, 0.0)": 0.7405800372265626,
+   "(5, 0.5, 0.001)": 0.7304911292411292,
+   "(5, 1.0, 0.0)": 0.6983527638432442,
+   "(5, 1.0, 0.001)": 0.7150664385250955
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 58,
+   "stopped_step": 98,
+   "best_holdout_loss": 0.4027298092842102,
+   "prior_loss": 1.5803706645965576,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 32.8
+ },
+ {
+  "set": "C",
+  "seed": 43,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS11",
+   "ADAS13",
+   "MMSE",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPTotal",
+   "PTEDUCAT",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "RAVLT_immediate"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7583472204415058,
+   "(3, 0.5, 0.001)": 0.7573148793199235,
+   "(3, 1.0, 0.0)": 0.7321066900575471,
+   "(3, 1.0, 0.001)": 0.744519317803842,
+   "(5, 0.5, 0.0)": 0.7369599171263852,
+   "(5, 0.5, 0.001)": 0.7342330761177834,
+   "(5, 1.0, 0.0)": 0.7174762488912068,
+   "(5, 1.0, 0.001)": 0.726821677193759
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 70,
+   "stopped_step": 110,
+   "best_holdout_loss": 0.7309426665306091,
+   "prior_loss": 1.5869072675704956,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 28.9
+ },
+ {
+  "set": "C",
+  "seed": 43,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "RAVLT_learning",
+   "EcogSPMem",
+   "PTEDUCAT",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPTotal",
+   "RAVLT_immediate"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7206787950014205,
+   "(3, 0.5, 0.001)": 0.7130652906858668,
+   "(3, 1.0, 0.0)": 0.7177436327139595,
+   "(3, 1.0, 0.001)": 0.735863444132085,
+   "(5, 0.5, 0.0)": 0.7050144093097571,
+   "(5, 0.5, 0.001)": 0.7023523632066564,
+   "(5, 1.0, 0.0)": 0.7291490890045211,
+   "(5, 1.0, 0.001)": 0.7395624914874039
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 69,
+   "stopped_step": 109,
+   "best_holdout_loss": 0.7940384149551392,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 28.7
+ },
+ {
+  "set": "C",
+  "seed": 43,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "ADAS11",
+   "MMSE",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "RAVLT_learning",
+   "EcogSPTotal",
+   "MOCA",
+   "EcogSPOrgan",
+   "EcogSPDivatt"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7060407108364696,
+   "(3, 0.5, 0.001)": 0.7031688298826221,
+   "(3, 1.0, 0.0)": 0.6946955801542338,
+   "(3, 1.0, 0.001)": 0.6816868168337745,
+   "(5, 0.5, 0.0)": 0.6743301461027766,
+   "(5, 0.5, 0.001)": 0.6749562757550365,
+   "(5, 1.0, 0.0)": 0.6976725824213335,
+   "(5, 1.0, 0.001)": 0.6868250442868982
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 58,
+   "stopped_step": 98,
+   "best_holdout_loss": 0.6175518035888672,
+   "prior_loss": 1.5869150161743164,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.2
+ },
+ {
+  "set": "C",
+  "seed": 43,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "EcogSPMem",
+   "FAQ",
+   "EcogSPTotal",
+   "RAVLT_immediate",
+   "MOCA",
+   "EcogSPPlan"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7210992276091646,
+   "(3, 0.5, 0.001)": 0.7056952831436788,
+   "(3, 1.0, 0.0)": 0.704800254967289,
+   "(3, 1.0, 0.001)": 0.7229899930986887,
+   "(5, 0.5, 0.0)": 0.6993141730064807,
+   "(5, 0.5, 0.001)": 0.7003533914451905,
+   "(5, 1.0, 0.0)": 0.7169599098281897,
+   "(5, 1.0, 0.001)": 0.7251552826153207
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 35,
+   "stopped_step": 75,
+   "best_holdout_loss": 0.876452624797821,
+   "prior_loss": 1.828899621963501,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 30.2
+ },
+ {
+  "set": "C",
+  "seed": 43,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "RAVLT_perc_forgetting",
+   "ADAS13",
+   "MMSE",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "ADAS11",
+   "MOCA",
+   "EcogPtDivatt",
+   "EcogSPTotal",
+   "RAVLT_learning"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7139368173887821,
+   "(3, 0.5, 0.001)": 0.7104520010317111,
+   "(3, 1.0, 0.0)": 0.7122015524445406,
+   "(3, 1.0, 0.001)": 0.7164276033218584,
+   "(5, 0.5, 0.0)": 0.7167685530807204,
+   "(5, 0.5, 0.001)": 0.7251582731124714,
+   "(5, 1.0, 0.0)": 0.7089311270319765,
+   "(5, 1.0, 0.001)": 0.7095578857588081
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 53,
+   "stopped_step": 93,
+   "best_holdout_loss": 0.6653684377670288,
+   "prior_loss": 1.5868914127349854,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.8
+ },
+ {
+  "set": "C",
+  "seed": 43,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7489697573706893,
+   "(3, 0.5, 0.001)": 0.739000466751137,
+   "(3, 1.0, 0.0)": 0.7294851779393159,
+   "(3, 1.0, 0.001)": 0.7337475279556807,
+   "(5, 0.5, 0.0)": 0.7219953746215789,
+   "(5, 0.5, 0.001)": 0.7347765686076736,
+   "(5, 1.0, 0.0)": 0.7422684914488802,
+   "(5, 1.0, 0.001)": 0.7521672318796533
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 54,
+   "stopped_step": 94,
+   "best_holdout_loss": 0.7793487906455994,
+   "prior_loss": 1.820595383644104,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 31.7
+ },
+ {
+  "set": "C",
+  "seed": 44,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "MMSE",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "EcogSPMem",
+   "MOCA",
+   "FAQ",
+   "RAVLT_learning"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7157578924684391,
+   "(3, 0.5, 0.001)": 0.7195631588149858,
+   "(3, 1.0, 0.0)": 0.7289940418246397,
+   "(3, 1.0, 0.001)": 0.7359702964906798,
+   "(5, 0.5, 0.0)": 0.7115619919384817,
+   "(5, 0.5, 0.001)": 0.7162680484923045,
+   "(5, 1.0, 0.0)": 0.7128789544846647,
+   "(5, 1.0, 0.001)": 0.7147797341622527
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 65,
+   "stopped_step": 105,
+   "best_holdout_loss": 0.6252362728118896,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 27.3
+ },
+ {
+  "set": "C",
+  "seed": 44,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "EcogSPPlan",
+   "FAQ",
+   "PTEDUCAT",
+   "RAVLT_perc_forgetting",
+   "EcogSPOrgan"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7338569813347713,
+   "(3, 0.5, 0.001)": 0.73165618497028,
+   "(3, 1.0, 0.0)": 0.7262595178916637,
+   "(3, 1.0, 0.001)": 0.7345070171115033,
+   "(5, 0.5, 0.0)": 0.7403067524443906,
+   "(5, 0.5, 0.001)": 0.7302181048658704,
+   "(5, 1.0, 0.0)": 0.7173677923260166,
+   "(5, 1.0, 0.001)": 0.7279617389998354
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 57,
+   "stopped_step": 97,
+   "best_holdout_loss": 0.5571841597557068,
+   "prior_loss": 1.5869072675704956,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 25.3
+ },
+ {
+  "set": "C",
+  "seed": 44,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "EcogSPMem",
+   "FAQ",
+   "RAVLT_perc_forgetting",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "EcogSPOrgan",
+   "PTEDUCAT"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7309447425818938,
+   "(3, 0.5, 0.001)": 0.73161317808556,
+   "(3, 1.0, 0.0)": 0.7362400372970341,
+   "(3, 1.0, 0.001)": 0.7304046544441135,
+   "(5, 0.5, 0.0)": 0.7323283642731593,
+   "(5, 0.5, 0.001)": 0.7365646402834223,
+   "(5, 1.0, 0.0)": 0.7252640971264452,
+   "(5, 1.0, 0.001)": 0.7314067255871101
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 79,
+   "stopped_step": 119,
+   "best_holdout_loss": 0.5345985293388367,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 25.5
+ },
+ {
+  "set": "C",
+  "seed": 44,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "EcogSPPlan",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "EcogSPDivatt",
+   "EcogSPMem",
+   "FAQ",
+   "RAVLT_learning",
+   "EcogSPTotal"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7266705269217122,
+   "(3, 0.5, 0.001)": 0.7183412063484191,
+   "(3, 1.0, 0.0)": 0.7044452973110935,
+   "(3, 1.0, 0.001)": 0.7193308068930628,
+   "(5, 0.5, 0.0)": 0.6991569830001583,
+   "(5, 0.5, 0.001)": 0.7042156383369775,
+   "(5, 1.0, 0.0)": 0.7116479472781058,
+   "(5, 1.0, 0.001)": 0.7188596381874884
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 82,
+   "stopped_step": 122,
+   "best_holdout_loss": 0.5699856877326965,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 24.9
+ },
+ {
+  "set": "C",
+  "seed": 44,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPMem",
+   "PTEDUCAT",
+   "EcogSPDivatt",
+   "EcogSPOrgan",
+   "EcogSPPlan"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7025851199857946,
+   "(3, 0.5, 0.001)": 0.6998479997419763,
+   "(3, 1.0, 0.0)": 0.7026297736392646,
+   "(3, 1.0, 0.001)": 0.6822838962402069,
+   "(5, 0.5, 0.0)": 0.687780455940566,
+   "(5, 0.5, 0.001)": 0.7056354443843071,
+   "(5, 1.0, 0.0)": 0.6993560453807475,
+   "(5, 1.0, 0.001)": 0.7054253925859308
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 48,
+   "stopped_step": 88,
+   "best_holdout_loss": 0.6708234548568726,
+   "prior_loss": 1.586891531944275,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 26.0
+ },
+ {
+  "set": "C",
+  "seed": 44,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.725002710047664,
+   "(3, 0.5, 0.001)": 0.7310474426173663,
+   "(3, 1.0, 0.0)": 0.7233805326515086,
+   "(3, 1.0, 0.001)": 0.7272868972458972,
+   "(5, 0.5, 0.0)": 0.7138971825090175,
+   "(5, 0.5, 0.001)": 0.7168275858856845,
+   "(5, 1.0, 0.0)": 0.7238184403290053,
+   "(5, 1.0, 0.001)": 0.7189597332339693
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 83,
+   "stopped_step": 123,
+   "best_holdout_loss": 0.5469306111335754,
+   "prior_loss": 1.580370545387268,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 31.9
+ },
+ {
+  "set": "C",
+  "seed": 45,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "ADAS11",
+   "FAQ",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "EcogSPOrgan",
+   "MOCA"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.700258560494497,
+   "(3, 0.5, 0.001)": 0.7183936311892971,
+   "(3, 1.0, 0.0)": 0.7181508954873441,
+   "(3, 1.0, 0.001)": 0.7173780871560831,
+   "(5, 0.5, 0.0)": 0.6871471710889658,
+   "(5, 0.5, 0.001)": 0.6951481807829905,
+   "(5, 1.0, 0.0)": 0.6834025280714007,
+   "(5, 1.0, 0.001)": 0.6974117952559855
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 59,
+   "stopped_step": 99,
+   "best_holdout_loss": 0.5614368319511414,
+   "prior_loss": 1.5869072675704956,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 24.6
+ },
+ {
+  "set": "C",
+  "seed": 45,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS11",
+   "MMSE",
+   "ADAS13",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "RAVLT_immediate",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "PTEDUCAT"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7188274409464673,
+   "(3, 0.5, 0.001)": 0.7129873608049258,
+   "(3, 1.0, 0.0)": 0.7198096271421651,
+   "(3, 1.0, 0.001)": 0.7391897138989146,
+   "(5, 0.5, 0.0)": 0.7079336409917436,
+   "(5, 0.5, 0.001)": 0.7296046974169944,
+   "(5, 1.0, 0.0)": 0.7078693639026341,
+   "(5, 1.0, 0.001)": 0.7058803110589262
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 66,
+   "stopped_step": 106,
+   "best_holdout_loss": 0.6037757396697998,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 26.1
+ },
+ {
+  "set": "C",
+  "seed": 45,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "RAVLT_perc_forgetting",
+   "EcogSPMem",
+   "RAVLT_learning",
+   "ADAS11",
+   "FAQ",
+   "EcogSPDivatt",
+   "PTEDUCAT",
+   "MOCA"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7500001869537761,
+   "(3, 0.5, 0.001)": 0.7492095726579628,
+   "(3, 1.0, 0.0)": 0.73849352533189,
+   "(3, 1.0, 0.001)": 0.7331970209467435,
+   "(5, 0.5, 0.0)": 0.7052503778670829,
+   "(5, 0.5, 0.001)": 0.7069397386413326,
+   "(5, 1.0, 0.0)": 0.7156037548243642,
+   "(5, 1.0, 0.001)": 0.7105015150185241
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 52,
+   "stopped_step": 92,
+   "best_holdout_loss": 0.5510185956954956,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 25.5
+ },
+ {
+  "set": "C",
+  "seed": 45,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "MOCA",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPMem",
+   "EcogSPTotal",
+   "EcogSPLang",
+   "EcogPtMem"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7174321745002461,
+   "(3, 0.5, 0.001)": 0.7174577308980565,
+   "(3, 1.0, 0.0)": 0.7128998349068771,
+   "(3, 1.0, 0.001)": 0.7159460940774414,
+   "(5, 0.5, 0.0)": 0.7305402414964264,
+   "(5, 0.5, 0.001)": 0.7342218680574957,
+   "(5, 1.0, 0.0)": 0.7044088781400136,
+   "(5, 1.0, 0.001)": 0.6927311838714867
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 53,
+   "stopped_step": 93,
+   "best_holdout_loss": 0.5690624117851257,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 25.6
+ },
+ {
+  "set": "C",
+  "seed": 45,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "EcogSPMem",
+   "RAVLT_learning",
+   "FAQ",
+   "EcogSPPlan",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "EcogSPTotal",
+   "EcogPtMem"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7234150679093788,
+   "(3, 0.5, 0.001)": 0.7261527417632491,
+   "(3, 1.0, 0.0)": 0.7158964488591683,
+   "(3, 1.0, 0.001)": 0.7346257742358,
+   "(5, 0.5, 0.0)": 0.7353676017469122,
+   "(5, 0.5, 0.001)": 0.7431001908162198,
+   "(5, 1.0, 0.0)": 0.7157430092084144,
+   "(5, 1.0, 0.001)": 0.7340131449401824
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 42,
+   "stopped_step": 82,
+   "best_holdout_loss": 0.49070119857788086,
+   "prior_loss": 1.5868916511535645,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 24.3
+ },
+ {
+  "set": "C",
+  "seed": 45,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7418702927985107,
+   "(3, 0.5, 0.001)": 0.7374150256681764,
+   "(3, 1.0, 0.0)": 0.7173268398268399,
+   "(3, 1.0, 0.001)": 0.7287360040830468,
+   "(5, 0.5, 0.0)": 0.7545821543355197,
+   "(5, 0.5, 0.001)": 0.7427923592856429,
+   "(5, 1.0, 0.0)": 0.7277869723682684,
+   "(5, 1.0, 0.001)": 0.7337132842685598
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 55,
+   "stopped_step": 95,
+   "best_holdout_loss": 0.720257043838501,
+   "prior_loss": 1.580370545387268,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 27.3
+ },
+ {
+  "set": "C",
+  "seed": 46,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "FAQ",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "EcogSPDivatt",
+   "PTEDUCAT",
+   "EcogSPTotal",
+   "MOCA"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7231232636057487,
+   "(3, 0.5, 0.001)": 0.7418847904788847,
+   "(3, 1.0, 0.0)": 0.7042944759574096,
+   "(3, 1.0, 0.001)": 0.7197568965294884,
+   "(5, 0.5, 0.0)": 0.7127981015390366,
+   "(5, 0.5, 0.001)": 0.7151773698357471,
+   "(5, 1.0, 0.0)": 0.7183264672146679,
+   "(5, 1.0, 0.001)": 0.721267969790578
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 46,
+   "stopped_step": 86,
+   "best_holdout_loss": 0.774507999420166,
+   "prior_loss": 1.5869072675704956,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 26.4
+ },
+ {
+  "set": "C",
+  "seed": 46,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "FAQ",
+   "EcogSPTotal",
+   "RAVLT_perc_forgetting",
+   "PTEDUCAT",
+   "EcogSPDivatt",
+   "RAVLT_immediate"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7094823075014998,
+   "(3, 0.5, 0.001)": 0.7278624259115464,
+   "(3, 1.0, 0.0)": 0.7122185200788328,
+   "(3, 1.0, 0.001)": 0.72129346032225,
+   "(5, 0.5, 0.0)": 0.7093457793124438,
+   "(5, 0.5, 0.001)": 0.7230717251321572,
+   "(5, 1.0, 0.0)": 0.7185913546117115,
+   "(5, 1.0, 0.001)": 0.727899192629487
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 35,
+   "stopped_step": 75,
+   "best_holdout_loss": 0.8178330659866333,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 27.0
+ },
+ {
+  "set": "C",
+  "seed": 46,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "EcogSPPlan",
+   "RAVLT_learning",
+   "MOCA",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "EcogSPTotal"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.740557374576012,
+   "(3, 0.5, 0.001)": 0.7313966674764601,
+   "(3, 1.0, 0.0)": 0.7164989336760776,
+   "(3, 1.0, 0.001)": 0.7229184468971934,
+   "(5, 0.5, 0.0)": 0.7317558577892455,
+   "(5, 0.5, 0.001)": 0.7178444505532606,
+   "(5, 1.0, 0.0)": 0.7104816411906895,
+   "(5, 1.0, 0.001)": 0.7314514099699564
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 58,
+   "stopped_step": 98,
+   "best_holdout_loss": 0.7779732346534729,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 26.1
+ },
+ {
+  "set": "C",
+  "seed": 46,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "ADAS11",
+   "EcogSPOrgan",
+   "RAVLT_learning",
+   "RAVLT_immediate",
+   "EcogSPTotal"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7092830239982171,
+   "(3, 0.5, 0.001)": 0.7271329336484694,
+   "(3, 1.0, 0.0)": 0.7231772818953892,
+   "(3, 1.0, 0.001)": 0.7081099742539434,
+   "(5, 0.5, 0.0)": 0.694990914621092,
+   "(5, 0.5, 0.001)": 0.7021982313895903,
+   "(5, 1.0, 0.0)": 0.716222790489969,
+   "(5, 1.0, 0.001)": 0.7133793169297337
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 52,
+   "stopped_step": 92,
+   "best_holdout_loss": 0.5576793551445007,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 23.4
+ },
+ {
+  "set": "C",
+  "seed": 46,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "RAVLT_perc_forgetting",
+   "ADAS11",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "FAQ",
+   "EcogSPOrgan",
+   "EcogSPPlan",
+   "RAVLT_learning"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7148043852486469,
+   "(3, 0.5, 0.001)": 0.7135941875072995,
+   "(3, 1.0, 0.0)": 0.7074873882935723,
+   "(3, 1.0, 0.001)": 0.7016361248397177,
+   "(5, 0.5, 0.0)": 0.6846863436658464,
+   "(5, 0.5, 0.001)": 0.670550211095448,
+   "(5, 1.0, 0.0)": 0.7150687448578734,
+   "(5, 1.0, 0.001)": 0.7032576816596964
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 36,
+   "stopped_step": 76,
+   "best_holdout_loss": 0.7261027693748474,
+   "prior_loss": 1.8288835287094116,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 25.5
+ },
+ {
+  "set": "C",
+  "seed": 46,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7190121680997564,
+   "(3, 0.5, 0.001)": 0.726696351428808,
+   "(3, 1.0, 0.0)": 0.7143632467112823,
+   "(3, 1.0, 0.001)": 0.7225807170828291,
+   "(5, 0.5, 0.0)": 0.7216022368101143,
+   "(5, 0.5, 0.001)": 0.7237524084254476,
+   "(5, 1.0, 0.0)": 0.7234252722550037,
+   "(5, 1.0, 0.001)": 0.7301562389235661
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 47,
+   "stopped_step": 87,
+   "best_holdout_loss": 0.6513753533363342,
+   "prior_loss": 1.8205955028533936,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 28.8
+ },
+ {
+  "set": "F",
+  "seed": 42,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "RAVLT_perc_forgetting",
+   "MMSE",
+   "EcogSPMem",
+   "ADAS11",
+   "EcogSPDivatt",
+   "EcogSPPlan",
+   "MOCA",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6781648956343633,
+   "(3, 0.5, 0.001)": 0.6888377466497204,
+   "(3, 1.0, 0.0)": 0.6973976032454177,
+   "(3, 1.0, 0.001)": 0.7089747845075722,
+   "(5, 0.5, 0.0)": 0.6921013146385222,
+   "(5, 0.5, 0.001)": 0.7007756323591376,
+   "(5, 1.0, 0.0)": 0.6854750689404281,
+   "(5, 1.0, 0.001)": 0.6902958597571857
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 71,
+   "stopped_step": 111,
+   "best_holdout_loss": 0.6050952672958374,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 30.5
+ },
+ {
+  "set": "F",
+  "seed": 42,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "ADAS11",
+   "MMSE",
+   "FAQ",
+   "RAVLT_perc_forgetting",
+   "EcogSPMem",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "MOCA",
+   "EcogSPOrgan",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6868767507002801,
+   "(3, 0.5, 0.001)": 0.6932381120024141,
+   "(3, 1.0, 0.0)": 0.6870769528687259,
+   "(3, 1.0, 0.001)": 0.6777583920802545,
+   "(5, 0.5, 0.0)": 0.6901131742254123,
+   "(5, 0.5, 0.001)": 0.6751173568429636,
+   "(5, 1.0, 0.0)": 0.6979521909527996,
+   "(5, 1.0, 0.001)": 0.6960474539337183
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 45,
+   "stopped_step": 85,
+   "best_holdout_loss": 0.7706010341644287,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.2
+ },
+ {
+  "set": "F",
+  "seed": 42,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPPlan",
+   "FAQ",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "MOCA",
+   "EcogSPOrgan",
+   "PTEDUCAT",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6569416039640499,
+   "(3, 0.5, 0.001)": 0.6489444569746132,
+   "(3, 1.0, 0.0)": 0.6551110524387354,
+   "(3, 1.0, 0.001)": 0.6603718589782552,
+   "(5, 0.5, 0.0)": 0.6592170924793087,
+   "(5, 0.5, 0.001)": 0.6647816570066774,
+   "(5, 1.0, 0.0)": 0.6657519863322832,
+   "(5, 1.0, 0.001)": 0.6657277923060666
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 57,
+   "stopped_step": 97,
+   "best_holdout_loss": 0.7245293855667114,
+   "prior_loss": 1.8288995027542114,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 27.6
+ },
+ {
+  "set": "F",
+  "seed": 42,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPPlan",
+   "RAVLT_perc_forgetting",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "EcogSPOrgan",
+   "FAQ",
+   "RAVLT_learning",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6521568209633709,
+   "(3, 0.5, 0.001)": 0.6690124253875798,
+   "(3, 1.0, 0.0)": 0.6808333125247328,
+   "(3, 1.0, 0.001)": 0.6726201061533452,
+   "(5, 0.5, 0.0)": 0.7161538399225692,
+   "(5, 0.5, 0.001)": 0.7183844476327716,
+   "(5, 1.0, 0.0)": 0.7123319054809819,
+   "(5, 1.0, 0.001)": 0.717759532005342
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 43,
+   "stopped_step": 83,
+   "best_holdout_loss": 0.8397745490074158,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 28.8
+ },
+ {
+  "set": "F",
+  "seed": 42,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "ADAS13",
+   "EcogSPMem",
+   "EcogSPPlan",
+   "RAVLT_immediate",
+   "EcogSPDivatt",
+   "EcogSPOrgan",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.709870015232478,
+   "(3, 0.5, 0.001)": 0.698487458305955,
+   "(3, 1.0, 0.0)": 0.6849253356704186,
+   "(3, 1.0, 0.001)": 0.6942136149194268,
+   "(5, 0.5, 0.0)": 0.7160704900861135,
+   "(5, 0.5, 0.001)": 0.7079633526287644,
+   "(5, 1.0, 0.0)": 0.6807142858778777,
+   "(5, 1.0, 0.001)": 0.7032747309450096
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 59,
+   "stopped_step": 99,
+   "best_holdout_loss": 0.5173318982124329,
+   "prior_loss": 1.586891531944275,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.8
+ },
+ {
+  "set": "F",
+  "seed": 42,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7016643897646726,
+   "(3, 0.5, 0.001)": 0.7073233640722351,
+   "(3, 1.0, 0.0)": 0.7204491057109826,
+   "(3, 1.0, 0.001)": 0.7177961792729816,
+   "(5, 0.5, 0.0)": 0.6936040264705261,
+   "(5, 0.5, 0.001)": 0.700463375966617,
+   "(5, 1.0, 0.0)": 0.7075761387029604,
+   "(5, 1.0, 0.001)": 0.70766621892744
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 57,
+   "stopped_step": 97,
+   "best_holdout_loss": 0.5958366394042969,
+   "prior_loss": 1.8205955028533936,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 30.3
+ },
+ {
+  "set": "F",
+  "seed": 43,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS11",
+   "ADAS13",
+   "MMSE",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPTotal",
+   "PTEDUCAT",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "RAVLT_immediate",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.705635027410926,
+   "(3, 0.5, 0.001)": 0.7007597556959206,
+   "(3, 1.0, 0.0)": 0.7150152844773928,
+   "(3, 1.0, 0.001)": 0.7009452524399662,
+   "(5, 0.5, 0.0)": 0.6872360284591731,
+   "(5, 0.5, 0.001)": 0.6826580311143564,
+   "(5, 1.0, 0.0)": 0.7026878906788286,
+   "(5, 1.0, 0.001)": 0.6951730126619627
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 37,
+   "stopped_step": 77,
+   "best_holdout_loss": 0.9457967877388,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 28.9
+ },
+ {
+  "set": "F",
+  "seed": 43,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "RAVLT_learning",
+   "EcogSPMem",
+   "PTEDUCAT",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPTotal",
+   "RAVLT_immediate",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7006067877995084,
+   "(3, 0.5, 0.001)": 0.7197243450117164,
+   "(3, 1.0, 0.0)": 0.7011843659952457,
+   "(3, 1.0, 0.001)": 0.7130957924473784,
+   "(5, 0.5, 0.0)": 0.677840483103641,
+   "(5, 0.5, 0.001)": 0.6831309434331313,
+   "(5, 1.0, 0.0)": 0.6763414671100485,
+   "(5, 1.0, 0.001)": 0.6898680109432035
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 63,
+   "stopped_step": 103,
+   "best_holdout_loss": 0.6889782547950745,
+   "prior_loss": 1.5869072675704956,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 30.6
+ },
+ {
+  "set": "F",
+  "seed": 43,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "ADAS11",
+   "MMSE",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "RAVLT_learning",
+   "EcogSPTotal",
+   "MOCA",
+   "EcogSPOrgan",
+   "EcogSPDivatt",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6890796523172604,
+   "(3, 0.5, 0.001)": 0.7139249481016526,
+   "(3, 1.0, 0.0)": 0.6799808776190641,
+   "(3, 1.0, 0.001)": 0.6844650297805437,
+   "(5, 0.5, 0.0)": 0.6820251410203855,
+   "(5, 0.5, 0.001)": 0.6900870088579143,
+   "(5, 1.0, 0.0)": 0.6847944048568202,
+   "(5, 1.0, 0.001)": 0.6925145513264951
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 78,
+   "stopped_step": 118,
+   "best_holdout_loss": 0.5457132458686829,
+   "prior_loss": 1.5869150161743164,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 31.0
+ },
+ {
+  "set": "F",
+  "seed": 43,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "EcogSPMem",
+   "FAQ",
+   "EcogSPTotal",
+   "RAVLT_immediate",
+   "MOCA",
+   "EcogSPPlan",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6757539227907339,
+   "(3, 0.5, 0.001)": 0.6973346357378525,
+   "(3, 1.0, 0.0)": 0.6806241465935888,
+   "(3, 1.0, 0.001)": 0.7156208473223798,
+   "(5, 0.5, 0.0)": 0.699755276484258,
+   "(5, 0.5, 0.001)": 0.7013722753854332,
+   "(5, 1.0, 0.0)": 0.7030859783025272,
+   "(5, 1.0, 0.001)": 0.6987627602172123
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 71,
+   "stopped_step": 111,
+   "best_holdout_loss": 0.9700381755828857,
+   "prior_loss": 1.828899621963501,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.2
+ },
+ {
+  "set": "F",
+  "seed": 43,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "RAVLT_perc_forgetting",
+   "ADAS13",
+   "MMSE",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "ADAS11",
+   "MOCA",
+   "EcogPtDivatt",
+   "EcogSPTotal",
+   "RAVLT_learning",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6833351041655916,
+   "(3, 0.5, 0.001)": 0.6958886059445084,
+   "(3, 1.0, 0.0)": 0.6818508771577921,
+   "(3, 1.0, 0.001)": 0.6828341465196289,
+   "(5, 0.5, 0.0)": 0.6931635028313949,
+   "(5, 0.5, 0.001)": 0.6920955819020465,
+   "(5, 1.0, 0.0)": 0.6953518396986158,
+   "(5, 1.0, 0.001)": 0.6981293085813396
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 57,
+   "stopped_step": 97,
+   "best_holdout_loss": 0.8752410411834717,
+   "prior_loss": 1.8288835287094116,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.5
+ },
+ {
+  "set": "F",
+  "seed": 43,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7119778848928189,
+   "(3, 0.5, 0.001)": 0.7057677474485322,
+   "(3, 1.0, 0.0)": 0.7207380829952817,
+   "(3, 1.0, 0.001)": 0.7217252905099835,
+   "(5, 0.5, 0.0)": 0.6980571518735053,
+   "(5, 0.5, 0.001)": 0.708734471493432,
+   "(5, 1.0, 0.0)": 0.7099800468530147,
+   "(5, 1.0, 0.001)": 0.7069903683209231
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 68,
+   "stopped_step": 108,
+   "best_holdout_loss": 0.7144153118133545,
+   "prior_loss": 1.820595383644104,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 32.8
+ },
+ {
+  "set": "F",
+  "seed": 44,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "MMSE",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "EcogSPMem",
+   "MOCA",
+   "FAQ",
+   "RAVLT_learning",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6716451794853078,
+   "(3, 0.5, 0.001)": 0.6844996749596375,
+   "(3, 1.0, 0.0)": 0.6783180744621428,
+   "(3, 1.0, 0.001)": 0.6801974777226655,
+   "(5, 0.5, 0.0)": 0.6886477822836284,
+   "(5, 0.5, 0.001)": 0.6887021332285697,
+   "(5, 1.0, 0.0)": 0.6975609253435786,
+   "(5, 1.0, 0.001)": 0.701891842008121
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 49,
+   "stopped_step": 89,
+   "best_holdout_loss": 0.7985141277313232,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 26.8
+ },
+ {
+  "set": "F",
+  "seed": 44,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "EcogSPPlan",
+   "FAQ",
+   "PTEDUCAT",
+   "RAVLT_perc_forgetting",
+   "EcogSPOrgan",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7186576922969032,
+   "(3, 0.5, 0.001)": 0.7195238095238095,
+   "(3, 1.0, 0.0)": 0.7083313245477787,
+   "(3, 1.0, 0.001)": 0.7007645209515015,
+   "(5, 0.5, 0.0)": 0.6814821131005043,
+   "(5, 0.5, 0.001)": 0.6911504784086469,
+   "(5, 1.0, 0.0)": 0.6951791840483278,
+   "(5, 1.0, 0.001)": 0.6994129737984496
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 67,
+   "stopped_step": 107,
+   "best_holdout_loss": 0.5515244007110596,
+   "prior_loss": 1.5869072675704956,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 32.8
+ },
+ {
+  "set": "F",
+  "seed": 44,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "EcogSPMem",
+   "FAQ",
+   "RAVLT_perc_forgetting",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "EcogSPOrgan",
+   "PTEDUCAT",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7011330643313118,
+   "(3, 0.5, 0.001)": 0.7176159159813372,
+   "(3, 1.0, 0.0)": 0.7024392073143081,
+   "(3, 1.0, 0.001)": 0.7013750098884564,
+   "(5, 0.5, 0.0)": 0.6937711329987934,
+   "(5, 0.5, 0.001)": 0.6969909704799884,
+   "(5, 1.0, 0.0)": 0.7030382868965303,
+   "(5, 1.0, 0.001)": 0.7091239401997191
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 74,
+   "stopped_step": 114,
+   "best_holdout_loss": 0.5920661687850952,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 25.5
+ },
+ {
+  "set": "F",
+  "seed": 44,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "EcogSPPlan",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "EcogSPDivatt",
+   "EcogSPMem",
+   "FAQ",
+   "RAVLT_learning",
+   "EcogSPTotal",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6878123953363351,
+   "(3, 0.5, 0.001)": 0.6905358106139051,
+   "(3, 1.0, 0.0)": 0.6684570513995743,
+   "(3, 1.0, 0.001)": 0.6837796099032054,
+   "(5, 0.5, 0.0)": 0.6937239948417279,
+   "(5, 0.5, 0.001)": 0.6989704851150634,
+   "(5, 1.0, 0.0)": 0.6835400132913996,
+   "(5, 1.0, 0.001)": 0.7001925049625957
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 70,
+   "stopped_step": 110,
+   "best_holdout_loss": 0.7148691415786743,
+   "prior_loss": 1.8288995027542114,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 31.2
+ },
+ {
+  "set": "F",
+  "seed": 44,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPMem",
+   "PTEDUCAT",
+   "EcogSPDivatt",
+   "EcogSPOrgan",
+   "EcogSPPlan",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6874025410214833,
+   "(3, 0.5, 0.001)": 0.6896143332280832,
+   "(3, 1.0, 0.0)": 0.6687371920136054,
+   "(3, 1.0, 0.001)": 0.6709869573460789,
+   "(5, 0.5, 0.0)": 0.6924693620677925,
+   "(5, 0.5, 0.001)": 0.6945868165815425,
+   "(5, 1.0, 0.0)": 0.6947759629231902,
+   "(5, 1.0, 0.001)": 0.7065945413138961
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 52,
+   "stopped_step": 92,
+   "best_holdout_loss": 0.7083860039710999,
+   "prior_loss": 1.8288836479187012,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 25.4
+ },
+ {
+  "set": "F",
+  "seed": 44,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6905662029231823,
+   "(3, 0.5, 0.001)": 0.6943988123785912,
+   "(3, 1.0, 0.0)": 0.6880024122551449,
+   "(3, 1.0, 0.001)": 0.6928450941745062,
+   "(5, 0.5, 0.0)": 0.7101733310314339,
+   "(5, 0.5, 0.001)": 0.7098889758089506,
+   "(5, 1.0, 0.0)": 0.7056729467692521,
+   "(5, 1.0, 0.001)": 0.703381253572794
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 52,
+   "stopped_step": 92,
+   "best_holdout_loss": 0.5121068358421326,
+   "prior_loss": 1.580370545387268,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 30.8
+ },
+ {
+  "set": "F",
+  "seed": 45,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "ADAS11",
+   "FAQ",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "EcogSPOrgan",
+   "MOCA",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6867881531613926,
+   "(3, 0.5, 0.001)": 0.6950733688270171,
+   "(3, 1.0, 0.0)": 0.696137546306212,
+   "(3, 1.0, 0.001)": 0.6857266461507042,
+   "(5, 0.5, 0.0)": 0.6889807073471965,
+   "(5, 0.5, 0.001)": 0.6864485601225281,
+   "(5, 1.0, 0.0)": 0.6884180187728897,
+   "(5, 1.0, 0.001)": 0.6967479674796748
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 75,
+   "stopped_step": 115,
+   "best_holdout_loss": 0.6865838766098022,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 31.0
+ },
+ {
+  "set": "F",
+  "seed": 45,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS11",
+   "MMSE",
+   "ADAS13",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "RAVLT_immediate",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "PTEDUCAT",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6614982239992392,
+   "(3, 0.5, 0.001)": 0.7040447850317654,
+   "(3, 1.0, 0.0)": 0.7039047447423166,
+   "(3, 1.0, 0.001)": 0.7157557417830449,
+   "(5, 0.5, 0.0)": 0.6737993804749176,
+   "(5, 0.5, 0.001)": 0.6665414131799138,
+   "(5, 1.0, 0.0)": 0.6606993396578964,
+   "(5, 1.0, 0.001)": 0.6842319003286711
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 37,
+   "stopped_step": 77,
+   "best_holdout_loss": 0.7477504014968872,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.5
+ },
+ {
+  "set": "F",
+  "seed": 45,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "RAVLT_perc_forgetting",
+   "EcogSPMem",
+   "RAVLT_learning",
+   "ADAS11",
+   "FAQ",
+   "EcogSPDivatt",
+   "PTEDUCAT",
+   "MOCA",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7393859103173677,
+   "(3, 0.5, 0.001)": 0.712055491263412,
+   "(3, 1.0, 0.0)": 0.7233816967239581,
+   "(3, 1.0, 0.001)": 0.7194922421960035,
+   "(5, 0.5, 0.0)": 0.6887658319710056,
+   "(5, 0.5, 0.001)": 0.7074719362625705,
+   "(5, 1.0, 0.0)": 0.6980460066489095,
+   "(5, 1.0, 0.001)": 0.7087834504871132
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 74,
+   "stopped_step": 114,
+   "best_holdout_loss": 0.5982004404067993,
+   "prior_loss": 1.5869148969650269,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 30.9
+ },
+ {
+  "set": "F",
+  "seed": 45,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "MOCA",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPMem",
+   "EcogSPTotal",
+   "EcogSPLang",
+   "EcogPtMem",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6960559108983077,
+   "(3, 0.5, 0.001)": 0.7021343459120402,
+   "(3, 1.0, 0.0)": 0.6960500032184249,
+   "(3, 1.0, 0.001)": 0.7058489358887742,
+   "(5, 0.5, 0.0)": 0.6980775209388315,
+   "(5, 0.5, 0.001)": 0.6858444234081074,
+   "(5, 1.0, 0.0)": 0.6558947946256806,
+   "(5, 1.0, 0.001)": 0.6736477458458785
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 40,
+   "stopped_step": 80,
+   "best_holdout_loss": 0.7028250694274902,
+   "prior_loss": 1.8288995027542114,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 28.7
+ },
+ {
+  "set": "F",
+  "seed": 45,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "EcogSPMem",
+   "RAVLT_learning",
+   "FAQ",
+   "EcogSPPlan",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "EcogSPTotal",
+   "EcogPtMem",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6960522276372847,
+   "(3, 0.5, 0.001)": 0.7096739259909182,
+   "(3, 1.0, 0.0)": 0.7100632199386177,
+   "(3, 1.0, 0.001)": 0.7116160351258528,
+   "(5, 0.5, 0.0)": 0.7136151729041964,
+   "(5, 0.5, 0.001)": 0.7213126383054456,
+   "(5, 1.0, 0.0)": 0.7166713051014322,
+   "(5, 1.0, 0.001)": 0.7054668917896585
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 55,
+   "stopped_step": 95,
+   "best_holdout_loss": 0.5636056065559387,
+   "prior_loss": 1.5868916511535645,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.9
+ },
+ {
+  "set": "F",
+  "seed": 45,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.731988995242703,
+   "(3, 0.5, 0.001)": 0.7320613864506995,
+   "(3, 1.0, 0.0)": 0.7361683088698766,
+   "(3, 1.0, 0.001)": 0.7302031466873562,
+   "(5, 0.5, 0.0)": 0.7185655461208624,
+   "(5, 0.5, 0.001)": 0.7284987635771747,
+   "(5, 1.0, 0.0)": 0.7131141056035584,
+   "(5, 1.0, 0.001)": 0.7096866785931776
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 74,
+   "stopped_step": 114,
+   "best_holdout_loss": 0.8464440703392029,
+   "prior_loss": 1.8205955028533936,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 33.5
+ },
+ {
+  "set": "F",
+  "seed": 46,
+  "unit": 0,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "FAQ",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "EcogSPDivatt",
+   "PTEDUCAT",
+   "EcogSPTotal",
+   "MOCA",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7212046638576416,
+   "(3, 0.5, 0.001)": 0.7144792595166325,
+   "(3, 1.0, 0.0)": 0.7208589698940493,
+   "(3, 1.0, 0.001)": 0.7231154292355938,
+   "(5, 0.5, 0.0)": 0.7013229760893313,
+   "(5, 0.5, 0.001)": 0.710949840027263,
+   "(5, 1.0, 0.0)": 0.6985135407228431,
+   "(5, 1.0, 0.001)": 0.7005304695506325
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 61,
+   "stopped_step": 101,
+   "best_holdout_loss": 0.7970080971717834,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 29.9
+ },
+ {
+  "set": "F",
+  "seed": 46,
+  "unit": 1,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "FAQ",
+   "EcogSPTotal",
+   "RAVLT_perc_forgetting",
+   "PTEDUCAT",
+   "EcogSPDivatt",
+   "RAVLT_immediate",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6779770225753222,
+   "(3, 0.5, 0.001)": 0.6735363116031603,
+   "(3, 1.0, 0.0)": 0.6495949290576912,
+   "(3, 1.0, 0.001)": 0.6740758394136375,
+   "(5, 0.5, 0.0)": 0.6604540079791268,
+   "(5, 0.5, 0.001)": 0.6536886815841744,
+   "(5, 1.0, 0.0)": 0.6853568105283809,
+   "(5, 1.0, 0.001)": 0.6940116317310498
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 50,
+   "stopped_step": 90,
+   "best_holdout_loss": 0.8553491830825806,
+   "prior_loss": 1.8288918733596802,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 22.0
+ },
+ {
+  "set": "F",
+  "seed": 46,
+  "unit": 2,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "ADAS11",
+   "RAVLT_perc_forgetting",
+   "EcogSPPlan",
+   "RAVLT_learning",
+   "MOCA",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "EcogSPTotal",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7121135002175474,
+   "(3, 0.5, 0.001)": 0.7252065021709203,
+   "(3, 1.0, 0.0)": 0.7388159261570536,
+   "(3, 1.0, 0.001)": 0.7305790865025323,
+   "(5, 0.5, 0.0)": 0.7195179874707042,
+   "(5, 0.5, 0.001)": 0.7162761304281661,
+   "(5, 1.0, 0.0)": 0.7294651335260156,
+   "(5, 1.0, 0.001)": 0.737968706177377
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 68,
+   "stopped_step": 108,
+   "best_holdout_loss": 0.711337149143219,
+   "prior_loss": 1.8288995027542114,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 23.1
+ },
+ {
+  "set": "F",
+  "seed": 46,
+  "unit": 3,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "ADAS13",
+   "MMSE",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "ADAS11",
+   "EcogSPOrgan",
+   "RAVLT_learning",
+   "RAVLT_immediate",
+   "EcogSPTotal",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   1.0,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.6946116541457821,
+   "(3, 0.5, 0.001)": 0.6970386800483717,
+   "(3, 1.0, 0.0)": 0.7008662921386067,
+   "(3, 1.0, 0.001)": 0.697104946424478,
+   "(5, 0.5, 0.0)": 0.6730064238388322,
+   "(5, 0.5, 0.001)": 0.673088142174169,
+   "(5, 1.0, 0.0)": 0.670248116336829,
+   "(5, 1.0, 0.001)": 0.6805323885307775
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 65,
+   "stopped_step": 105,
+   "best_holdout_loss": 0.6878060698509216,
+   "prior_loss": 1.8288995027542114,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 21.8
+ },
+ {
+  "set": "F",
+  "seed": 46,
+  "unit": 4,
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "RAVLT_perc_forgetting",
+   "ADAS11",
+   "EcogSPMem",
+   "EcogSPDivatt",
+   "FAQ",
+   "EcogSPOrgan",
+   "EcogSPPlan",
+   "RAVLT_learning",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   3,
+   0.5,
+   0.001
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.710966912315456,
+   "(3, 0.5, 0.001)": 0.7190714703578992,
+   "(3, 1.0, 0.0)": 0.6993352439576697,
+   "(3, 1.0, 0.001)": 0.7084660935302141,
+   "(5, 0.5, 0.0)": 0.6826965314894509,
+   "(5, 0.5, 0.001)": 0.6786905402917293,
+   "(5, 1.0, 0.0)": 0.7015522973753672,
+   "(5, 1.0, 0.001)": 0.6810919250164389
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 69,
+   "stopped_step": 109,
+   "best_holdout_loss": 0.7199108004570007,
+   "prior_loss": 1.5868914127349854,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 22.4
+ },
+ {
+  "set": "F",
+  "seed": 46,
+  "unit": "val",
+  "cols": [
+   "CDRSB",
+   "CogIndex",
+   "MMSE",
+   "ADAS13",
+   "ADAS11",
+   "EcogSPMem",
+   "RAVLT_perc_forgetting",
+   "FAQ",
+   "EcogSPPlan",
+   "EcogSPDivatt",
+   "RAVLT_learning",
+   "PTEDUCAT",
+   "Ventricles_ICV",
+   "Hippocampus_ICV",
+   "WholeBrain_ICV",
+   "Entorhinal_ICV",
+   "Fusiform_ICV",
+   "MidTemp_ICV",
+   "ALZ"
+  ],
+  "config": [
+   5,
+   1.0,
+   0.0
+  ],
+  "inner_scores": {
+   "(3, 0.5, 0.0)": 0.7066396566222183,
+   "(3, 0.5, 0.001)": 0.7184231849881128,
+   "(3, 1.0, 0.0)": 0.6980704327478822,
+   "(3, 1.0, 0.001)": 0.705245342138418,
+   "(5, 0.5, 0.0)": 0.7096366872892681,
+   "(5, 0.5, 0.001)": 0.7099301937657967,
+   "(5, 1.0, 0.0)": 0.7187856487408412,
+   "(5, 1.0, 0.001)": 0.7109988958047514
+  },
+  "inner_failures": 0,
+  "refit": {
+   "best_step": 63,
+   "stopped_step": 103,
+   "best_holdout_loss": 0.6821364164352417,
+   "prior_loss": 1.8205955028533936,
+   "failed": false,
+   "reason": ""
+  },
+  "seconds": 32.5
+ }
+]

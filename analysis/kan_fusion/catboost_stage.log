@@ -1,0 +1,16 @@
+seed 42: rankings + C_K done
+seed 43: rankings + C_K done
+seed 44: rankings + C_K done
+seed 45: rankings + C_K done
+seed 46: rankings + C_K done
+CV macro-F1 of CatBoost C by K: {8: 0.7424, 10: 0.7433, 12: 0.7435} -> K* = 12
+final top-K*: ['CDRSB', 'CogIndex', 'MMSE', 'ADAS13', 'ADAS11', 'EcogSPMem', 'RAVLT_perc_forgetting', 'FAQ', 'EcogSPPlan', 'EcogSPDivatt', 'RAVLT_learning', 'PTEDUCAT']
+fold-level top-K* frequency (of 25): {'CDRSB': 25, 'CogIndex': 25, 'ADAS13': 25, 'RAVLT_perc_forgetting': 25, 'MMSE': 25, 'EcogSPMem': 25, 'ADAS11': 25, 'FAQ': 21, 'EcogSPDivatt': 17, 'EcogSPPlan': 14, 'RAVLT_learning': 14, 'PTEDUCAT': 13, 'MOCA': 12, 'EcogSPTotal': 12, 'EcogSPOrgan': 11, 'RAVLT_immediate': 7, 'EcogPtMem': 2, 'EcogPtDivatt': 1, 'EcogSPLang': 1}
+seed 42: C/F/R done
+seed 43: C/F/R done
+seed 44: C/F/R done
+seed 45: C/F/R done
+seed 46: C/F/R done
+C: CV macro-F1 0.7435 ± 0.0107   val 0.7638 ± 0.0199
+F: CV macro-F1 0.7577 ± 0.0136   val 0.7752 ± 0.0175
+R: CV macro-F1 0.7517 ± 0.0060   val 0.7781 ± 0.0196
