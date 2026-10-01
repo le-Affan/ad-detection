@@ -241,3 +241,107 @@ Computed for all 688 train/val scans by `brainage_reliability.py`; output in
   vs 0.216; fusion-feasibility report). This handicaps F on val only.
 - **Val is small:** 25 LMCI and 23 AD subjects, so val differences of ±0.02
   macro-F1 are within seed spread.
+
+---
+
+## Addendum — KAN specification (Prompt 2)
+
+Committed 2026-10-01, before any model has been fitted on the fusion dataset
+(CatBoost or KAN). It adds the KAN details that item c deferred and does not
+change items a–h. The only KAN fits run before this commit used random data, to
+time the loop.
+
+**Environment:** `LYP/.venv-kan` (Python 3.12.3): pykan 0.2.8, torch 2.14.1+cpu,
+numpy 2.5.3, pandas 3.0.6, scikit-learn 1.9.1, scipy 1.18.1, matplotlib 3.11.2,
+sympy 1.14.0. CPU, one torch thread per fit, fits run in parallel processes.
+CatBoost and the evaluation run in `LYP/.venv-fusion`, unchanged.
+
+### K1. Architecture
+
+**Network:** a pykan `MultKAN` of width `[n_in, 8, 5]`, spline order k = 3,
+base function SiLU, other settings at the pykan defaults. Symbolic branch
+disabled.
+
+**Outputs:**
+- Outputs 0–3 are the COG logits, giving the 4-class softmax (the
+  `[n_in, 8, 4]` network).
+- Output 4 is the ADD logit (AD vs rest): a small head of 8 edges on the shared
+  hidden layer.
+- The head shares the hidden layer because the joint loss only means something
+  for shared parameters: two disjoint networks under a summed loss would just
+  train independently.
+- All pre-registered metrics use the COG softmax, including AD AUC from P(AD).
+  The ADD head's AUC (sigmoid of output 4) is reported in addition.
+
+**Loss:** CE(COG) + λ·BCE(ADD) + μ·R, where R is pykan's
+`reg('edge_forward_spline_n', lamb_l1=1, lamb_entropy=2, lamb_coef=0,
+lamb_coefdiff=0)` (the pykan defaults).
+
+**Grid, in this order (8 configs):**
+- G ∈ {3, 5}
+- λ ∈ {0.5, 1.0}
+- μ ∈ {0, 1e-3}
+
+### K2. One fit, given a set of training rows and the rows to predict
+
+1. **Preprocessing, on the training rows only:**
+   - PTGENDER → 1 (Male) / 0;
+   - a missing ALZ gets the training rows' median;
+   - every column is z-scored with the training rows' mean and SD.
+   
+   The same values are applied to the predicted rows.
+2. **Early-stopping holdout:** a stratified 15% of the training rows
+   (`random_state = seed`). The model is fitted on the other 85%.
+3. **Grid from the training distribution:** `update_grid` on the 85% fitting
+   rows at step 0, then every 5 steps up to step 50 (pykan's default schedule).
+4. **Optimisation:** Adam, lr 0.01, full batch, at most 400 steps. Each step, the
+   holdout loss CE + λ·BCE (no R) is computed. Training stops after 40 steps
+   without improvement, and the best-holdout-loss state is restored.
+5. **Seed:** torch and pykan seed = the run seed.
+6. **Convergence failure:**
+   - Definition: any non-finite loss; or a best holdout loss no lower than the
+     loss of predicting the training class frequencies; or a best step of 0.
+   - Failed fits are counted and kept as they are, never re-run.
+   - If more than 20% of the 25 outer CV fits of either input set fail,
+     **"KAN does not train stably"**: CatBoost becomes the final decision layer
+     whatever e2 says, and that is reported.
+
+### K3. Hyperparameter choice (nested, train only, never val)
+
+- **For every outer fit** (each CV fold × seed, and each seed's all-569 fit for
+  val):
+  - split the outer training portion with `StratifiedKFold(3, shuffle=True,
+    random_state = seed)`;
+  - fit each of the 8 configs (K2) on every inner training split;
+  - score pooled inner out-of-fold macro-F1;
+  - choose the maximum, with ties going to the earlier config in the grid order.
+- Refit the chosen config on the whole outer training portion (K2), then predict
+  the held-out fold (CV) or val.
+- C and F are tuned separately.
+- Inputs: the same per-fold top-K\* lists as CatBoost (item b) in CV, and the
+  final list for val.
+- The chosen configs are recorded.
+
+### K4. Interpretability (on the 5 all-569 F models, one per seed)
+
+**Edge functions:**
+- Plot the 8 layer-0 edges (input → hidden) for ALZ, Hippocampus_ICV,
+  Ventricles_ICV and the first 3 clinical features of the frozen final list
+  (item b, SHAP order).
+- Plot over the input's train 1st–99th percentile, with the x axis in the
+  dataset's units (raw ratio for the volumes, probability for ALZ).
+- Also plot, with the 5 seeds overlaid, the partial dependence of severity s and
+  of P(AD) on each of these inputs, with every other input at its training mean.
+
+**Flat or non-trivial:**
+- For each input, take the range of that partial dependence of s over its train
+  5th–95th percentile.
+- Median over seeds < 0.10 stage units → **flat**; ≥ 0.10 → **non-trivial**.
+- pykan's input attribution (`node_scores[0]` after `attribute()`) is reported
+  alongside, as a share of the total.
+
+**Pruning:**
+- `prune_input(threshold=1e-2)` (pykan default) on each of the 5 models, without
+  retraining.
+- Report which inputs survive, as a count of seeds out of 5, and the pruned
+  models' val macro-F1 (descriptive).
