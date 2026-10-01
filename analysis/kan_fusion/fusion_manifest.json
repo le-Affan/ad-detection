@@ -1,0 +1,99 @@
+{
+  "rows": {
+    "train": 569,
+    "val": 122
+  },
+  "clinical_features": [
+    "AGE",
+    "PTGENDER",
+    "PTEDUCAT",
+    "APOE4",
+    "CDRSB",
+    "ADAS11",
+    "ADAS13",
+    "MMSE",
+    "RAVLT_immediate",
+    "RAVLT_learning",
+    "RAVLT_forgetting",
+    "RAVLT_perc_forgetting",
+    "FAQ",
+    "MOCA",
+    "EcogPtMem",
+    "EcogPtLang",
+    "EcogPtVisspat",
+    "EcogPtPlan",
+    "EcogPtOrgan",
+    "EcogPtDivatt",
+    "EcogPtTotal",
+    "EcogSPMem",
+    "EcogSPLang",
+    "EcogSPVisspat",
+    "EcogSPPlan",
+    "EcogSPOrgan",
+    "EcogSPDivatt",
+    "EcogSPTotal",
+    "CogIndex"
+  ],
+  "mri_inputs": [
+    "Ventricles_ICV",
+    "Hippocampus_ICV",
+    "WholeBrain_ICV",
+    "Entorhinal_ICV",
+    "Fusiform_ICV",
+    "MidTemp_ICV",
+    "ALZ"
+  ],
+  "ratio_definition": "ADNI FreeSurfer volume / ADNI FreeSurfer ICV (raw mm^3, step2_features.csv)",
+  "ratio_imputation_train_median": {
+    "Ventricles_ICV": 0.021725567621732174,
+    "Hippocampus_ICV": 0.0046579917953606855,
+    "WholeBrain_ICV": 0.6970481896674768,
+    "Entorhinal_ICV": 0.002386354433079385,
+    "Fusiform_ICV": 0.012102621305392686,
+    "MidTemp_ICV": 0.013308013448359954
+  },
+  "ratio_zscore_train_mean": {
+    "Ventricles_ICV": 0.02409135893110846,
+    "Hippocampus_ICV": 0.00466203267466677,
+    "WholeBrain_ICV": 0.6968108857876674,
+    "Entorhinal_ICV": 0.002358754924253642,
+    "Fusiform_ICV": 0.012063609399411049,
+    "MidTemp_ICV": 0.013283935357669256
+  },
+  "ratio_zscore_train_std": {
+    "Ventricles_ICV": 0.012301857376753437,
+    "Hippocampus_ICV": 0.0008061577806300608,
+    "WholeBrain_ICV": 0.045633339606774445,
+    "Entorhinal_ICV": 0.0004804212868420058,
+    "Fusiform_ICV": 0.001608611420796208,
+    "MidTemp_ICV": 0.0017253512165914216
+  },
+  "alz_source": "analysis/fusion_feasibility/alz_crossfit.csv (train out-of-fold; val = mean of 5 fold models)",
+  "fs_missing": {
+    "train": 1,
+    "val": 0
+  },
+  "fs_missing_rids": [
+    4095
+  ],
+  "no_mri": [
+    {
+      "RID": 2360,
+      "PTID": "126_S_2360",
+      "split": "train",
+      "diagnosis": "EMCI"
+    },
+    {
+      "RID": 4095,
+      "PTID": "098_S_4095",
+      "split": "train",
+      "diagnosis": "AD"
+    },
+    {
+      "RID": 4187,
+      "PTID": "941_S_4187",
+      "split": "val",
+      "diagnosis": "LMCI"
+    }
+  ]
+}
