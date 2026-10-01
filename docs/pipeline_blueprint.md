@@ -1,7 +1,8 @@
-# Pipeline Blueprint v2 — Multimodal AD Assessment System
+# Pipeline Blueprint v3 — Multimodal AD Assessment System
 
 Date: 2026-10-01
-Status: current plan. Replaces blueprint v1 (2026-09-28) and supersedes
+Status: current. v3 records the built and frozen system (`fusion-v3`) and its single test run.
+Replaces v2 (same date) and v1 (2026-09-28); supersedes
 `docs/mri_role_refined_plan.md` wherever they differ.
 Rule for every experiment: decision rules are written and committed BEFORE the
 results exist. Test subjects are read once, in the frozen test evaluation.
@@ -11,19 +12,21 @@ results exist. Test subjects are read once, in the frozen test evaluation.
 ## 1. System in one paragraph
 
 A stage-aware, interpretable assessment system for ADNI-GO/2 subjects. A
-clinical stream (cognition, function, demographics) and an MRI stream
-(regional volumes and a CNN-derived AD probability) feed a fusion layer that
-outputs a 4-stage classification (CN / EMCI / LMCI / AD), an AD-vs-rest
+clinical specialist (CatBoost on cognition, function, demographics) and an MRI
+specialist (logistic model on regional volumes/ICV, a CNN-derived AD
+probability, brain-age gap, age and sex) each output 4-class probabilities; a
+KAN fusion layer combines these stream-level scores and outputs a 4-stage classification (CN / EMCI / LMCI / AD), an AD-vs-rest
 probability and a continuous severity index. An assessment card shows the
 outputs with explanations (SHAP, Grad-CAM, KAN edge functions, a
 clinical-vs-imaging discordance flag, and brain-age as supporting imaging
-evidence). The test set has not been read.
+evidence). The frozen system was evaluated on test once (`fusion-v3`, freeze
+commit `8f351b6`).
 
 ---
 
 ## 2. Evidence log (what has been tested and what it showed)
 
-All results are validation / cross-validation. The test set is untouched.
+Rows 1–7 are validation / cross-validation. Row 8 includes the single frozen test run.
 
 | # | Experiment | Branch | Result |
 |---|---|---|---|
@@ -33,6 +36,8 @@ All results are validation / cross-validation. The test set is untouched.
 | 4 | Cross-fitted ALZ added to clinical CatBoost | `fusion-feasibility` | B − A macro-F1 +0.000 CV [−0.009, +0.008]; B′ − A′ +0.009 [−0.003, +0.021], val −0.019. No reliable gain. ALZ AUC 0.764 (train, cross-fitted) / 0.778 (val) |
 | 5 | Brain-age gap (DeepBrainNet) added | `brain-age` | E − B −0.002 [−0.011, +0.006]; E′ − B′ +0.004 [−0.007, +0.016]. No reliable gain. Strong stage gradient: corrected gap CN 0.0 → EMCI +2.2 → LMCI +4.0 → AD +6.8 years (KW p = 2×10⁻¹⁶); AD vs CN AUC 0.80 alone |
 | 6 | Remove the 7 FreeSurfer volumes from the clinical features | `mri-morphometry` | A − A0 +0.002 [−0.010, +0.015]; A′ − A0′ −0.003 [−0.021, +0.015]. Volumes add nothing on CV. SynthSeg Part 2 deliberately not run |
+| 7 | KAN vs CatBoost on raw clinical top-12 (C) and + 7 MRI inputs (F) | `kan-fusion` | CatBoost F − C +0.014 CV [−0.001, +0.029]: no reliable MRI gain. KAN on raw features −0.058 vs CatBoost on F (not non-inferior); MRI inputs hurt the raw-feature KAN |
+| 8 | Stream specialists + KAN fusion on stream scores (35 configurations, nested stacking), frozen and tested once | `fusion-v3` | Final KAN K2 CV 0.756 vs clinical specialist 0.744 (+0.013 [−0.006, +0.034]) and CatBoost F 0.758 (−0.002). MRI share inside the fusion +0.007 [−0.006, +0.019]. **Test:** KAN 0.764, clinical 0.771, CatBoost F 0.746, CatBoost R 0.784; all differences within ±0.08 CIs. MRI specialist alone: AD-vs-rest AUC 0.880 CV / 0.873 test; 4-class macro-F1 0.42 / 0.44 (majority 0.14) |
 
 **Reading of the evidence.** The imaging signals are valid: ALZ AUC ~0.77,
 brain-age AUC 0.80 with a clean stage gradient, hippocampus ~10% smaller in
@@ -41,8 +46,9 @@ assessments are available, because the CN/EMCI/LMCI/AD labels are defined by
 those assessments. Subject count (~570 train) bounds what a 3D CNN can learn
 beyond that. The report states this plainly and treats it as a finding.
 
-Clinical stream reference numbers: test accuracy 0.813, macro-F1 0.786
-(untouched since). Fixed-tree retrain: val macro-F1 0.778, CV 0.752. Do not
+Clinical stream reference numbers: original step-5 model test accuracy 0.813,
+macro-F1 0.786; CatBoost R refitted on 691 (fusion-v3 test run) 0.813 / 0.784.
+Fixed-tree retrain: val macro-F1 0.778, CV 0.752. Do not
 quote the saved model's validation 0.808 (its settings were tuned on val).
 Clinical confusion (val): 13 of 16 LMCI errors go to EMCI.
 
@@ -53,38 +59,41 @@ Clinical confusion (val): 13 of 16 LMCI errors go to EMCI.
 ```
  Clinical tables                         T1 MRI scan
         │                                      │
- Clinical stream [built]            ┌──────────┼───────────────┐
- cognition, function, age           ▼          ▼               ▼
- (36 features minus the       Volumes/ICV   3D CNN         Brain-age
-  7 FreeSurfer columns)       [built]       ALZ score      [built]
-        │                          │        (cross-fitted)   │
-        │                          │           │             │ card only,
-        └──────────┬───────────────┴───────────┘             │ not a model
-                   ▼                                          │ input
-          Top-K clinical + 7 MRI inputs                       │
-                   ▼                                          │
-        Fusion layer [to build]                               │
-        KAN, compared with CatBoost                           │
-                   │                                          │
-      ┌────────────┼──────────────┐                           │
-      ▼            ▼              ▼                           │
-  Stage (COG)   AD vs rest    Severity index                  │
-  4-class       probability   Σ k·p(stage k)                  │
-      └────────────┴──────┬───────┘                           │
-                          ▼                                   │
-                  Assessment card ◄───────────────────────────┘
-        outputs, SHAP, Grad-CAM, KAN curves, flags
+        │                       ┌──────────────┼──────────────┐
+        │                       ▼              ▼              ▼
+        │                 Volumes/ICV     3D CNN ALZ      Brain-age gap
+        │                 (FreeSurfer)   (cross-fitted)   (DeepBrainNet,
+        │                       │              │           reliability rule)
+        ▼                       └──────┬───────┴──────────────┘
+ Clinical specialist                   ▼            (+ age, sex)
+ CatBoost, top-12 of 29        MRI specialist
+ → p_clin (4)                  multinomial logistic → p_mri (4), P(AD)
+        │                              │
+        └──────────────┬───────────────┘
+                       ▼
+     KAN fusion K2 (residual): logit = log p_clin + KAN(clin logits, MRI logits,
+     has_mri, age, CDRSB, CogIndex, MMSE); modality dropout 15%
+                       │
+      ┌────────────────┼──────────────────┐
+      ▼                ▼                  ▼
+  Stage (COG)     AD vs rest (ADD)   Severity s = Σ k·p(stage k)
+      └────────────────┴────────┬─────────┘
+                                ▼
+                 Assessment card: outputs, SHAP, Grad-CAM, KAN edge curves,
+                 MRI specialist standalone, discordance flag, brain age
 ```
 
-### 3.1 Inputs
-- **Clinical stream:** current 36 features minus Ventricles, Hippocampus,
-  WholeBrain, Entorhinal, Fusiform, MidTemp, ICV (arm A0). Top-K by SHAP, K ∈
-  {8, 10, 12}, chosen on training data only.
-- **MRI stream (7 inputs):** the six FreeSurfer volumes each divided by ICV
-  (Ventricles, Hippocampus, WholeBrain, Entorhinal, Fusiform, MidTemp) plus the
-  cross-fitted ALZ score.
-- **Not model inputs:** brain-age gap, SynthSeg volumes, Path C slopes
-  (future information), DEMO (auxiliary CNN loss only).
+### 3.1 Inputs (as frozen in `analysis/fusion_v3/freeze.md`)
+- **Clinical specialist:** the 29 arm-A0 clinical features (36 minus the 7
+  FreeSurfer columns); top 12 by SHAP inside every fit (K = 12 chosen on train
+  CV); CatBoost, harness settings, 265 trees.
+- **MRI specialist:** six FreeSurfer volumes / ICV, cross-fitted ALZ, corrected
+  brain-age gap (NaN if the reliability rule fails), age, sex; multinomial
+  logistic regression (C = 0.1), chosen from 6 candidates by train-CV log-loss.
+- **KAN fusion:** stream-level scores only (centred log-probabilities of both
+  specialists), the has_mri flag, plus age and the clinical top-3 (CDRSB,
+  CogIndex, MMSE). Stream scores are out-of-fold (nested inside CV).
+- **Not used:** SynthSeg volumes, Path C slopes (future information), DEMO.
 - Moving the volumes into the MRI stream is a structural choice. Step 0 shows it
   costs no accuracy. State this when presenting it.
 
@@ -113,13 +122,14 @@ Clinical confusion (val): 13 of 16 LMCI errors go to EMCI.
 
 | Component | Status | Notes |
 |---|---|---|
-| Clinical stream (CatBoost + SHAP) | Built | Test untouched |
+| Clinical specialist (CatBoost + SHAP) | Built, frozen | Test macro-F1 0.771 (5-seed average, refitted on 691) |
 | 3D CNN, ALZ | Built | v9 lr_3e-5 config, no class weighting; 5 folds × 3 seeds cross-fit; val/test ALZ = mean of the 5 fold models |
 | FreeSurfer volumes (ADNI tables) | Available | Higher quality than SynthSeg on our volumes (SynthSeg cortical agreement 0.27–0.45) |
 | Brain-age (DeepBrainNet) | Built, card only | VGG16 release (not the paper's Inception-ResNet-v2); cite our measured MAE 3.16 years on CN, not the paper's. Bias correction α = 0.58, fitted on CN train only (inside each CV fold) |
-| KAN fusion + CatBoost comparator | **To build** | Prompts 1–2 |
-| Severity index, discordance flag | **To build** | Prompt 1–2 |
-| Frozen test evaluation | **To run** | Prompt 3 |
+| MRI specialist | Built, frozen | Logistic, AD-vs-rest AUC 0.873 on test; weak at staging (4-class macro-F1 0.44) |
+| KAN fusion (K2) + CatBoost comparators | Built, frozen (`fusion-v3`) | Matches CatBoost F / clinical specialist within CIs; does not beat them |
+| Severity index, discordance flag | Built | Severity monotonic on CV, val and test; flag thresholds from train (kan-fusion) |
+| Frozen test evaluation | **Done once** | Freeze `8f351b6`, test outputs `adc4ccb`; no re-runs |
 | Assessment card, demo notebook, report, slides | **To do** | After test evaluation |
 
 ---
@@ -128,10 +138,10 @@ Clinical confusion (val): 13 of 16 LMCI errors go to EMCI.
 
 | Step | Work | Gate |
 |---|---|---|
-| Prompt 1 | Push `mri-morphometry`; branch `kan-fusion`; build fusion dataset; pre-register KAN rules | Pre-registration committed |
-| Prompt 2 | KAN + CatBoost on input sets C (clinical only) and F (clinical + MRI); severity; discordance; edge-function plots and pruning. One day, train/val only | KAN is the final decision layer only if within 0.02 macro-F1 of CatBoost on CV; otherwise CatBoost is final and KAN is the interpretability comparison |
-| Prompt 3 | Freeze models and rules, then read test once | Freeze commit precedes any test access |
-| Card + demo | Assessment card, update `demo/phase1_phase2_demo.ipynb` | — |
+| Prompt 1 | Push `mri-morphometry`; branch `kan-fusion`; fusion dataset; pre-registration | **Done** |
+| Prompt 2 | KAN vs CatBoost on raw features (C / F) | **Done**: CatBoost F won; KAN not non-inferior |
+| fusion-v3 | Stream specialists + KAN fusion on stream scores; freeze; single test run | **Done**: KAN K2 frozen as the decision layer; test 0.764 macro-F1 |
+| Card + demo | Assessment card, update `demo/phase1_phase2_demo.ipynb` with the frozen fusion-v3 models | — |
 | Report + slides | Corrected numbers, honest MRI framing, limitations | — |
 
 Optional: regenerate Path C slopes for a longitudinal panel (the file is lost);
@@ -149,10 +159,12 @@ standalone 3-class MRI model with the Liu et al. (2020) design fixes.
   bootstrap (2,000 resamples).
 - **Imaging contribution:** F (clinical + MRI inputs) vs C (clinical only),
   reported as its own results-table row for each model, with the CI.
-- **Final test, run once:** (1) clinical CatBoost C, (2) CatBoost on F, (3) the
-  final decision layer, (4) ALZ alone, (5) reference R (full 36 features).
-  Metrics: accuracy, macro-F1, balanced accuracy, per-class F1, AD AUC,
-  confusion matrices, severity monotonicity, stage-distance error.
+- **Final test, run once (done, `fusion-v3`):** clinical specialist 0.771,
+  MRI specialist (standalone / MRI-only mode) 0.438 with AD AUC 0.873, KAN
+  fusion K2 (final decision layer) 0.764, CatBoost F 0.746, CatBoost R 0.784
+  (macro-F1; 5-seed averages refitted on all 691 train+val subjects). Metrics:
+  accuracy, macro-F1, balanced accuracy, per-class F1, AD AUC, 3-class,
+  confusion matrices, severity monotonicity, paired bootstrap CIs.
 
 ---
 
@@ -186,7 +198,12 @@ standalone 3-class MRI model with the Liu et al. (2020) design fixes.
 - Scanners are unharmonised (site 016 shows a brain-age offset).
 - Brain-age model compresses towards the mean (α = 0.58); released model is
   VGG16, not the published architecture.
-- One cohort; no external validation; test set of 123 subjects with few LMCI.
+- One cohort; no external validation; test set of 123 subjects with few LMCI
+  (24): test differences of ±0.07 macro-F1 are within the CIs.
+- Fusion configurations (35) were selected on the same train CV that reports
+  them; the test run is the unbiased check.
+- The KAN's MRI-logit edges are not separately identifiable (centred logits sum
+  to zero); read them jointly.
 - Path A raw-scan coverage is 690 of 811 subjects, and the missing subjects are
   AD-heavy (55 of 121).
 
@@ -212,5 +229,6 @@ standalone 3-class MRI model with the Liu et al. (2020) design fixes.
 - Reports: `analysis/fusion_feasibility/report.md`,
   `analysis/brain_age/p2_report.md`, `analysis/mri_morphometry/part1_report.md`
 - Branches: `path-a-multivisit`, `multivisit-static-augmentation`,
-  `fusion-feasibility`, `brain-age` (pushed); `mri-morphometry` (local until
-  Prompt 1); `kan-fusion` (to create). Branches only; never push to master.
+  `fusion-feasibility`, `brain-age`, `mri-morphometry`, `kan-fusion`, `fusion-v3`
+  (all pushed). Branches only; never push to master.
+- fusion-v3: `analysis/fusion_v3/report.md`, `freeze.md`, `config_log.csv`.
