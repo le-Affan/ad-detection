@@ -1,0 +1,1 @@
+[{"variant": "K1", "G": 5, "mu": 0.01, "scale": false, "_notes": "iter1: input scale/range fix OFF (raw logits, default grid [-1,1]) vs config 11"}, {"variant": "K2", "G": 5, "mu": 0.001, "temp": true, "_notes": "iter2: temperature-calibrated stream logits (affects K2 residual base; no-op for z-scored K1/K3 inputs); vs config 14; adopt if +0.003"}]

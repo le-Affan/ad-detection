@@ -1,0 +1,17 @@
+{
+ "variant": "K2",
+ "G": 5,
+ "mu": 0.001,
+ "scale": true,
+ "temp": false,
+ "extras": [
+  "AGE",
+  "CDRSB",
+  "CogIndex",
+  "MMSE"
+ ],
+ "ls": 0.0,
+ "cb": true,
+ "ord": 0.5,
+ "no_mri": false
+}

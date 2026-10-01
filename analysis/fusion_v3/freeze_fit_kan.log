@@ -1,0 +1,6 @@
+outer seed 42: 5 KANs saved and reload-checked
+outer seed 43: 5 KANs saved and reload-checked
+outer seed 44: 5 KANs saved and reload-checked
+outer seed 45: 5 KANs saved and reload-checked
+outer seed 46: 5 KANs saved and reload-checked
+in-sample (691, not an estimate): {'macro_f1': np.float64(0.807), 'bal_acc': np.float64(0.805), 'acc': np.float64(0.805), 'ad_auc': 0.994, 'logloss': 0.435, 'stage_dist': 0.2, 'f1_CN': np.float64(0.936), 'f1_EMCI': np.float64(0.786), 'f1_LMCI': np.float64(0.59), 'f1_AD': np.float64(0.915)}

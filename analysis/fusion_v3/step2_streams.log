@@ -1,0 +1,7 @@
+seed 42 done
+seed 43 done
+seed 44 done
+seed 45 done
+seed 46 done
+clinical specialist vs kan-fusion CatBoost C: max |diff| OOF 0.00e+00, val 2.42e-01
+{"macro_f1": 0.7435, "bal_acc": 0.7404, "acc": 0.7634, "ad_auc": 0.9831, "logloss": 0.5461, "stage_dist": 0.2446, "f1_CN": 0.945, "f1_EMCI": 0.7757, "f1_LMCI": 0.4071, "f1_AD": 0.8464, "macro_f1_sd": 0.0107, "n": 569}

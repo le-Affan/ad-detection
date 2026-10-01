@@ -1,0 +1,12 @@
+[8] K1 G3 mu0.001 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7399 ± 0.0056  LMCI 0.393 AD 0.852  logloss 0.535 | val 0.7277  fails 0  15s
+[9] K1 G3 mu0.01 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7401 ± 0.0090  LMCI 0.387 AD 0.854  logloss 0.538 | val 0.7121  fails 0  13s
+[10] K1 G5 mu0.001 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7423 ± 0.0066  LMCI 0.413 AD 0.852  logloss 0.548 | val 0.7497  fails 0  12s
+[11] K1 G5 mu0.01 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7437 ± 0.0088  LMCI 0.411 AD 0.848  logloss 0.546 | val 0.7426  fails 0  13s
+[12] K2 G3 mu0.001 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7376 ± 0.0090  LMCI 0.385 AD 0.853  logloss 0.533 | val 0.7322  fails 0  8s
+[13] K2 G3 mu0.01 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7316 ± 0.0059  LMCI 0.361 AD 0.846  logloss 0.531 | val 0.7320  fails 0  15s
+[14] K2 G5 mu0.001 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7427 ± 0.0067  LMCI 0.420 AD 0.856  logloss 0.542 | val 0.7561  fails 0  7s
+[15] K2 G5 mu0.01 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7367 ± 0.0131  LMCI 0.385 AD 0.845  logloss 0.533 | val 0.7513  fails 0  8s
+[16] K3 G3 mu0.001 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7393 ± 0.0037  LMCI 0.390 AD 0.852  logloss 0.541 | val 0.7541  fails 0  13s
+[17] K3 G3 mu0.01 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7397 ± 0.0064  LMCI 0.382 AD 0.855  logloss 0.544 | val 0.7469  fails 0  19s
+[18] K3 G5 mu0.001 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7418 ± 0.0071  LMCI 0.397 AD 0.848  logloss 0.547 | val 0.7613  fails 0  11s
+[19] K3 G5 mu0.01 scale1 temp0 extras0 ls0.0 cb0 ord0.0: CV macro-F1 0.7389 ± 0.0118  LMCI 0.385 AD 0.853  logloss 0.554 | val 0.7556  fails 0  16s

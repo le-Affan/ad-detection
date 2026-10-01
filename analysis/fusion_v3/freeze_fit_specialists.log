@@ -1,0 +1,7 @@
+builder check: reproduces step4_train.csv and fusion_trainval ratios/ALZ
+seed 42: clinical top-12 ['CDRSB', 'CogIndex', 'MMSE', 'ADAS11', 'ADAS13', 'FAQ', 'EcogSPMem', 'RAVLT_perc_forgetting', 'EcogSPPlan', 'EcogSPTotal', 'RAVLT_immediate', 'PTEDUCAT']; OOF macro-F1 clin 0.750, MRI AD AUC 0.869
+seed 43: clinical top-12 ['CDRSB', 'CogIndex', 'ADAS11', 'MMSE', 'ADAS13', 'RAVLT_perc_forgetting', 'FAQ', 'EcogSPMem', 'EcogSPDivatt', 'EcogSPTotal', 'EcogSPPlan', 'PTEDUCAT']; OOF macro-F1 clin 0.737, MRI AD AUC 0.863
+seed 44: clinical top-12 ['CDRSB', 'CogIndex', 'ADAS13', 'MMSE', 'EcogSPMem', 'ADAS11', 'RAVLT_perc_forgetting', 'FAQ', 'EcogSPPlan', 'PTEDUCAT', 'EcogSPDivatt', 'EcogSPOrgan']; OOF macro-F1 clin 0.752, MRI AD AUC 0.867
+seed 45: clinical top-12 ['CDRSB', 'CogIndex', 'ADAS13', 'ADAS11', 'MMSE', 'RAVLT_perc_forgetting', 'FAQ', 'EcogSPMem', 'EcogSPPlan', 'PTEDUCAT', 'EcogSPDivatt', 'RAVLT_learning']; OOF macro-F1 clin 0.757, MRI AD AUC 0.871
+seed 46: clinical top-12 ['CDRSB', 'CogIndex', 'ADAS13', 'MMSE', 'RAVLT_perc_forgetting', 'FAQ', 'ADAS11', 'EcogSPDivatt', 'EcogSPPlan', 'EcogSPMem', 'PTEDUCAT', 'EcogSPTotal']; OOF macro-F1 clin 0.744, MRI AD AUC 0.868
+691 subjects: 688 with a scan, 684 with a reliable brain age

@@ -1,0 +1,378 @@
+{
+ "table": [
+  {
+   "input": "mri_logit_CN",
+   "output": "CN",
+   "amplitude_median": 0.6729269027709961,
+   "verdict": "not consistent (9 up, 0 down, 16 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_CN",
+   "output": "EMCI",
+   "amplitude_median": 0.30756209790706635,
+   "verdict": "not consistent (3 up, 0 down, 22 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_CN",
+   "output": "LMCI",
+   "amplitude_median": 0.2520540654659271,
+   "verdict": "not consistent (0 up, 20 down, 5 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_CN",
+   "output": "AD",
+   "amplitude_median": 0.9354956150054932,
+   "verdict": "monotone decreasing, consistent"
+  },
+  {
+   "input": "mri_logit_EMCI",
+   "output": "CN",
+   "amplitude_median": 0.4127338156104088,
+   "verdict": "monotone decreasing, consistent"
+  },
+  {
+   "input": "mri_logit_EMCI",
+   "output": "EMCI",
+   "amplitude_median": 0.4447614699602127,
+   "verdict": "not consistent (18 up, 0 down, 7 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_EMCI",
+   "output": "LMCI",
+   "amplitude_median": 0.5130753219127655,
+   "verdict": "monotone decreasing, consistent"
+  },
+  {
+   "input": "mri_logit_EMCI",
+   "output": "AD",
+   "amplitude_median": 0.34710341691970825,
+   "verdict": "not consistent (0 up, 13 down, 12 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_LMCI",
+   "output": "CN",
+   "amplitude_median": 0.9600813686847687,
+   "verdict": "not consistent (0 up, 24 down, 1 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_LMCI",
+   "output": "EMCI",
+   "amplitude_median": 0.4283967576920986,
+   "verdict": "not consistent (1 up, 22 down, 2 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_LMCI",
+   "output": "LMCI",
+   "amplitude_median": 0.18789473921060562,
+   "verdict": "not consistent (0 up, 21 down, 4 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_LMCI",
+   "output": "AD",
+   "amplitude_median": 0.8342562615871429,
+   "verdict": "not consistent (20 up, 0 down, 5 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_AD",
+   "output": "CN",
+   "amplitude_median": 0.6240671426057816,
+   "verdict": "monotone decreasing, consistent"
+  },
+  {
+   "input": "mri_logit_AD",
+   "output": "EMCI",
+   "amplitude_median": 0.36487093567848206,
+   "verdict": "not consistent (0 up, 19 down, 6 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_AD",
+   "output": "LMCI",
+   "amplitude_median": 0.46190790832042694,
+   "verdict": "not consistent (1 up, 0 down, 24 non-monotone of 25)"
+  },
+  {
+   "input": "mri_logit_AD",
+   "output": "AD",
+   "amplitude_median": 0.5064515769481659,
+   "verdict": "not consistent (0 up, 7 down, 18 non-monotone of 25)"
+  },
+  {
+   "input": "clin_logit_CN",
+   "output": "LMCI",
+   "amplitude_median": 0.7731485664844513,
+   "verdict": "monotone decreasing, consistent"
+  },
+  {
+   "input": "clin_logit_CN",
+   "output": "AD",
+   "amplitude_median": 0.492676243185997,
+   "verdict": "not consistent (0 up, 6 down, 19 non-monotone of 25)"
+  },
+  {
+   "input": "clin_logit_EMCI",
+   "output": "LMCI",
+   "amplitude_median": 0.6189672499895096,
+   "verdict": "not consistent (0 up, 0 down, 25 non-monotone of 25)"
+  },
+  {
+   "input": "clin_logit_EMCI",
+   "output": "AD",
+   "amplitude_median": 0.44116201996803284,
+   "verdict": "not consistent (0 up, 18 down, 7 non-monotone of 25)"
+  },
+  {
+   "input": "clin_logit_LMCI",
+   "output": "LMCI",
+   "amplitude_median": 0.8330296576023102,
+   "verdict": "monotone decreasing, consistent"
+  },
+  {
+   "input": "clin_logit_LMCI",
+   "output": "AD",
+   "amplitude_median": 0.7372081875801086,
+   "verdict": "not consistent (0 up, 1 down, 24 non-monotone of 25)"
+  },
+  {
+   "input": "clin_logit_AD",
+   "output": "LMCI",
+   "amplitude_median": 0.5435247868299484,
+   "verdict": "not consistent (11 up, 0 down, 14 non-monotone of 25)"
+  },
+  {
+   "input": "clin_logit_AD",
+   "output": "AD",
+   "amplitude_median": 0.6977524161338806,
+   "verdict": "not consistent (1 up, 13 down, 11 non-monotone of 25)"
+  },
+  {
+   "input": "AGE",
+   "output": "LMCI",
+   "amplitude_median": 0.5442686378955841,
+   "verdict": "monotone decreasing, consistent"
+  },
+  {
+   "input": "AGE",
+   "output": "AD",
+   "amplitude_median": 0.933911919593811,
+   "verdict": "not consistent (0 up, 22 down, 3 non-monotone of 25)"
+  },
+  {
+   "input": "CDRSB",
+   "output": "LMCI",
+   "amplitude_median": 0.33572155237197876,
+   "verdict": "not consistent (1 up, 10 down, 14 non-monotone of 25)"
+  },
+  {
+   "input": "CDRSB",
+   "output": "AD",
+   "amplitude_median": 1.2024256587028503,
+   "verdict": "not consistent (5 up, 0 down, 20 non-monotone of 25)"
+  },
+  {
+   "input": "CogIndex",
+   "output": "LMCI",
+   "amplitude_median": 0.4538937360048294,
+   "verdict": "monotone decreasing, consistent"
+  },
+  {
+   "input": "CogIndex",
+   "output": "AD",
+   "amplitude_median": 0.7611004412174225,
+   "verdict": "monotone decreasing, consistent"
+  },
+  {
+   "input": "MMSE",
+   "output": "LMCI",
+   "amplitude_median": 0.6765016317367554,
+   "verdict": "not consistent (14 up, 0 down, 11 non-monotone of 25)"
+  },
+  {
+   "input": "MMSE",
+   "output": "AD",
+   "amplitude_median": 1.0893546342849731,
+   "verdict": "monotone decreasing, consistent"
+  }
+ ],
+ "flag": [
+  [
+   -0.025180155411362648,
+   0.06031566113233566,
+   -0.02259473130106926,
+   0.004865275230258703
+  ],
+  [
+   0.030202116817235947,
+   0.06744803488254547,
+   0.1195751428604126,
+   0.00029594823718070984
+  ],
+  [
+   0.0024315379559993744,
+   0.004473261535167694,
+   -0.019058478996157646,
+   0.02275986596941948
+  ],
+  [
+   0.00889432430267334,
+   0.01570124365389347,
+   0.0014671827666461468,
+   -0.07431671023368835
+  ],
+  [
+   0.009431708604097366,
+   0.1291087418794632,
+   -0.03582407906651497,
+   0.0014115804806351662
+  ],
+  [
+   -0.005719492211937904,
+   0.060791146010160446,
+   -0.037501975893974304,
+   0.02438412792980671
+  ],
+  [
+   0.03384651616215706,
+   0.0644650086760521,
+   0.1082272082567215,
+   0.019707027822732925
+  ],
+  [
+   -0.01740897446870804,
+   -0.01722515933215618,
+   0.01429959386587143,
+   -0.020343564450740814
+  ],
+  [
+   0.02167215757071972,
+   0.013486151583492756,
+   -0.006111522205173969,
+   -0.06979840993881226
+  ],
+  [
+   0.026552733033895493,
+   0.19519741833209991,
+   -0.1429888904094696,
+   -0.012087918817996979
+  ],
+  [
+   -0.005343751981854439,
+   -0.01425628550350666,
+   -0.01826626993715763,
+   0.027650952339172363
+  ],
+  [
+   0.05550984665751457,
+   0.029836304485797882,
+   0.13173820078372955,
+   0.025404002517461777
+  ],
+  [
+   -0.024979669600725174,
+   -0.014131326228380203,
+   0.013452298939228058,
+   -0.007329443469643593
+  ],
+  [
+   0.022252686321735382,
+   0.007201983127743006,
+   -0.0072115748189389706,
+   -0.042878422886133194
+  ],
+  [
+   0.0012636221945285797,
+   -0.0063665881752967834,
+   -0.007525588385760784,
+   0.01068132370710373
+  ],
+  [
+   -0.028255578130483627,
+   -0.016924863681197166,
+   -0.013312970288097858,
+   0.00846434012055397
+  ],
+  [
+   0.0069267526268959045,
+   0.030351627618074417,
+   0.15781347453594208,
+   -0.004329110495746136
+  ],
+  [
+   0.013775918632745743,
+   -0.030921973288059235,
+   0.0317947193980217,
+   0.02268127351999283
+  ],
+  [
+   0.005497726611793041,
+   -0.026917966082692146,
+   0.04846157133579254,
+   -0.077018141746521
+  ],
+  [
+   -0.006526801735162735,
+   -0.007361274212598801,
+   0.0071426136419177055,
+   -0.00989491492509842
+  ],
+  [
+   -0.016582494601607323,
+   -0.00309598445892334,
+   -0.01483073364943266,
+   0.026651699095964432
+  ],
+  [
+   0.035632193088531494,
+   0.04839741066098213,
+   0.11500753462314606,
+   0.01953171193599701
+  ],
+  [
+   -0.049847137182950974,
+   -0.008847290650010109,
+   0.030897054821252823,
+   -0.015776485204696655
+  ],
+  [
+   -0.0006954525597393513,
+   0.022137045860290527,
+   -0.02055240236222744,
+   -0.008422225713729858
+  ],
+  [
+   0.0031521525233983994,
+   0.0037325620651245117,
+   -0.008763575926423073,
+   0.010797879658639431
+  ]
+ ],
+ "attribution_share_mean": {
+  "clin_logit_CN": 0.08615288268038696,
+  "clin_logit_EMCI": 0.0916813467106837,
+  "clin_logit_LMCI": 0.111108243496992,
+  "clin_logit_AD": 0.08972814085073531,
+  "mri_logit_CN": 0.06694320855468788,
+  "mri_logit_EMCI": 0.06253405252519176,
+  "mri_logit_LMCI": 0.06685375562286362,
+  "mri_logit_AD": 0.06536441975505618,
+  "has_mri": 0.001209084151056834,
+  "AGE": 0.07806521872256568,
+  "CDRSB": 0.11093132417620633,
+  "CogIndex": 0.07922034198383111,
+  "MMSE": 0.0902079807697427
+ },
+ "kept": {
+  "clin_logit_CN": 25,
+  "clin_logit_EMCI": 25,
+  "clin_logit_LMCI": 25,
+  "clin_logit_AD": 25,
+  "mri_logit_CN": 25,
+  "mri_logit_EMCI": 25,
+  "mri_logit_LMCI": 25,
+  "mri_logit_AD": 25,
+  "has_mri": 0,
+  "AGE": 25,
+  "CDRSB": 25,
+  "CogIndex": 25,
+  "MMSE": 25
+ }
+}
