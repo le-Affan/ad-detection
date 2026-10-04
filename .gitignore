@@ -101,3 +101,13 @@ analysis/mv/**/*.pt
 # into dataset/mri_prep/vol96 (a machine-local path, not data).
 analysis/fusion_feasibility/**/*.pt
 analysis/fusion_feasibility/folds/*/vol96
+
+# --- Assessment card (fusion-v3 demo): DUA-restricted subject-level data ---
+# demo/card_data/ holds per-subject tables (IDs, diagnoses, scores, volumes,
+# model outputs) and brain-slice / Grad-CAM images for 811 subjects;
+# demo/output/ holds rendered cards (the same data plus brain slices).
+# Regenerate both locally with the src/card/build_*.py scripts and the notebook
+# (demo/README.md, "Regenerating card data"). The notebook is committed with
+# its outputs stripped.
+demo/card_data/*
+demo/output/*

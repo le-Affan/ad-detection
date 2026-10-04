@@ -8,7 +8,7 @@ second.
 
     from card import CardData, render_card
     data = CardData()                      # finds demo/card_data from this file's location
-    render_card(data, "002_S_4229", "demo/output")
+    render_card(data, ptid, "demo/output")   # ptid: any PTID in data.ptids
 """
 import base64
 import html

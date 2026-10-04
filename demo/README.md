@@ -15,14 +15,23 @@ frozen fusion-v3 system (freeze commit `8f351b6`). The card shows:
 
 **Research prototype, not for clinical use.**
 
-## Run it (about 15 s)
+**The card data is not in git.** `demo/card_data/` and `demo/output/` hold
+DUA-restricted, subject-level ADNI data:
+- per-subject tables: IDs, diagnoses, scores, volumes and model outputs;
+- brain-slice and Grad-CAM images.
+
+Both are git-ignored. Build them locally first; see "Regenerating card data"
+below. The notebook is committed with its outputs stripped. Do not commit an
+executed copy.
+
+## Run it (about 15 s, after regenerating the card data)
 
 ```bash
 python3 -m venv .venv-demo          # once: numpy, pandas, matplotlib, jupyter, ipywidgets
 .venv-demo/bin/pip install numpy pandas matplotlib jupyter ipywidgets
 cd demo
-../.venv-demo/bin/jupyter nbconvert --to notebook --execute assessment_demo.ipynb --output assessment_demo.ipynb
-# or open assessment_demo.ipynb in Jupyter and run all cells
+../.venv-demo/bin/jupyter nbconvert --to notebook --execute assessment_demo.ipynb --output-dir output
+# writes the executed copy to demo/output/ (git-ignored); or open the notebook in Jupyter and run all cells
 ```
 
 On this machine the environment is `LYP/.venv-demo` (`../../.venv-demo` from the
@@ -37,15 +46,15 @@ repo root).
 - **From Python** (with `src/` on `sys.path`):
   ```python
   from card import CardData, render_card
-  render_card(CardData(), "003_S_4136", "demo/output")
+  data = CardData()
+  render_card(data, data.ptids[0], "demo/output")
   ```
 
 ## What it reads
 
 The notebook only reads `demo/card_data/`. It never fits or runs a model, and it
-computes no metric. That directory was written once from the frozen artefacts
-by three scripts, which need the project environments and, for Grad-CAM, the
-MRI volumes:
+computes no metric. That directory is written from the frozen artefacts by three
+scripts, which need the project environments and, for Grad-CAM, the MRI volumes:
 
 | Step | Command (from the repo root) | Output |
 |---|---|---|
@@ -125,15 +134,35 @@ output existed:
 - **Duplicates:** a subject already chosen is skipped.
 - **Empty categories** fall back to the train split.
 
-| Category | PTID | Split | True | Final | Clinical specialist | Note |
-|---|---|---|---|---|---|---|
-| correct CN | 003_S_4900 | val | CN | CN | CN | corrected brain-age gap −20.9 y ("extreme value" note) |
-| correct EMCI | 002_S_2010 | val | EMCI | EMCI | EMCI | |
-| correct LMCI | 002_S_4654 | val | LMCI | LMCI | LMCI | MRI specialist says AD |
-| correct AD | 003_S_4136 | val | AD | AD | AD | gap +17.4 y ("extreme value" note) |
-| misclassified LMCI | 006_S_4713 | val | LMCI | **EMCI** | LMCI | the fusion moved a correct clinical LMCI to EMCI |
-| discordance flag | 135_S_4954 | val | AD | AD | AD | flag fires (clinical AD, ALZ 0.24); the only flagged val subject |
-| unreliable brain-age scan | 016_S_4121 | **train** (fallback) | CN | CN | CN | no val scan fails the rule; 23% of brain voxels saturated |
-| no scan | 941_S_4187 | val | LMCI | LMCI | LMCI | the only val subject without a scan; neutral MRI inputs |
+The notebook prints the selected subjects: category, ID, split, and whether the
+category fell back to train. This README does not list them, because they are
+subject-level data. One category does fall back to train: no val scan fails the
+brain-age reliability rule, so the unreliable-scan subject comes from train.
 
 Val and train predictions are in-sample for the frozen system.
+
+## Regenerating card data
+
+This needs local ADNI data, which is not in git:
+- the clinical tables under `dataset/`;
+- the preprocessed MRI volumes `dataset/mri_prep/vol96/`, for Grad-CAM;
+- the ALZ cross-fit checkpoints `analysis/fusion_feasibility/runs/fold*_s*/best.pt`;
+- the frozen fusion-v3 artefacts in `analysis/fusion_v3/frozen/` and
+  `frozen_run/`.
+
+On this machine the environments live in `LYP/`. Run from the repo root, in
+this order:
+
+```bash
+../../.venv-fusion/bin/python src/card/build_card_data.py      # ~5 s; writes subjects.csv, clinical_shap.npz, streams_all.npz, meta.json
+../../.venv-kan/bin/python    src/card/build_kan_terms.py      # ~5 s; needs streams_all.npz; writes kan_terms.npz, kan_edges.json
+../../.venv-mri/bin/python    src/card/build_gradcam.py        # ~1.5 min on GPU; writes gradcam.npz
+cd demo && ../../../.venv-demo/bin/jupyter nbconvert --to notebook --execute assessment_demo.ipynb --output-dir output
+```
+
+- **Self-checks:** steps 1 and 2 assert that their val and test outputs
+  reproduce `analysis/fusion_v3/frozen_run/`, and they fail if that is not the
+  case.
+- **Nothing is retrained**, and no metric is computed.
+- **Output:** `demo/card_data/` (about 14 MB) and the rendered cards in
+  `demo/output/`. Both stay local.
