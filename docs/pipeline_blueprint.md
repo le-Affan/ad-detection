@@ -5,7 +5,9 @@ Status: current. v3 records the built and frozen system (`fusion-v3`) and its si
 Replaces v2 (same date) and v1 (2026-09-28); supersedes
 `docs/mri_role_refined_plan.md` wherever they differ.
 Rule for every experiment: decision rules are written and committed BEFORE the
-results exist. Test subjects are read once, in the frozen test evaluation.
+results exist. The original clinical stream (step5) reported a test result
+(accuracy 0.813, macro-F1 0.786) before this work; the fusion-v3 pipeline was
+evaluated once on test, after the freeze commit `8f351b6`.
 
 ---
 
