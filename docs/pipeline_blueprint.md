@@ -39,6 +39,11 @@ Rows 1–7 are validation / cross-validation. Row 8 includes the single frozen t
 | 7 | KAN vs CatBoost on raw clinical top-12 (C) and + 7 MRI inputs (F) | `kan-fusion` | CatBoost F − C +0.014 CV [−0.001, +0.029]: no reliable MRI gain. KAN on raw features −0.058 vs CatBoost on F (not non-inferior); MRI inputs hurt the raw-feature KAN |
 | 8 | Stream specialists + KAN fusion on stream scores (35 configurations, nested stacking), frozen and tested once | `fusion-v3` | Final KAN K2 CV 0.756 vs clinical specialist 0.744 (+0.013 [−0.006, +0.034]) and CatBoost F 0.758 (−0.002). MRI share inside the fusion +0.007 [−0.006, +0.019]. **Test:** KAN 0.764, clinical 0.771, CatBoost F 0.746, CatBoost R 0.784; all differences within ±0.08 CIs. MRI specialist alone: AD-vs-rest AUC 0.880 CV / 0.873 test; 4-class macro-F1 0.42 / 0.44 (majority 0.14) |
 
+Post-hoc, not in the freeze (train CV / val only): MRI specialist input-set controls
+(`analysis/fusion_v3/mri_controls.md`). Age + sex alone give AD-vs-rest AUC 0.574; volumes/ICV alone 0.867; the
+frozen specialist 0.880 (M4 − M0 +0.306 [+0.239, +0.370]; M4 − M2 +0.009 [−0.003, +0.020] CV). AD detection comes
+from the regional volumes, not from age.
+
 **Reading of the evidence.** The imaging signals are valid: ALZ AUC ~0.77,
 brain-age AUC 0.80 with a clean stage gradient, hippocampus ~10% smaller in
 AD. They add no measurable staging accuracy once cognitive and functional
@@ -107,6 +112,9 @@ Clinical confusion (val): 13 of 16 LMCI errors go to EMCI.
 ### 3.3 Card contents and rules
 - SHAP (clinical inputs), Grad-CAM (CNN; wording: periventricular/ventricular
   attribution, not hippocampal), KAN edge-function plots.
+- **KAN edges on the card:** only MRI edges consistent in all 25 val-stage and all 25 frozen KANs (MRI CN → AD,
+  MRI EMCI → LMCI). Grad-CAM wording: the map is too coarse to localise a structure; cohort-level attribution is
+  periventricular/ventricular.
 - **Discordance flag**, thresholds fixed from train only: clinical prediction AD
   with ALZ below the 10th percentile of train-AD ALZ, or clinical prediction
   CN/EMCI with ALZ above the 90th percentile. Reported descriptively.
@@ -130,7 +138,8 @@ Clinical confusion (val): 13 of 16 LMCI errors go to EMCI.
 | KAN fusion (K2) + CatBoost comparators | Built, frozen (`fusion-v3`) | Matches CatBoost F / clinical specialist within CIs; does not beat them |
 | Severity index, discordance flag | Built | Severity monotonic on CV, val and test; flag thresholds from train (kan-fusion) |
 | Frozen test evaluation | **Done once** | Freeze `8f351b6`, test outputs `adc4ccb`; no re-runs |
-| Assessment card, demo notebook, report, slides | **To do** | After test evaluation |
+| Assessment card + demo notebook | **Built** | `src/card/`, `demo/assessment_demo.ipynb` (HTML + PNG, any of 814 subjects, precomputed outputs only); see `demo/README.md` |
+| Report, slides | **To do** | — |
 
 ---
 
@@ -141,7 +150,7 @@ Clinical confusion (val): 13 of 16 LMCI errors go to EMCI.
 | Prompt 1 | Push `mri-morphometry`; branch `kan-fusion`; fusion dataset; pre-registration | **Done** |
 | Prompt 2 | KAN vs CatBoost on raw features (C / F) | **Done**: CatBoost F won; KAN not non-inferior |
 | fusion-v3 | Stream specialists + KAN fusion on stream scores; freeze; single test run | **Done**: KAN K2 frozen as the decision layer; test 0.764 macro-F1 |
-| Card + demo | Assessment card, update `demo/phase1_phase2_demo.ipynb` with the frozen fusion-v3 models | — |
+| Card + demo | Assessment card from frozen artefacts; demo notebook | **Done** (`fusion-v3`): showcase set chosen by a committed rule |
 | Report + slides | Corrected numbers, honest MRI framing, limitations | — |
 
 Optional: regenerate Path C slopes for a longitudinal panel (the file is lost);
@@ -231,4 +240,5 @@ standalone 3-class MRI model with the Liu et al. (2020) design fixes.
 - Branches: `path-a-multivisit`, `multivisit-static-augmentation`,
   `fusion-feasibility`, `brain-age`, `mri-morphometry`, `kan-fusion`, `fusion-v3`
   (all pushed). Branches only; never push to master.
-- fusion-v3: `analysis/fusion_v3/report.md`, `freeze.md`, `config_log.csv`.
+- fusion-v3: `analysis/fusion_v3/report.md`, `freeze.md`, `config_log.csv`, `mri_controls.md` (post-hoc).
+- Card: `src/card/` (builders + renderer + showcase rule), `demo/card_data/`, `demo/output/`, `demo/README.md`.

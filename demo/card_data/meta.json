@@ -1,0 +1,164 @@
+{
+ "freeze_commit": "8f351b6",
+ "names": [
+  "CN",
+  "EMCI",
+  "LMCI",
+  "AD"
+ ],
+ "clinical_features": [
+  "AGE",
+  "PTGENDER",
+  "PTEDUCAT",
+  "APOE4",
+  "CDRSB",
+  "ADAS11",
+  "ADAS13",
+  "MMSE",
+  "RAVLT_immediate",
+  "RAVLT_learning",
+  "RAVLT_forgetting",
+  "RAVLT_perc_forgetting",
+  "FAQ",
+  "MOCA",
+  "EcogPtMem",
+  "EcogPtLang",
+  "EcogPtVisspat",
+  "EcogPtPlan",
+  "EcogPtOrgan",
+  "EcogPtDivatt",
+  "EcogPtTotal",
+  "EcogSPMem",
+  "EcogSPLang",
+  "EcogSPVisspat",
+  "EcogSPPlan",
+  "EcogSPOrgan",
+  "EcogSPDivatt",
+  "EcogSPTotal",
+  "CogIndex"
+ ],
+ "feature_labels": {
+  "AGE": "Age (years)",
+  "PTGENDER": "Sex",
+  "PTEDUCAT": "Education (years)",
+  "APOE4": "APOE \u03b54 alleles",
+  "CDRSB": "CDR sum of boxes",
+  "ADAS11": "ADAS-Cog 11",
+  "ADAS13": "ADAS-Cog 13",
+  "MMSE": "MMSE",
+  "RAVLT_immediate": "RAVLT immediate recall",
+  "RAVLT_learning": "RAVLT learning",
+  "RAVLT_forgetting": "RAVLT forgetting",
+  "RAVLT_perc_forgetting": "RAVLT % forgetting",
+  "FAQ": "FAQ (function)",
+  "MOCA": "MoCA",
+  "EcogPtMem": "ECog self: memory",
+  "EcogPtLang": "ECog self: language",
+  "EcogPtVisspat": "ECog self: visuospatial",
+  "EcogPtPlan": "ECog self: planning",
+  "EcogPtOrgan": "ECog self: organisation",
+  "EcogPtDivatt": "ECog self: divided attention",
+  "EcogPtTotal": "ECog self: total",
+  "EcogSPMem": "ECog partner: memory",
+  "EcogSPLang": "ECog partner: language",
+  "EcogSPVisspat": "ECog partner: visuospatial",
+  "EcogSPPlan": "ECog partner: planning",
+  "EcogSPOrgan": "ECog partner: organisation",
+  "EcogSPDivatt": "ECog partner: divided attention",
+  "EcogSPTotal": "ECog partner: total",
+  "CogIndex": "Cognitive index (z MMSE \u2212 z CDR-SB \u2212 z ADAS13)"
+ },
+ "volume_reference": {
+  "Ventricles_ICV": {
+   "label": "Ventricles",
+   "n": 133,
+   "pct": {
+    "p5": 0.008766341561280377,
+    "p25": 0.0138450487429451,
+    "p50": 0.0205488155386803,
+    "p75": 0.026601876675603216,
+    "p95": 0.04360905946083295
+   }
+  },
+  "Hippocampus_ICV": {
+   "label": "Hippocampus",
+   "n": 133,
+   "pct": {
+    "p5": 0.004047303344340955,
+    "p25": 0.004620257094951252,
+    "p50": 0.005017899399308294,
+    "p75": 0.005509136704507346,
+    "p95": 0.006120012775911951
+   }
+  },
+  "WholeBrain_ICV": {
+   "label": "Whole brain",
+   "n": 133,
+   "pct": {
+    "p5": 0.6484949750851068,
+    "p25": 0.6836727504218248,
+    "p50": 0.7057566655753107,
+    "p75": 0.7375643842077174,
+    "p95": 0.770309159604098
+   }
+  },
+  "Entorhinal_ICV": {
+   "label": "Entorhinal cortex",
+   "n": 133,
+   "pct": {
+    "p5": 0.0020115009163973337,
+    "p25": 0.00233849791721085,
+    "p50": 0.0025484199796126403,
+    "p75": 0.002778445389658661,
+    "p95": 0.003123373434374574
+   }
+  },
+  "Fusiform_ICV": {
+   "label": "Fusiform gyrus",
+   "n": 133,
+   "pct": {
+    "p5": 0.010409782829868207,
+    "p25": 0.011820592795694418,
+    "p50": 0.012737464104263308,
+    "p75": 0.013570734823448123,
+    "p95": 0.01532374924317544
+   }
+  },
+  "MidTemp_ICV": {
+   "label": "Middle temporal gyrus",
+   "n": 133,
+   "pct": {
+    "p5": 0.011635298499799638,
+    "p25": 0.012897985272381054,
+    "p50": 0.013835931192945414,
+    "p75": 0.014944989549465862,
+    "p95": 0.016202026168376387
+   }
+  }
+ },
+ "brain_age": {
+  "alpha": 0.5974716632241652,
+  "beta": 29.01678122287367,
+  "extreme_gap_years": 15.0
+ },
+ "discordance": {
+  "P10": 0.2981,
+  "P90": 0.8751
+ },
+ "severity_stage_means_cv": [
+  0.11019841462802665,
+  1.3199055301998839,
+  1.7367603451589515,
+  2.7812419792154173
+ ],
+ "versions": {
+  "catboost": "1.2.10",
+  "scikit-learn": "1.8.0",
+  "git_head": "0c7074e"
+ },
+ "n": {
+  "train": 569,
+  "val": 122,
+  "test": 123
+ }
+}
