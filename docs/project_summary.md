@@ -61,7 +61,7 @@ results below.
         ▼                              └───────┴────┬───┴─────────┘
  Clinical specialist                                ▼
  CatBoost, 265 trees                         MRI specialist
-        │                                  regularised classifier
+        │                                  logistic reg., C = 0.1
         └──────────────┬────────────────────────────┘
                        ▼
               Residual KAN fusion layer
@@ -100,14 +100,27 @@ result is a 189×233×164 volume; a 96³ downsample feeds the CNN.
 | Brain-age gap | DeepBrainNet (pretrained on healthy brains, not on ADNI), bias-corrected with a line fitted on cognitively normal training subjects only; set to missing when a scan fails the reliability rule |
 | Age and sex | ADNI tables |
 
-The MRI specialist is a regularised classifier chosen by nested CV log-loss
-(exact model family: see `analysis/fusion_v3/config_log.csv`). Its outputs are
-4-class scores and an AD probability.
+The MRI specialist is a **multinomial logistic regression** with L2 penalty
+and C = 0.1:
+- **Inputs (10):** the six volume ratios, ALZ, the corrected brain-age gap,
+  age and sex.
+- **Preprocessing:** median imputation and z-scoring, fitted on its training
+  rows.
+- **Selection:** it had the lowest mean multi-class log-loss of six candidates
+  in repeated stratified 5-fold CV over the training subjects (5 seeds). The
+  candidates were two shallow CatBoost models, logistic regression with C = 0.1
+  and C = 1, an ordinal logistic model and a small MLP
+  (`analysis/fusion_v3/config_log.csv`, rows 1–6; `freeze.md`).
+- **Outputs:** 4-class scores and an AD probability.
 
 ### 4.3 Fusion layer
-- A **residual KAN**: final logit = clinical logit + a KAN correction computed
-  from the MRI scores. Inputs: clinical logits, MRI logits, age and the top-3
-  clinical features.
+- A **residual KAN**: final logit = clinical log-probability + a KAN
+  correction.
+- **The correction uses all 13 inputs:** the clinical specialist's 4 logits,
+  the MRI specialist's 4 logits, a scan-available flag, age, and the three
+  clinical features CDR-SB, CogIndex and MMSE. It is not an MRI-only term.
+- **The MRI share of the correction is measured, not assumed:** exact Shapley
+  values over the input groups (`analysis/explainability`, §7).
 - Trained with a class-balanced loss and modality dropout (the MRI stream is
   hidden in 15% of rows, so subjects without a scan are handled).
 - An ensemble of 25 seed models; final specialists and KAN were refit on train +
@@ -119,7 +132,7 @@ The MRI specialist is a regularised classifier chosen by nested CV log-loss
 | Stage (COG) | 4-class probabilities; predicted class = argmax |
 | AD vs rest (ADD) | Binary AD probability |
 | Severity index | s = Σ k·p(stage k), k = 0..3; monotonic across stages on CV, val and test (Spearman with true stage 0.88 on test) |
-| Assessment card | Outputs, clinical SHAP evidence, MRI evidence (volumes, Grad-CAM), brain age with reliability and extreme-value notes, KAN correction, exploratory discordance flag |
+| Assessment card | <ul><li>Outputs.</li><li>**Clinical panel:** SHAP evidence with both CDR-SB plausibility results (pre-registered criterion and post-hoc check).</li><li>**MRI panel:** the specialist's SHAP drivers first, then volumes against reference ranges, then the CNN map labelled "not anatomically reliable" (no region named).</li><li>Brain age with reliability and extreme-value notes.</li><li>"Fusion changed the stage" and "MRI changed the stage" indicators.</li><li>**Fusion panel:** KAN Shapley effects, shown only where all 25 models agree.</li><li>Exploratory discordance flag.</li><li>A validation status on every explanation panel.</li></ul> |
 
 ## 5. Results
 
@@ -203,7 +216,7 @@ were used, and no test metric was computed. Full report:
 | SHAP on the clinical specialist | <ul><li>Stable across the 5 seeds (0.90); faithful.</li><li>CDR-SB fails the pre-registered sign criterion (0.36).</li><li>A post-hoc check shows its SHAP toward AD does rise with CDR-SB (Spearman 0.61 train, 0.55 val).</li></ul> | WEAK, both CDR-SB results stated |
 | SHAP on the MRI specialist (new) | <ul><li>Exact.</li><li>Volumes carry 66% of the AD attribution, ALZ + brain-age gap 27%, age + sex 6%, agreeing with the input-set controls.</li><li>Faithful.</li><li>Ventricles point the unexpected way (12% plausible), from the frozen model's coefficient.</li><li>Stability across refits 0.60.</li></ul> | WEAK; shown first in the MRI panel |
 | CNN attribution (LayerCAM, replaces Grad-CAM) | <ul><li>A deletion rule chose layer1 (24³). Its top voxels remove 1.08 ALZ logits vs 0.31 for random occlusion. The old 3³ Grad-CAM was no better than random.</li><li>Both sanity checks fail: the maps change little when the weights are randomised (0.81 correlation), and occluding the top region lowers the AD score less than control regions.</li><li>The maps barely differ between AD and CN.</li></ul> | WEAK; labelled "not anatomically reliable"; no region named |
-| KAN fusion (Shapley values, new) | <ul><li>Exact, all 25 models.</li><li>89 of 144 effects have the same sign in all 25 models, including every MRI effect.</li><li>78 of the 89 replicate on held-out validation subjects.</li><li>The MRI correction to the AD logit is ordered by stage: CN −0.45, EMCI −0.11, LMCI +0.23, AD +0.54.</li></ul> | WEAK (CDR-SB and MMSE plausibility); only consistent effects shown |
+| KAN fusion (Shapley values, new) | <ul><li>Exact, all 25 models.</li><li>89 of 144 effects have the same sign in all 25 models, including every MRI effect.</li><li>78 of the 89 replicate on held-out validation subjects.</li><li>The MRI group's contribution to the KAN correction of the AD logit is ordered by stage: CN −0.45, EMCI −0.11, LMCI +0.23, AD +0.54.</li></ul> | WEAK (CDR-SB and MMSE plausibility); only consistent effects shown |
 | "Fusion / MRI changed the stage" (new) | No measurable benefit (§5.2) | Shown with its training and held-out evidence |
 | Discordance flag | 13 of 567 training subjects flagged; error rate 23% flagged vs 24% unflagged | Exploratory, not validated |
 
@@ -228,7 +241,8 @@ heatmap does not support any anatomical claim.
 
 | Deliverable | Where |
 |---|---|
-| Code and reports | GitHub `le-Affan/ad-detection`, branches `fusion-v3` (final system), `path-a-multivisit` (multi-visit preprocessing and temporal models), and experiment branches |
+| Code and reports | GitHub `le-Affan/ad-detection`, branches `fusion-v3` (final system), `explainability` (pre-registered explanation analysis and the current card), `path-a-multivisit` (multi-visit preprocessing and temporal models), and experiment branches |
+| Explainability analysis | `analysis/explainability/` (`preregistration.md`, `report.md`, `results/`, `figures/`, `atlas/`) |
 | Assessment card and demo notebook | `src/card/`, `demo/assessment_demo.ipynb` (about 15 s run) |
 | Blueprint and results | `docs/pipeline_blueprint.md`, `docs/final_results.md` |
 | Experiment reports | `analysis/fusion_feasibility/`, `brain_age/`, `mri_morphometry/`, `kan_fusion/`, `fusion_v3/` |
@@ -265,13 +279,14 @@ Q&A are still to do.
 
 ## 11. What is left
 
-1. Defense deck and written report, built from `docs/final_results.md`.
-2. Defense preparation: updated Q&A, numbers to know cold, likely examiner
+1. Defense deck, built from `docs/final_results.md`.
+2. Written report.
+3. Defense Q&A: updated answers, numbers to know cold, likely examiner
    questions.
-3. Explainability fix (prompt ready) and, optionally, the resolution diagnostic.
-4. Optional extras: a longitudinal severity panel (requires regenerating the
-   lost atrophy-slope file) and a higher-resolution Grad-CAM.
+4. Research paper draft.
 5. Consolidating branches into `master`.
+6. Optional: a longitudinal severity panel. This requires regenerating the
+   lost atrophy-slope file.
 
 ## 12. How to explain the project in one paragraph
 

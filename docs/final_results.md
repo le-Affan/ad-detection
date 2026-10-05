@@ -151,7 +151,7 @@ Same subjects (those with a scan). The MRI-only mode is the MRI specialist.
 | MRI share, macro-F1 (CV; final KAN vs the same KAN with MRI masked) | +0.007 [−0.006, +0.019], not reliable |
 | LMCI→AD errors, clinical specialist → KAN fusion (CV, mean count per seed, 569 subjects) | 17.2 → 14.6; the same KAN with MRI masked gives 15.6, so 1.0 of the 2.6 is attributable to MRI. Test: 3 → 3 |
 | Clinical specialist → KAN fusion on test | LMCI recovered 8 → 12; EMCI called LMCI 7 → 13 (a trade, not a gain). On CV this shift appears when the class-balanced loss is adopted (config log #26/#28) |
-| KAN edges consistent across all 25 seed models (the 25 KANs trained on the 569 train subjects) | MRI evidence for "normal" lowers the AD logit; MRI evidence for AD lowers the CN logit |
+| KAN edges consistent across all 25 seed models (the 25 KANs trained on the 569 train subjects) | MRI evidence for "normal" lowers the AD logit; MRI evidence for AD lowers the CN logit. Edge curves are a model description, not the card's explanation: the card uses group Shapley values (§9) |
 | Not usable as an explanation | The direct MRI-AD → AD edge is non-monotone in 18 of 25 models |
 | `has_mri` flag | Pruned in all 25 models; missing scans handled by modality dropout |
 
@@ -347,7 +347,7 @@ out-of-fold, flagged subjects have error rate 23% vs 24% unflagged.
 
 **Suggested wording.** "Every explanation was evaluated against pre-registered
 checks; none passed all of them. The MRI specialist's attributions agree with
-the input-set ablations, and the fusion's MRI correction is consistent across
-all 25 models. The CNN heatmaps fail model-randomisation checks and are shown
+the input-set ablations, and the MRI group's Shapley contribution to the fusion's
+correction is consistent across all 25 models. The CNN heatmaps fail model-randomisation checks and are shown
 as non-anatomical."
 

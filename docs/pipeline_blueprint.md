@@ -88,8 +88,9 @@ Clinical confusion (val): 13 of 16 LMCI errors go to EMCI.
   Stage (COG)     AD vs rest (ADD)   Severity s = Σ k·p(stage k)
       └────────────────┴────────┬─────────┘
                                 ▼
-                 Assessment card: outputs, SHAP, Grad-CAM, KAN edge curves,
-                 MRI specialist standalone, discordance flag, brain age
+                 Assessment card: outputs, clinical SHAP, MRI-specialist SHAP,
+                 CNN map (not anatomically reliable), KAN Shapley effects,
+                 stage-change indicators, discordance flag, brain age
 ```
 
 ### 3.1 Inputs (as frozen in `analysis/fusion_v3/freeze.md`)
