@@ -8,12 +8,13 @@ seed-s specialists' scores (demo/card_data/streams_all.npz):
   - the residual (KAN outputs 0-3, added to log p_clinical) and every edge's
     output phi_ij(x_i). K2 is a single layer, so output j = sum_i phi_ij(x_i)
     (pykan's affine node parameters are fixed at scale 1, bias 0; checked).
-Edges shown on the card: the MRI-logit edges that kan_interpret.py found
+Edge curves (kan_edges.json): the MRI-logit edges that kan_interpret.py found
 monotone and consistent in all 25 val-stage KANs (kan_interp.json), re-checked
-with the same rule on the 25 frozen KANs over the 691 training inputs. An edge
-is shown only if it passes both. The MRI AD-logit -> AD edge is never shown.
-For each shown edge the curve (mean, min and max over the 25 KANs) is stored on a
-grid over the raw input's P1-P99 (691 training subjects with a scan).
+with the same rule on the 25 frozen KANs over the 691 training inputs, with each
+passing edge's curve (mean, min and max over the 25 KANs) on a grid over the raw
+input's P1-P99. They are kept as a record and are NOT drawn on the card: the card
+explains the fusion with group-level Shapley values (kan_shapley.npz below),
+showing a group only where all 25 KANs agree in sign.
 Shapley values (analysis/explainability, P3): exact interventional Shapley values of each frozen KAN over
 the 4 input groups (clinical logits; MRI logits + has_mri; age; CDRSB + CogIndex + MMSE) for the centred final
 COG logits, the centred residual and the ADD logit; background = the train subjects' prediction-time inputs.

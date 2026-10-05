@@ -41,7 +41,7 @@ Rows 1–7 are validation / cross-validation. Row 8 includes the single frozen t
 | 5 | Brain-age gap (DeepBrainNet) added | `brain-age` | E − B −0.002 [−0.011, +0.006]; E′ − B′ +0.004 [−0.007, +0.016]. No reliable gain. Strong stage gradient: corrected gap CN 0.0 → EMCI +2.2 → LMCI +4.0 → AD +6.8 years (KW p = 2×10⁻¹⁶); AD vs CN AUC 0.80 alone |
 | 6 | Remove the 7 FreeSurfer volumes from the clinical features | `mri-morphometry` | A − A0 +0.002 [−0.010, +0.015]; A′ − A0′ −0.003 [−0.021, +0.015]. Volumes add nothing on CV. SynthSeg Part 2 deliberately not run |
 | 7 | KAN vs CatBoost on raw clinical top-12 (C) and + 7 MRI inputs (F) | `kan-fusion` | CatBoost F − C +0.014 CV [−0.001, +0.029]: no reliable MRI gain. KAN on raw features −0.058 vs CatBoost on F (not non-inferior); MRI inputs hurt the raw-feature KAN |
-| 8 | Stream specialists + KAN fusion on stream scores (35 configurations, nested stacking), frozen and tested once | `fusion-v3` | Final KAN K2 CV 0.756 vs clinical specialist 0.744 (+0.013 [−0.006, +0.034]) and CatBoost F 0.758 (−0.002). MRI share inside the fusion +0.007 [−0.006, +0.019]. **Test:** KAN 0.764, clinical 0.771, CatBoost F 0.746, CatBoost R 0.784; all differences within ±0.08 CIs. MRI specialist alone: AD-vs-rest AUC 0.880 CV / 0.873 test; 4-class macro-F1 0.42 / 0.44 (majority 0.14) |
+| 8 | Stream specialists + KAN fusion on stream scores (nested stacking: inner out-of-fold stream scores inside each outer CV fold; the 35 configurations were compared on that outer CV, not tuned in an inner loop), frozen and tested once | `fusion-v3` | Final KAN K2 CV 0.756 vs clinical specialist 0.744 (+0.013 [−0.006, +0.034]) and CatBoost F 0.758 (−0.002). MRI share inside the fusion +0.007 [−0.006, +0.019]. **Test:** KAN 0.764, clinical 0.771, CatBoost F 0.746, CatBoost R 0.784; all differences within ±0.08 CIs. MRI specialist alone: AD-vs-rest AUC 0.880 CV / 0.873 test; 4-class macro-F1 0.42 / 0.44 (majority 0.14) |
 
 Post-hoc, not in the freeze (train CV / val only): MRI specialist input-set controls
 (`analysis/fusion_v3/mri_controls.md`). Age + sex alone give AD-vs-rest AUC 0.574; volumes/ICV alone 0.867; the
@@ -102,7 +102,12 @@ Clinical confusion (val): 13 of 16 LMCI errors go to EMCI.
   logistic regression (C = 0.1), chosen from 6 candidates by train-CV log-loss.
 - **KAN fusion:** stream-level scores only (centred log-probabilities of both
   specialists), the has_mri flag, plus age and the clinical top-3 (CDRSB,
-  CogIndex, MMSE). Stream scores are out-of-fold (nested inside CV).
+  CogIndex, MMSE). Stream scores are out-of-fold:
+  - **In CV:** for each seed and outer fold, the KAN trains on inner 5-fold
+    out-of-fold scores from the outer-train set. It predicts the outer-test fold
+    from specialists fitted on the whole outer-train set.
+  - **For the frozen system:** a single-level 5-fold out-of-fold pass over the
+    691 train + val subjects.
 - **Not used:** SynthSeg volumes, Path C slopes (future information), DEMO.
 - Moving the volumes into the MRI stream is a structural choice. Step 0 shows it
   costs no accuracy. State this when presenting it.
