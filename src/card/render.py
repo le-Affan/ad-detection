@@ -1,10 +1,17 @@
 """Assessment card renderer (numpy, pandas, matplotlib only).
 
 Reads the precomputed per-subject outputs in demo/card_data/ (written by
-build_card_data.py, build_kan_terms.py and build_gradcam.py from the frozen
-fusion-v3 artefacts) and renders one subject's card as HTML and PNG. It never
-fits or runs a model, so any train, val or test subject renders in about a
-second.
+build_card_data.py, build_kan_terms.py and build_cam.py from the frozen
+fusion-v3 artefacts) and the committed aggregate rules of the explainability
+analysis (analysis/explainability/results/card_rules.json, eval_status.json),
+and renders one subject's card as HTML and PNG. It never fits or runs a model,
+so any train, val or test subject renders in about a second.
+
+Explanation text is generated from the pre-registered rules, never fixed:
+  - CNN region names come only from the naming rule P1-R3 (card_rules["cnn_naming"]);
+  - KAN contributions are shown only where all 25 KANs agree in sign (P3-R2) and
+    cohort effects only for consistent cells (P3-R1);
+  - every explanation panel carries its P5 validation status (eval_status.json).
 
     from card import CardData, render_card
     data = CardData()                      # finds demo/card_data from this file's location
@@ -27,6 +34,10 @@ from matplotlib.gridspec import GridSpec  # noqa: E402
 
 NAMES = ["CN", "EMCI", "LMCI", "AD"]
 DATA_DIR = Path(__file__).resolve().parents[2] / "demo" / "card_data"
+RULES_DIR = Path(__file__).resolve().parents[2] / "analysis" / "explainability" / "results"
+PREREG_COMMIT = "050ca8e"
+VOXEL_MM = (1.979, 2.442, 2.059)                     # vol96 voxel size (S, P, R)
+MIN_EFFECT = 0.05
 INK, INK2, MUTED, GRID = "#0b0b0b", "#52514e", "#8a8984", "#e4e3df"
 BLUE, ORANGE, GREY, RED = "#2a78d6", "#eb6834", "#b9b8b2", "#e34948"
 SHOW_TOP = 6
@@ -40,8 +51,9 @@ plt.rcParams.update({"font.size": 9, "axes.edgecolor": MUTED, "axes.labelcolor":
 
 # --- data ---------------------------------------------------------------------------
 class CardData:
-    def __init__(self, data_dir=None):
+    def __init__(self, data_dir=None, rules_dir=None):
         d = Path(data_dir) if data_dir else DATA_DIR
+        rd = Path(rules_dir) if rules_dir else RULES_DIR
         self.dir = d
         self.subjects = pd.read_csv(d / "subjects.csv")
         self.meta = json.load(open(d / "meta.json"))
@@ -52,11 +64,19 @@ class CardData:
         self.edges = json.load(open(d / "kan_edges.json"))
         assert (sh["ptid"] == self.subjects.PTID.to_numpy()).all()
         assert (k["rids"] == self.subjects.RID.to_numpy()).all()
-        self.gc = None
-        if (d / "gradcam.npz").exists():
-            g = np.load(d / "gradcam.npz", allow_pickle=True)
-            self.gc = {key: g[key] for key in g.files}
-            self.gc_index = {p: i for i, p in enumerate(self.gc["ptid"])}
+        ms = np.load(d / "mri_shap.npz", allow_pickle=True)
+        assert (ms["ptid"] == self.subjects.PTID.to_numpy()).all()
+        self.mshap = {key: ms[key] for key in ms.files}
+        ks = np.load(d / "kan_shapley.npz", allow_pickle=True)
+        assert (ks["rids"] == self.subjects.RID.to_numpy()).all()
+        self.kshap = {key: ks[key] for key in ks.files}
+        self.rules = json.load(open(rd / "card_rules.json"))
+        self.eval = json.load(open(rd / "eval_status.json"))
+        self.cam = None
+        if (d / "cam.npz").exists():
+            g = np.load(d / "cam.npz", allow_pickle=True)
+            self.cam = {key: g[key] for key in g.files}
+            self.cam_index = {p: i for i, p in enumerate(self.cam["ptid"])}
         self.index = {p: i for i, p in enumerate(self.subjects.PTID)}
         p = self.kan["p"]
         self.subjects["pred"] = np.array(NAMES)[p.argmax(1)]
@@ -82,17 +102,66 @@ class CardData:
         shap_rows = [{"feature": self.features[j], "label": self.meta["feature_labels"][self.features[j]],
                       "value": fmt_value(self.features[j], r[f"raw_{self.features[j]}"]), "shap": float(sv[j])}
                      for j in order]
-        shown = [e for e in self.edges["edges"] if e["shown"]]
-        edge_terms = [{**e, "x": float(self.kan["x_raw"][i, e["input_index"]]),
-                       "contrib": float(self.kan["edge"][i, e["output_index"], e["input_index"]])} for e in shown]
-        gc = None
-        if self.gc is not None and ptid in self.gc_index:
-            j = self.gc_index[ptid]
-            gc = {"bg": self.gc["bg"][j], "cam": self.gc["cam"][j], "n_models": int(self.gc["n_models"][j])}
-        return {"row": r, "p": p, "pred": NAMES[int(p.argmax())], "add": float(self.kan["add"][i]),
+        cam = None
+        if self.cam is not None and ptid in self.cam_index:
+            j = self.cam_index[ptid]
+            cam = {"bg": self.cam["bg"][j], "cam": self.cam["cam"][j], "n_models": int(self.cam["n_models"][j]),
+                   "density": dict(zip(self.cam["regions"], self.cam["density"][j].astype(float)))}
+        pred = NAMES[int(p.argmax())]
+        mri_p = np.array([r[f"mri_p_{n}"] for n in NAMES])
+        return {"row": r, "p": p, "pred": pred, "add": float(self.kan["add"][i]),
                 "severity": float(p @ np.arange(4)), "clin": clin, "clin_pred": NAMES[kc], "shap": shap_rows,
-                "mri": np.array([r[f"mri_p_{n}"] for n in NAMES]), "residual": self.kan["residual"][i].astype(float),
-                "base": self.kan["base"][i].astype(float), "edges": edge_terms, "gradcam": gc}
+                "mri": mri_p, "residual": self.kan["residual"][i].astype(float),
+                "base": self.kan["base"][i].astype(float), "cam": cam,
+                "mri_shap": self.mri_shap_rows(i, r, mri_p) if r.has_mri else None,
+                "kan_shap": self.kan_shap(i, pred),
+                "mri_masked_pred": NAMES[int(self.kshap["p_mri_masked"][i].argmax())] if r.has_mri else None}
+
+    def mri_shap_rows(self, i, r, mri_p):
+        """P2-R3: the 6 largest |phi| for the MRI specialist's predicted class, then the 3 largest for AD."""
+        phi, imp = self.mshap["phi"][i].astype(float), self.mshap["imputed"][i]
+        feats, labels = list(self.mshap["features"]), list(self.mshap["labels"])
+        k = int(mri_p.argmax())
+        out = {"pred": NAMES[k], "rows": [], "ad_rows": []}
+        for tgt, n, key in ((k, 6, "rows"), (3, 3, "ad_rows")):
+            if key == "ad_rows" and k == 3:
+                break
+            for j in np.argsort(-np.abs(phi[:, tgt]), kind="stable")[:n]:
+                out[key].append({"feature": feats[j], "label": labels[j], "value": mri_value(feats[j], r, imp[j]),
+                                 "phi": float(phi[j, tgt]), "imputed": bool(imp[j])})
+        return out
+
+    def kan_shap(self, i, pred):
+        """Group Shapley values (25 KANs) for the final and residual logits of the predicted stage (P3-R2)."""
+        G = self.kshap["phi_group"][:, i].astype(float)                              # (25, 4 groups, 9 targets)
+        tg = list(self.kshap["targets"])
+        out = {}
+        for key in (f"final_{pred}", f"residual_{pred}"):
+            t = tg.index(key)
+            rows = []
+            for g, gn in enumerate(self.kshap["groups"]):
+                v = G[:, g, t]
+                same = bool((v > 0).all() or (v < 0).all())
+                rows.append({"group": str(gn), "mean": float(v.mean()), "min": float(v.min()), "max": float(v.max()),
+                             "consistent": same and abs(v.mean()) >= MIN_EFFECT})
+            out[key] = rows
+        return out
+
+
+def mri_value(feat, r, imputed):
+    if imputed:
+        return "missing (imputed)" if feat != "BAG" else f"not used ({r.ba_status}; imputed)"
+    if feat.endswith("_ICV"):
+        return f"{r[f'volpct_{feat}']:.0f}th pct of CN-train"
+    if feat == "ALZ":
+        return f"{r.alz:.2f}"
+    if feat == "BAG":
+        return f"{r.ba_corr_gap:+.1f} y"
+    if feat == "AGE":
+        return f"{r.raw_AGE:.0f} y"
+    if feat == "SEX":
+        return str(r.raw_PTGENDER)
+    return ""
 
 
 def fmt_value(feat, v):
@@ -160,35 +229,137 @@ def mri_lines(s):
     if not r.has_mri:
         return ["No MRI scan. The MRI stream is treated as missing: the MRI specialist gives no output, the fusion "
                 "layer receives neutral MRI inputs (training class-prior logits, has_mri = 0; it was trained with "
-                "15% modality dropout), and Grad-CAM and brain age are not available."] + (
+                "15% modality dropout), and the CNN attribution and brain age are not available."] + (
             ["The FreeSurfer volumes shown come from the ADNI tables; they are displayed for reference but are not "
              "used, because the MRI specialist runs only for subjects with a scan."]
             if any(not np.isnan(r[k]) for k in r.index if k.startswith("vol_")) else [])
     m = s["mri"]
     return [f"MRI specialist (volumes/ICV, ALZ, brain-age gap, age, sex): {NAMES[int(m.argmax())]} "
             f"({m.max():.0%}); P(AD) {m[3]:.0%}. CNN AD probability (ALZ) {r.alz:.2f}.",
-            "The MRI specialist detects AD well (AD-vs-rest AUC 0.87 on test) but is weak at staging MCI."]
+            "The MRI specialist detects AD well (AD-vs-rest AUC 0.87 on test) but is weak at staging MCI. Its AD "
+            "detection comes mostly from the six volume ratios (train CV: volumes alone AUC 0.867; ALZ alone 0.764)."]
 
 
-def edge_text(e):
-    a, b = e["input"].replace("mri_logit_", ""), e["output"]
-    direction = "decreasing" if "decreasing" in e["verdict_frozen"] else "increasing"
-    return f"MRI {a} logit → {b} logit ({direction} in all 25 + 25 models)"
+def validation(data, key):
+    e = data.eval[key]
+    if e["overall"] == "VALIDATED":
+        return "Validation: VALIDATED (all pre-registered checks passed)"
+    return "Validation: WEAK. Weak or failed checks: " + "; ".join(e["weak_or_failed"])
 
 
-def kan_lines(s):
-    shown = sum(e["contrib"] for e in s["edges"]) if s["edges"] else 0
+def mri_shap_lines(s):
+    ms = s["mri_shap"]
+    if ms is None:
+        return []
+    L = [f"Drivers of the MRI specialist's {ms['pred']} score (SHAP on the centred class score, log-odds units; "
+         "background = training subjects with a scan):"]
+    L += [f"{x['label']} = {x['value']}: {'towards' if x['phi'] > 0 else 'away from'} {ms['pred']} ({abs(x['phi']):.2f})"
+          for x in ms["rows"]]
+    if ms["ad_rows"]:
+        L.append("For AD: " + "; ".join(f"{x['label']} {'towards' if x['phi'] > 0 else 'away from'} AD "
+                                         f"({abs(x['phi']):.2f})" for x in ms["ad_rows"]) + ".")
+    return L
+
+
+def cell_mm(size):
+    lo, hi = min(VOXEL_MM) * 96 / size, max(VOXEL_MM) * 96 / size
+    return f"{size}³ grid (cells ≈ {lo:.0f}–{hi:.0f} mm)"
+
+
+def cnn_region_text(data, s):
+    """Generated from the pre-registered naming rule P1-R3 (card_rules['cnn_naming']); never a fixed string."""
+    nm = data.rules["cnn_naming"]
+    st = data.rules["cnn_stage"]
+    head = (f"CNN attribution: LayerCAM of the ALZ CNN at {st['stage']} ({cell_mm(st['map_size'])}), "
+            f"{s['cam']['n_models']} models; stage chosen by the pre-registered deletion rule.")
+    if not nm["named"]:
+        return [head, "No brain region passes the pre-registered naming rule; read this map as non-anatomical."]
+    parts = []
+    for x in nm["named"]:
+        q = [f"×{x['density']:.1f}"]
+        if x["region"].endswith("lobe"):
+            q.append("approximate")
+        if x["also_in_non_ad"]:
+            q.append("also present in non-AD subjects")
+        if not x["replicated_on_val"]:
+            q.append("not replicated on validation subjects")
+        parts.append(f"{x['region']} ({'; '.join(q)})")
+    approx = " Template atlas, affine registration: approximate." if nm["approximate_names"] else \
+        " Regions from a template atlas (affine registration)."
+    cohort = ("In AD training subjects the attribution is concentrated above the brain average in: "
+              + ", ".join(parts) + "." + approx)
+    subj = "This subject: " + ", ".join(f"{x['region']} ×{s['cam']['density'][x['region']]:.1f}"
+                                        for x in nm["named"]) + " the brain average."
+    return [head, cohort, subj]
+
+
+CAM_NOTE = ("Overlay: the whole map on brain voxels (brighter = higher); fixed slices through the template "
+            "hippocampus. The regular dot pattern is a stride artefact of gradient-based maps at this layer, "
+            "not anatomy.")
+GROUP_LABEL = {"clinical logits": "clinical specialist", "MRI logits + has_mri": "MRI specialist",
+               "age": "age", "CDRSB + CogIndex + MMSE": "CDR-SB / CogIndex / MMSE"}
+
+
+def kan_lines(data, s):
     L = [f"Final = clinical log-probabilities + KAN correction (K2 residual, mean of 25 KANs). Total correction "
          f"to each logit: " + ", ".join(f"{n} {v:+.2f}" for n, v in zip(NAMES, s["residual"])) + "."]
-    for e in s["edges"]:
-        L.append(f"{edge_text(e)}: input {e['x']:+.2f}, contribution {e['contrib']:+.2f} to the {e['output']} logit.")
-    L.append("Only MRI edges monotone in the same direction in all 25 val-stage and all 25 frozen KANs are shown; "
-             "the rest of the correction comes from the other edges (age, CDR-SB, CogIndex, MMSE, clinical logits, "
-             "and MRI edges without a consistent shape, including MRI AD → AD). MRI logits are centred and "
-             "sum to zero, so their edges are read jointly.")
+    pred = s["pred"]
+    for key, what in ((f"final_{pred}", f"final {pred} logit"), (f"residual_{pred}", f"KAN correction to {pred}")):
+        rows = s["kan_shap"][key]
+        ok = [x for x in rows if x["consistent"]]
+        bad = [GROUP_LABEL[x["group"]] for x in rows if not x["consistent"]]
+        L.append(f"Contributions to the {what} (Shapley, centred, mean of 25 KANs): "
+                 + (", ".join(f"{GROUP_LABEL[x['group']]} {x['mean']:+.2f}" for x in ok) if ok else "none consistent")
+                 + "." + (f" Not shown (sign differs across the 25 KANs or |value| < {MIN_EFFECT}): "
+                          + ", ".join(bad) + "." if bad else ""))
+    cells = [c for c in data.rules["kan"]["consistent_cells"]
+             if c["target"] in (f"final_{pred}", f"residual_{pred}") and c["stratum"] == pred]
+    if cells:
+        def rep(c):
+            v = c.get("val_trainonly_replication")
+            return "" if v in (None, "replicated") else f"; {v} on held-out validation subjects"
+        L.append(f"In training subjects whose true stage is {pred}, consistent in all 25 KANs: " + "; ".join(
+            f"{GROUP_LABEL[c['group']]} {'raises' if c['median_effect'] > 0 else 'lowers'} the "
+            f"{'final' if c['target'].startswith('final') else 'correction to the'} {pred} logit "
+            f"(median {c['median_effect']:+.2f}{rep(c)})" for c in cells) + ".")
     if not s["row"].has_mri:
-        L.append("No scan: MRI inputs are the neutral values, so the MRI edges contribute their neutral-point value.")
-    del shown
+        L.append("No scan: the MRI inputs are the neutral missing-scan values.")
+    L.append("Shapley values explain each KAN's logits; the probabilities shown average 25 softmaxes.")
+    return L
+
+
+def stage_change_lines(data, s):
+    sc = data.rules["stage_change"]
+    clin, fin = s["clin_pred"], s["pred"]
+    L = []
+    if clin != fin:
+        L.append(f"Fusion changed the stage: clinical specialist {clin} → final {fin}.")
+        t = [x for x in sc["A_transitions_train_oof"] if x["from"] == clin and x["to"] == fin]
+        n = t[0]["n"] if t else 0
+        if n >= sc["min_transition_n"]:
+            x = t[0]
+            both = x["both_wrong_closer"] + x["both_wrong_farther"] + x["both_wrong_same"]
+            L.append(f"On training subjects (out-of-fold), the change {clin} → {fin} occurred {n} times: "
+                     f"{x['corrected']} corrected, {x['broken']} made wrong, {both} wrong before and after.")
+        else:
+            L.append(f"Too few training cases ({n}) of the change {clin} → {fin} to judge it.")
+    else:
+        L.append(f"Fusion did not change the clinical specialist's stage ({clin}).")
+    a = sc["A_train_oof"]
+    L.append(f"All fusion stage changes on training subjects (out-of-fold): {a['fired']} of {a['n']}, "
+             f"net accuracy change {a['net_accuracy_change']:+.1%} [{a['net_ci_lo']:+.1%}, {a['net_ci_hi']:+.1%}].")
+    if s["row"].has_mri:
+        m = s["mri_masked_pred"]
+        L.append(f"MRI changed the stage: without the MRI inputs (scan treated as missing) the system would predict "
+                 f"{m} instead of {fin}." if m != fin else
+                 "The MRI inputs do not change the predicted stage (same stage with the scan treated as missing).")
+        b = sc.get("B_heldout_val")
+        if b:
+            L.append(f"On held-out validation subjects (train-only KANs), MRI changed the stage in {b['fired']} of "
+                     f"{b['n']}: {b['corrected']} corrected, {b['broken']} made wrong (net "
+                     f"{b['net_accuracy_change']:+.1%} [{b['net_ci_lo']:+.1%}, {b['net_ci_hi']:+.1%}]).")
+        else:
+            L.append("The 'MRI changed the stage' line is descriptive (in-sample frozen models).")
     return L
 
 
@@ -197,7 +368,9 @@ def footer(data):
     return [f"Frozen system fusion-v3, freeze commit {data.meta['freeze_commit']}. Clinical specialist: CatBoost "
             f"{v.get('catboost', '')} (265 trees, top-12 by SHAP, 5 seeds). MRI specialist: multinomial logistic "
             f"regression C = 0.1 (scikit-learn {v.get('scikit-learn', '')}). Fusion: KAN K2 residual, config 32, "
-            "25 models (pykan 0.2.8). ALZ: 3D ResNet CNN, 15 cross-fit checkpoints. Brain age: DeepBrainNet (VGG16).",
+            "25 models (pykan 0.2.8). ALZ: 3D ResNet CNN, 15 cross-fit checkpoints. Brain age: DeepBrainNet (VGG16). "
+            f"Explanations: analysis/explainability (pre-registered, commit {PREREG_COMMIT}); report "
+            "analysis/explainability/report.md.",
             NOT_CLINICAL]
 
 
@@ -283,10 +456,10 @@ def panel_volumes(ax, data, s):
     ax.set_title("Volumes / ICV vs CN-train reference\n(grey P5–P95, blue P25–P75; dot = subject)", loc="left")
 
 
-def panel_gradcam(axes, s):
-    gc = s["gradcam"]
+def panel_cam(axes, s):
+    gc = s["cam"]
     top = gc["cam"].max() / 255 if gc is not None else 1.0
-    for ax, t in zip(axes, ("axial", "coronal", "sagittal")):
+    for ax, t in zip(axes, ("axial", "coronal", "sagittal (left)")):
         ax.set_xticks([])
         ax.set_yticks([])
         for sp in ax.spines.values():
@@ -294,15 +467,28 @@ def panel_gradcam(axes, s):
         if gc is None:
             ax.text(0.5, 0.5, "no CNN volume", ha="center", va="center", transform=ax.transAxes, color=MUTED)
             continue
-        k = ("axial", "coronal", "sagittal").index(t)
+        k = ("axial", "coronal", "sagittal (left)").index(t)
         # stored arrays: axial (P, R), coronal (S, R), sagittal (S, P); vol96 axes run toward S, P, R
         origin = "upper" if t == "axial" else "lower"                       # anterior up / superior up
         ax.imshow(gc["bg"][k], cmap="gray", origin=origin)
         cam = gc["cam"][k].astype(float) / 255
-        show = (cam >= 0.6 * top) & (gc["bg"][k] > 12)                      # brain voxels, upper 40% of this map
-        ax.imshow(np.ma.masked_where(~show, cam), cmap="autumn_r", origin=origin, alpha=0.5, vmin=0.6 * top,
-                  vmax=top)
+        show = gc["bg"][k] > 12                                             # brain voxels; whole map, no threshold
+        ax.imshow(np.ma.masked_where(~show, cam), cmap="inferno", origin=origin, alpha=0.55, vmin=0, vmax=top)
         ax.set_title(t, fontsize=8, weight="normal", color=INK2)
+
+
+def panel_mri_shap(ax, s):
+    ms = s["mri_shap"]
+    if ms is None:
+        ax.axis("off")
+        return
+    rows = ms["rows"][::-1]
+    v = [r["phi"] for r in rows]
+    ax.barh(range(len(rows)), v, color=[BLUE if x > 0 else ORANGE for x in v], height=0.6)
+    ax.set_yticks(range(len(rows)), [f"{r['label']} = {r['value']}" for r in rows], fontsize=7.6)
+    ax.axvline(0, color=MUTED, lw=0.8)
+    ax.set_xlabel(f"SHAP (log-odds) for {ms['pred']}: blue towards, orange away", fontsize=8)
+    ax.set_title(f"MRI specialist drivers (predicts {ms['pred']})", loc="left")
 
 
 def panel_kan(ax, s):
@@ -318,16 +504,24 @@ def panel_kan(ax, s):
     ax.set_title("How the fusion changes the prediction", loc="left")
 
 
-def panel_edge(ax, e):
-    c = e["curve"]
-    ax.fill_between(c["x"], c["y_min"], c["y_max"], color="#cfe0f5", lw=0, label="range over 25 KANs")
-    ax.plot(c["x"], c["y_mean"], color=BLUE, lw=2, label="mean")
-    ax.plot([e["x"]], [e["contrib"]], marker="o", ms=8, color=INK, markeredgecolor="white", markeredgewidth=1.5)
-    ax.axhline(0, color=GRID, lw=0.8)
-    a = e["input"].replace("mri_logit_", "")
-    ax.set_xlabel(f"MRI {a} logit (centred)", fontsize=8)
-    ax.set_ylabel(f"→ {e['output']} logit", fontsize=8)
-    ax.set_title(f"MRI {a} → {e['output']}: {e['contrib']:+.2f}", loc="left", fontsize=8.5)
+def panel_kan_shapley(ax, s):
+    pred = s["pred"]
+    rows_f, rows_r = s["kan_shap"][f"final_{pred}"], s["kan_shap"][f"residual_{pred}"]
+    labels = [GROUP_LABEL[x["group"]] for x in rows_f]
+    y = np.arange(len(labels))[::-1]
+    for off, rows, col, nm in ((0.18, rows_f, BLUE, f"final {pred} logit"), (-0.18, rows_r, ORANGE,
+                                                                          f"KAN correction to {pred}")):
+        for yy, x in zip(y, rows):
+            if x["consistent"]:
+                ax.barh(yy + off, x["mean"], height=0.34, color=col)
+            else:
+                ax.text(0, yy + off, "  inconsistent across KANs", va="center", fontsize=6.8, color=MUTED)
+        ax.barh([], [], color=col, label=nm)
+    ax.set_yticks(y, labels, fontsize=7.8)
+    ax.axvline(0, color=MUTED, lw=0.8)
+    ax.legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.32), ncol=2)
+    ax.set_xlabel("Shapley value (centred logit), mean of 25 KANs", fontsize=8)
+    ax.set_title(f"What moves the {pred} logit\n(only where all 25 KANs agree)", loc="left", fontsize=8.8)
 
 
 # --- PNG ------------------------------------------------------------------------------
@@ -349,10 +543,10 @@ def _textbox(ax, title, lines, size=8.2, width=118):
 
 def render_png(data, ptid, path, category=None):
     s = data.subject(ptid)
-    fig = plt.figure(figsize=(11, 21.5), dpi=110)
+    fig = plt.figure(figsize=(11, 30), dpi=110)
     fig.patch.set_facecolor("white")
-    gs = GridSpec(10, 6, figure=fig, height_ratios=[0.8, 1.5, 0.02, 1.9, 1.6, 1.4, 0.9, 1.8, 1.5, 1.45],
-                  hspace=0.75, wspace=0.6, left=0.17, right=0.95, top=0.975, bottom=0.02)
+    gs = GridSpec(13, 6, figure=fig, height_ratios=[0.8, 1.5, 0.02, 1.9, 1.6, 1.7, 1.5, 0.85, 0.95, 1.8, 1.5, 1.2, 1.2],
+                  hspace=0.8, wspace=0.6, left=0.17, right=0.95, top=0.98, bottom=0.015)
     h = header(data, s, category)
     ax = fig.add_subplot(gs[0, :])
     ax.axis("off")
@@ -369,21 +563,26 @@ def render_png(data, ptid, path, category=None):
     panel_shap(fig.add_subplot(gs[3, 1:4]), s)
     _textbox(fig.add_subplot(gs[3, 4:]), None, [f"{r['label']}: {r['value']}; "
                                                f"{'towards' if r['shap'] > 0 else 'away from'} {s['clin_pred']} "
-                                               f"({abs(r['shap']):.2f})" for r in s["shap"]], size=7.4, width=42)
+                                               f"({abs(r['shap']):.2f})" for r in s["shap"]]
+             + ["", validation(data, "clinical_shap")], size=7.2, width=44)
     panel_mri(fig.add_subplot(gs[4, :2]), s)
-    panel_volumes(fig.add_subplot(gs[4, 3:]), data, s)
-    axes = [fig.add_subplot(gs[5, k]) for k in range(3)]
-    panel_gradcam(axes, s)
+    if s["mri_shap"]:
+        panel_mri_shap(fig.add_subplot(gs[4, 3:]), s)
+    panel_volumes(fig.add_subplot(gs[5, 1:3]), data, s)
     _textbox(fig.add_subplot(gs[5, 3:]), "MRI evidence", mri_lines(s) + (
-        [f"Grad-CAM of the ALZ CNN ({s['gradcam']['n_models']} models), central slices (right on the right; overlay = brain voxels in the top 40% of this subject's map, yellow = highest). The map is "
-         "coarse (3×3×3 before upsampling) and cannot localise a specific structure such as the hippocampus; across "
-         "the cohort the attribution is mainly periventricular / ventricular."] if s["gradcam"] else []), size=7.6, width=62)
-    _textbox(fig.add_subplot(gs[6, :]), "Brain age", brain_age_lines(data, s), size=7.8)
-    panel_kan(fig.add_subplot(gs[7, :3]), s)
-    _textbox(fig.add_subplot(gs[7, 3:]), None, kan_lines(s), size=7.2, width=62)
-    for k, e in enumerate(s["edges"][:2]):
-        panel_edge(fig.add_subplot(gs[8, 3 * k:3 * k + 2]), e)
-    _textbox(fig.add_subplot(gs[9, :]), "Flags", flag_lines(data, s) + [""] + footer(data), size=7.4, width=150)
+        ["", validation(data, "mri_shap")] if s["mri_shap"] else []), size=7.3, width=64)
+    axes = [fig.add_subplot(gs[6, k]) for k in range(3)]
+    panel_cam(axes, s)
+    _textbox(fig.add_subplot(gs[6, 3:]), "CNN attribution", (cnn_region_text(data, s) + [
+        CAM_NOTE, validation(data, "cnn")]) if s["cam"] else ["Not available (no CNN volume)."],
+        size=7.0, width=66)
+    _textbox(fig.add_subplot(gs[7, :]), "Brain age", brain_age_lines(data, s), size=7.8)
+    _textbox(fig.add_subplot(gs[8, :]), "Stage changes", stage_change_lines(data, s), size=7.4, width=150)
+    panel_kan(fig.add_subplot(gs[9, :3]), s)
+    panel_kan_shapley(fig.add_subplot(gs[9, 4:]), s)
+    _textbox(fig.add_subplot(gs[10, :]), "How the fusion changes the prediction",
+             kan_lines(data, s) + [validation(data, "kan")], size=7.3, width=150)
+    _textbox(fig.add_subplot(gs[11:, :]), "Flags", flag_lines(data, s) + [""] + footer(data), size=7.4, width=150)
     fig.savefig(path, dpi=110)
     plt.close(fig)
     return path
@@ -422,9 +621,14 @@ section{background:var(--card);border:1px solid var(--line);border-radius:10px;p
 img{max-width:100%;height:auto;border-radius:6px;background:#fff}
 table{border-collapse:collapse;width:100%;font-size:13px} td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 th{color:var(--ink2);font-weight:600} p{margin:4px 0;color:var(--ink2)} .warn{color:var(--warn);font-weight:600}
+.ok{color:var(--accent);font-weight:600} h3{font-size:13px;margin:12px 0 6px;color:var(--ink)}
 .kv td:first-child{color:var(--ink2);width:180px} .note{font-size:12px;color:var(--muted)}
 footer{font-size:12px;color:var(--muted);padding:8px 2px 24px}
 """
+
+
+def chip(data, key):
+    return "ok" if data.eval[key]["overall"] == "VALIDATED" else "warn"
 
 
 def render_html(data, ptid, path, category=None):
@@ -448,26 +652,33 @@ def render_html(data, ptid, path, category=None):
              "Top contributions (SHAP, log-odds, mean of 5 seeds):</p><div class='grid'>" +
              _img(lambda ax: panel_shap(ax, s), (5.2, 2.6)) +
              f"<table><tr><th>Feature</th><th>Value</th><th>Direction</th><th>Magnitude</th></tr>{rows}</table>"
-             "</div></section>")
+             "</div>" + f"<p class='{chip(data, 'clinical_shap')}'>{e(validation(data, 'clinical_shap'))}</p></section>")
     mri = "".join(f"<p>{e(x)}</p>" for x in mri_lines(s))
-    imgs = ("<div class='grid'>" + (_img(lambda ax: panel_mri(ax, s), (4.4, 2.3)) if s["row"].has_mri else "") +
-            _img(lambda ax: panel_volumes(ax, data, s), (5.4, 2.6)) + "</div>")
-    if s["row"].has_mri:
-        if s["gradcam"]:
-            imgs += (_img_multi(lambda axs: panel_gradcam(axs, s), 3, (7.5, 2.6)) +
-                     f"<p class='note'>Grad-CAM of the ALZ CNN ({s['gradcam']['n_models']} models), central slices (subject's right on the right; overlay = brain voxels in the top 40% of this subject's map, yellow = highest). "
-                     "The map is coarse (3×3×3 before upsampling) and cannot localise a specific "
-                     "structure such as the hippocampus; across the cohort the attribution is mainly periventricular / "
-                     "ventricular.</p>")
+    imgs = "<div class='grid'>" + (_img(lambda ax: panel_mri(ax, s), (4.4, 2.3)) if s["row"].has_mri else "")
+    if s["mri_shap"]:
+        ml = mri_shap_lines(s)
+        imgs += _img(lambda ax: panel_mri_shap(ax, s), (5.4, 2.6)) + "</div>" + \
+            "".join(f"<p class='note'>{e(x)}</p>" for x in ml) + \
+            f"<p class='{chip(data, 'mri_shap')}'>{e(validation(data, 'mri_shap'))}</p><div class='grid'>"
+    imgs += _img(lambda ax: panel_volumes(ax, data, s), (5.4, 2.6)) + "</div>"
+    if s["row"].has_mri and s["cam"]:
+        ct = cnn_region_text(data, s)
+        imgs += ("<h3>CNN attribution (supporting; the CNN's ALZ score is a minor input)</h3>" +
+                 _img_multi(lambda axs: panel_cam(axs, s), 3, (7.5, 2.6)) +
+                 "".join(f"<p>{e(x)}</p>" for x in ct) +
+                 f"<p class='note'>{e(CAM_NOTE)} Subject's right on the right.</p>"
+                 f"<p class='{chip(data, 'cnn')}'>{e(validation(data, 'cnn'))}</p>")
     P.append(f"<section><h2>4. MRI evidence</h2>{mri}{imgs}</section>")
     ba = "".join(f"<p class='{'warn' if x.startswith(('UNRELIABLE', 'Extreme')) else ''}'>{e(x)}</p>"
                  for x in brain_age_lines(data, s))
     P.append(f"<section><h2>5. Brain age</h2>{ba}</section>")
-    kl = kan_lines(s)
-    edges = "".join(_img(lambda ax, ee=ee: panel_edge(ax, ee), (3.6, 2.4)) for ee in s["edges"])
-    P.append("<section><h2>6. How MRI changes the prediction</h2><div class='grid'>" +
-             _img(lambda ax: panel_kan(ax, s), (4.6, 2.4)) + f"<div>{''.join(f'<p>{e(x)}</p>' for x in kl[:-1])}</div>"
-             f"</div><div class='grid'>{edges}</div><p class='note'>{e(kl[-1])}</p></section>")
+    kl = kan_lines(data, s)
+    sc = stage_change_lines(data, s)
+    P.append("<section><h2>6. How the fusion changes the prediction</h2><div class='grid'>" +
+             _img(lambda ax: panel_kan(ax, s), (4.6, 2.4)) + _img(lambda ax: panel_kan_shapley(ax, s), (5.2, 2.6)) +
+             "</div>" + "".join(f"<p>{e(x)}</p>" for x in kl[:-1]) + f"<p class='note'>{e(kl[-1])}</p>"
+             f"<p class='{chip(data, 'kan')}'>{e(validation(data, 'kan'))}</p>"
+             "<h3>Stage changes</h3>" + "".join(f"<p>{e(x)}</p>" for x in sc) + "</section>")
     fl = flag_lines(data, s)
     P.append(f"<section><h2>7. Flags</h2><p class='{'warn' if s['row'].discordant else ''}'>{e(fl[0])}</p>" +
              "".join(f"<p class='note'>{e(x)}</p>" for x in fl[1:]) + "</section>")

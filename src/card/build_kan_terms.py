@@ -14,8 +14,13 @@ with the same rule on the 25 frozen KANs over the 691 training inputs. An edge
 is shown only if it passes both. The MRI AD-logit -> AD edge is never shown.
 For each shown edge the curve (mean, min and max over the 25 KANs) is stored on a
 grid over the raw input's P1-P99 (691 training subjects with a scan).
+Shapley values (analysis/explainability, P3): exact interventional Shapley values of each frozen KAN over
+the 4 input groups (clinical logits; MRI logits + has_mri; age; CDRSB + CogIndex + MMSE) for the centred final
+COG logits, the centred residual and the ADD logit; background = the train subjects' prediction-time inputs.
+Also the ensemble prediction with the MRI inputs masked (the missing-scan input: neutral logits, has_mri = 0),
+for the card's "MRI changed the stage" line (P4-B).
 Outputs (demo/card_data/): kan_terms.npz (final p, ADD, residual, per-edge
-terms, clinical base, raw inputs; means over the 25 KANs), kan_edges.json.
+terms, clinical base, raw inputs; means over the 25 KANs), kan_edges.json, kan_shapley.npz.
 """
 import json
 import os
@@ -32,6 +37,10 @@ sys.path.insert(0, V3)
 import kan_fusion as KF  # noqa: E402
 import metrics as M  # noqa: E402
 from kan_interpret import edge_stats, input_names  # noqa: E402
+
+sys.path.insert(0, os.path.join(ROOT, "analysis", "explainability"))
+import common as XC  # noqa: E402
+import kan_shap_lib as KS  # noqa: E402
 
 FROZEN = os.path.join(V3, "frozen")
 OUT = os.path.join(ROOT, "demo", "card_data")
@@ -122,10 +131,33 @@ def main():
                         add=np.mean(A, 0).astype(np.float32), residual=np.mean(RES, 0).astype(np.float32),
                         edge=np.mean(EDGE, 0).astype(np.float32), base=np.mean(BASE, 0).astype(np.float32),
                         x_raw=np.mean(XRAW, 0).astype(np.float32))
+    shapley(z)
     for e in edges:
         if "consistent" in e["verdict_val_stage"] and "not" not in e["verdict_val_stage"] or e["shown"]:
             print(f"{e['input']:>14s} -> {e['output']:4s} val-stage: {e['verdict_val_stage']:34s} "
                   f"frozen: {e['verdict_frozen']:40s} shown {e['shown']}")
+
+
+def shapley(z):
+    """Per-subject group Shapley values of the 25 frozen KANs and the MRI-masked ensemble prediction."""
+    sp = XC.split_of()
+    has, ex = z["has"].astype(bool), z["extras"].astype(float)
+    bg = np.array([sp[int(r)] == "train" for r in z["rids"]])
+    config = KS.cfg()
+    G, P_mask = [], []
+    for s, k in KS.MODELS:
+        m, inp = KS.load_frozen(s, k, config)
+        T, f, out, base = KS.terms(m, inp, z[f"clin_{s}"], z[f"mri_{s}"], has, ex)
+        phi, ebg = KS.shapley(T, T[bg])
+        assert np.abs(phi.sum(1) + ebg - f).max() < 1e-4, "efficiency"
+        G.append(KS.group(phi))
+        with torch.no_grad():
+            o2 = m(inp(z[f"clin_{s}"], z[f"mri_{s}"], np.zeros_like(has), ex)).numpy()
+        P_mask.append(KS.softmax(o2[:, :4] + base.astype(np.float64)))
+    np.savez_compressed(os.path.join(OUT, "kan_shapley.npz"), rids=z["rids"], phi_group=np.array(G, np.float32),
+                        p_mri_masked=np.mean(P_mask, 0).astype(np.float32), groups=np.array(KS.GROUP_NAMES),
+                        targets=np.array(KS.TARGETS), n_background=int(bg.sum()))
+    print(f"kan_shapley.npz: {len(G)} models x {len(z['rids'])} subjects; background {int(bg.sum())} train")
 
 
 if __name__ == "__main__":

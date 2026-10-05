@@ -19,8 +19,10 @@ For every train, val and test subject:
     before any card output);
   - discordance flag (pre-registered, kan-fusion): clinical specialist
     predicts AD and ALZ < P10, or predicts CN/EMCI and ALZ > P90;
-  - FreeSurfer volume / ICV ratios against CN-train reference percentiles.
-Outputs (demo/card_data/): subjects.csv, clinical_shap.npz, streams_all.npz,
+  - FreeSurfer volume / ICV ratios against CN-train reference percentiles;
+  - MRI-specialist SHAP (analysis/explainability, P2): exact linear SHAP of the centred class scores of the
+    frozen MRI specialist, background = the train subjects with a scan; imputed inputs flagged.
+Outputs (demo/card_data/): subjects.csv, clinical_shap.npz, streams_all.npz, mri_shap.npz,
 meta.json.
 """
 import json
@@ -40,6 +42,9 @@ sys.path.insert(0, V3)
 import final_features as FF  # noqa: E402
 import metrics as M  # noqa: E402
 import specialists as S  # noqa: E402
+
+sys.path.insert(0, os.path.join(ROOT, "analysis", "explainability"))
+import mri_shap_lib as MS  # noqa: E402
 
 FROZEN = os.path.join(V3, "frozen")
 OUT = os.path.join(ROOT, "demo", "card_data")
@@ -125,6 +130,21 @@ def main():
     np.savez_compressed(os.path.join(OUT, "streams_all.npz"), **streams)
     np.savez_compressed(os.path.join(OUT, "clinical_shap.npz"), ptid=d.PTID.to_numpy(), features=np.array(feats),
                         shap=shap.mean(0).astype(np.float32))
+
+    # --- MRI-specialist SHAP (P2) -------------------------------------------------------------
+    mri = mris[0]
+    assert all(np.array_equal(m.model.coef_, mri.model.coef_) for m in mris)          # 5 identical seed copies
+    has = d.has_mri.to_numpy()
+    zm, miss = MS.design(mri, d[has])
+    bg = zm[(d.split[has] == "train").to_numpy()]
+    phi_s, base_s = MS.shap_values(mri, zm, bg)
+    assert np.abs(phi_s.sum(1) + base_s - MS.centred_scores(mri, zm)).max() < 1e-6
+    phi_all = np.full((n, len(MS.FEATURES), 4), np.nan)
+    imp_all = np.zeros((n, len(MS.FEATURES)), bool)
+    phi_all[has], imp_all[has] = phi_s, miss
+    np.savez_compressed(os.path.join(OUT, "mri_shap.npz"), ptid=d.PTID.to_numpy(), phi=phi_all.astype(np.float32),
+                        base=base_s, imputed=imp_all, features=np.array(MS.FEATURES),
+                        labels=np.array([MS.LABELS[f] for f in MS.FEATURES]), n_background=len(bg))
 
     # --- per-subject table -----------------------------------------------------------
     pc = np.mean([streams[f"clin_{s}"] for s in M.SEEDS], 0)
