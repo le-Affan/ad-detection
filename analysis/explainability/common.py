@@ -30,6 +30,19 @@ NAMES = ["CN", "EMCI", "LMCI", "AD"]
 B_BOOT = 2000
 
 
+DRY = False
+
+
+def set_dry():
+    """Dry run: every output (cache, results, figures, subject-level) goes under cache/dry/ (gitignored)."""
+    global DRY, CACHE, RESULTS, FIGURES, SUBJ
+    DRY = True
+    CACHE = os.path.join(HERE, "cache", "dry")
+    RESULTS = os.path.join(CACHE, "results")
+    FIGURES = os.path.join(CACHE, "figures")
+    SUBJ = os.path.join(CACHE, "subject_level")
+
+
 # --- frozen guard -----------------------------------------------------------------------
 def verify_manifest():
     """sha256 of every file listed in frozen/MANIFEST.sha256; raises on any mismatch."""
@@ -96,6 +109,9 @@ def boot_idx(n, B=B_BOOT, seed=0):
 def boot_ci(x, B=B_BOOT, seed=0, stat=np.mean):
     """Point estimate and percentile 95% CI of stat over subjects (axis 0)."""
     x = np.asarray(x, float)
+    if len(x) == 0:
+        nan = np.full(x.shape[1:], np.nan) if x.ndim > 1 else np.nan
+        return nan, nan, nan
     idx = boot_idx(len(x), B, seed)
     bs = np.array([stat(x[i], axis=0) for i in idx]) if stat is not np.mean else x[idx].mean(1)
     return stat(x, axis=0), np.percentile(bs, 2.5, axis=0), np.percentile(bs, 97.5, axis=0)
@@ -170,5 +186,6 @@ def subj_path(name):
 
 
 def cache_path(name):
-    os.makedirs(CACHE, exist_ok=True)
-    return os.path.join(CACHE, name)
+    p = os.path.join(CACHE, name)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    return p
