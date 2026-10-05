@@ -160,11 +160,15 @@ def write_json(obj, name, splits_used=("train", "val")):
 
 def update_json(name, key, value):
     """Merge one section into a results JSON (e.g. card_rules.json, eval_rows.json)."""
-    path = os.path.join(RESULTS, name)
-    obj = json.load(open(path)) if os.path.exists(path) else {}
-    obj[key] = value
+    import fcntl
     os.makedirs(RESULTS, exist_ok=True)
-    json.dump(obj, open(path, "w"), indent=1, default=_jsonable)
+    path = os.path.join(RESULTS, name)
+    with open(path + ".lock", "w") as lk:                      # the GPU and CPU lanes run concurrently
+        fcntl.flock(lk, fcntl.LOCK_EX)
+        obj = json.load(open(path)) if os.path.exists(path) else {}
+        obj[key] = value
+        json.dump(obj, open(path, "w"), indent=1, default=_jsonable)
+        fcntl.flock(lk, fcntl.LOCK_UN)
     return path
 
 

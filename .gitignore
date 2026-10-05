@@ -123,3 +123,4 @@ analysis/explainability/subject_level/*
 !analysis/explainability/subject_level/*.py
 analysis/explainability/atlas/work/*
 !analysis/explainability/atlas/work/*.py
+analysis/explainability/results/*.lock
