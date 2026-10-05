@@ -431,3 +431,27 @@ CNN only: P1-R4.
 - **Q4:** `docs/project_summary.md` is not created by this work. If it exists
   after execution, its §5, §7 and §10 are updated.
 - **Q5:** the candidate stages are layer1, layer2 and layer4 only.
+
+## Addendum 1 — 2026-10-05, written AFTER the P1–P5 results
+
+This addendum was made after the results existed. It is restrictive: it removes
+claims and changes no threshold or verdict.
+
+**The CNN panel on the card no longer names brain regions.**
+- **Reason:** both pre-registered sanity checks failed (P1-R4, cascading
+  randomisation and region deletion), and the maps barely differ between AD and
+  CN.
+- **What the card shows instead:** the map, labelled "not anatomically
+  reliable", with the failed checks.
+- **What is unchanged:** the naming rule P1-R3, its output (`p1_naming.json`)
+  and the region tables are kept and reported in `report.md`.
+
+**Known limitation of P1-R3, recorded, not fixed.** The qualifier "also present
+in non-AD subjects" is applied only when the AD − CN CI includes zero. It is
+therefore not applied where AD < CN significantly (ventricles, brainstem,
+thalamus), although the concentration is present in non-AD subjects there too.
+
+**Post-hoc check, labelled as such.** `p5_posthoc_cdrsb.py` computes the
+Spearman correlation between the raw CDR-SB value and its AD-class clinical
+SHAP value. It is reported next to the pre-registered CDR-SB plausibility
+criterion, which stays FAIL; it does not change any P5 verdict.

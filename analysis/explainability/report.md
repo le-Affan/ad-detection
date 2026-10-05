@@ -27,7 +27,7 @@ is an aggregate over train and/or val.
 
 | | Result |
 |---|---|
-| **P1 CNN attribution** | The deletion rule chose **LayerCAM at layer1 (24³)**, the only eligible stages being layer1 and layer2. The naming rule names 7 regions, but **both sanity checks fail**: <ul><li>the maps barely change when the trained weights are randomised;</li><li>occluding the most-attributed region lowers ALZ *less* than occluding similar-sized control regions.</li></ul> The maps are almost identical across CN, EMCI, LMCI and AD. **They should not be read anatomically.** The card names regions only because the pre-registered rule says so, and it labels the panel WEAK with the failed checks. |
+| **P1 CNN attribution** | The deletion rule chose **LayerCAM at layer1 (24³)**, the only eligible stages being layer1 and layer2. The naming rule names 7 regions, but **both sanity checks fail**: <ul><li>the maps barely change when the trained weights are randomised;</li><li>occluding the most-attributed region lowers ALZ *less* than occluding similar-sized control regions.</li></ul> The maps are almost identical across CN, EMCI, LMCI and AD. **They should not be read anatomically.** Since Addendum 1, the card names no region: it shows the map labelled "not anatomically reliable". |
 | **P2 MRI-specialist SHAP** | Exact (additivity error 1e-15). Volumes carry 66% of the AD attribution, ALZ + brain age 27%, and age + sex 6%. This **agrees** with the M0–M5 controls. Weak points: <ul><li>ventricle plausibility **fails** (12%), because the frozen model's ventricle coefficient points away from AD;</li><li>stability is WEAK (0.60).</li></ul> |
 | **P3 KAN Shapley** | Exact (efficiency error 1e-6; brute force agrees to 5e-7). <ul><li>89 of 144 cohort cells are consistent in all 25 KANs. All 36 cells of the MRI group are consistent.</li><li>On held-out val with the regenerated train-only KANs, 78 consistent cells replicate, 7 partially and 4 do not.</li><li>The train-only KANs reproduce the stored val predictions exactly (Δ = 0).</li></ul> |
 | **P4 Stage changes** | <ul><li>**Fusion changed the stage** for 68 of 569 train subjects (out-of-fold): 31 corrected and 32 made wrong. The net accuracy change is −0.2% [−2.8%, +2.6%]. On val it changed 12 of 122: 6 corrected, 6 made wrong.</li><li>**MRI changed the stage** for 10 of 121 held-out val subjects: 6 corrected and 4 made wrong. Net +1.7% [−3.3%, +6.6%].</li><li>**No measurable benefit either way.**</li></ul> |
@@ -114,13 +114,13 @@ val. But the AD − CN differences are tiny (|Δ| ≤ 0.06 on densities around
 (`figures/p1_group_maps.png`): the concentration is a property of the map, not
 of AD. For ventricles the density is significantly *lower* in AD than in CN.
 
-**Wording gap (flagged, not fixed).** As literally pre-registered, the card
-qualifier "also present in non-AD subjects" is added only when the AD − CN CI
-includes zero. It is therefore not added for regions where AD < CN significantly
-(ventricles, brainstem, thalamus up to rounding), although the concentration is
-present in non-AD subjects there too. This needs a sign-off decision
-(§8 below). The card's WEAK label and failed checks appear next to the text in
-every case.
+**Known limitation of the naming rule (recorded, not fixed).** As
+pre-registered, the qualifier "also present in non-AD subjects" is added only
+when the AD − CN CI includes zero. It is therefore not added for regions where
+AD < CN significantly (ventricles, brainstem, thalamus up to rounding), although
+the concentration is present in non-AD subjects there too. The rule's output in
+`results/p1_naming.json` is kept as computed. Since Addendum 1 the card shows no
+region names, so the gap no longer reaches the card.
 
 **The lattice.** Layer1 LayerCAM maps show a regular dot pattern with a period
 of 2 cells (about 16–20 mm) in every subject. It is the gradient checkerboard
@@ -314,9 +314,14 @@ WEAK 0.60–0.80, FAIL < 0.60. Train is primary and val the replication.
   CDR-SB's CN median is very low, so most EMCI and LMCI subjects count as
   "above". For them a multiclass model plausibly pushes toward EMCI or LMCI
   rather than AD.
-  - This is the likely reason for the low fractions; it was not tested
-    separately.
-  - The criterion was fixed in advance and is reported as it stands.
+  - The criterion was fixed in advance and its FAIL stands.
+  - **Post-hoc check (not pre-registered;** `p5_posthoc_cdrsb.py`, Addendum 1):
+    the Spearman correlation between the raw CDR-SB value and its AD-class
+    clinical SHAP value is **0.61 [0.54, 0.68]** on train (n = 569) and **0.55
+    [0.37, 0.70]** on val (n = 122).
+  - The SHAP value toward AD does rise with CDR-SB, moderately. This supports
+    the explanation above but does not change any P5 verdict.
+  - The same check was not run for the KAN row.
 - **MRI stability** is the agreement of global feature-importance rankings
   across 200 bootstrap refits.
   - It is 0.60 on train (val 0.73), and 0.70 against the frozen model's ranking.
@@ -332,8 +337,8 @@ and `results/eval_status.json`.
 1. **MRI evidence.** MRI-specialist SHAP drivers come first (6 for its
    predicted class, then 3 for AD, imputed inputs marked). Then the volume
    reference. Then the CNN attribution: LayerCAM at layer1, whole-map overlay on
-   fixed hippocampal slices. Its region text is generated by the naming rule and
-   carries the lattice note.
+   fixed hippocampal slices, labelled "not anatomically reliable" with the
+   reasons and the lattice note. No region is named (Addendum 1).
 2. **Stage changes.** Both indicators, with the out-of-fold transition counts
    and the held-out val result.
 3. **How the fusion changes the prediction.** Group Shapley values for the
@@ -341,7 +346,9 @@ and `results/eval_status.json`.
    consistent cohort cells with their replication status. The KAN edge curves
    are no longer drawn.
 4. **Validation status.** Every explanation panel states VALIDATED or WEAK with
-   the failed checks. All four are WEAK.
+   the failed checks. All four are WEAK. The clinical panel also states both
+   CDR-SB results: the pre-registered criterion (0.36, FAIL) and the post-hoc
+   correlation (0.61 train, 0.55 val), labelled post-hoc.
 5. **Discordance flag.** Unchanged, labelled exploratory.
 
 **Showcase rule** (`showcase.py`, commit `0c7074e`): unchanged.
@@ -350,18 +357,18 @@ and `results/eval_status.json`.
 40%, because the threshold picked out only lattice peaks. This is a display
 choice, not a pre-registered rule.
 
-## 8. Open items for sign-off
+## 8. Decisions after the results (2026-10-05)
 
-1. **Naming-rule qualifier (§2.2).** The literal rule omits "also present in
-   non-AD subjects" where AD < CN significantly. The proposed fix, as a dated
-   addendum, is to apply the qualifier whenever the AD − CN CI does not lie
-   entirely above zero. On current numbers this would add the qualifier to
-   ventricles, thalamus and brainstem, and leave amygdala, hippocampus and
-   cerebral white matter unqualified. Not done without your approval, because
-   it would be a post-results rule change.
-2. **CNN panel on the card.** With both sanity checks failing, you may prefer
-   the card to show the CNN map without region names. That would also be a
-   change to the pre-registered card rule, so it is not done.
+Recorded in `preregistration.md`, Addendum 1, which was written after the
+results.
+
+1. **Naming-rule qualifier:** no addendum. The gap is recorded as a known
+   limitation of the rule (§2.2).
+2. **CNN region names are removed from the card.** This change is restrictive:
+   it removes claims. The panel is labelled "not anatomically reliable"; the
+   region tables stay in this report.
+3. **Post-hoc CDR-SB check:** added and labelled post-hoc (§6). No rule,
+   threshold or verdict was changed.
 
 ## 9. Verification
 

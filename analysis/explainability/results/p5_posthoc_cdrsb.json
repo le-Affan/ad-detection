@@ -1,0 +1,27 @@
+{
+ "label": "POST-HOC (not pre-registered)",
+ "statistic": "Spearman(raw CDR-SB, CDR-SB SHAP on the AD centred target)",
+ "pre_registered_criterion": {
+  "train": 0.35634743875278396,
+  "n_train": 449,
+  "val": 0.3263157894736842,
+  "n_val": 95
+ },
+ "pre_registered_verdict": "FAIL (unchanged)",
+ "train": {
+  "n": 569,
+  "spearman": 0.6138874302883991,
+  "ci": [
+   0.5423487959147022,
+   0.6807809279775106
+  ]
+ },
+ "val": {
+  "n": 122,
+  "spearman": 0.5462045384852655,
+  "ci": [
+   0.3687975126780835,
+   0.704689922911573
+  ]
+ }
+}

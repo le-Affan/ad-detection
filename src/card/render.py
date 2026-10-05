@@ -8,7 +8,7 @@ and renders one subject's card as HTML and PNG. It never fits or runs a model,
 so any train, val or test subject renders in about a second.
 
 Explanation text is generated from the pre-registered rules, never fixed:
-  - CNN region names come only from the naming rule P1-R3 (card_rules["cnn_naming"]);
+  - CNN: no region names; the panel is labelled not anatomically reliable (Addendum 1);
   - KAN contributions are shown only where all 25 KANs agree in sign (P3-R2) and
     cohort effects only for consistent cells (P3-R1);
   - every explanation panel carries its P5 validation status (eval_status.json).
@@ -72,6 +72,8 @@ class CardData:
         self.kshap = {key: ks[key] for key in ks.files}
         self.rules = json.load(open(rd / "card_rules.json"))
         self.eval = json.load(open(rd / "eval_status.json"))
+        ph = rd / "p5_posthoc_cdrsb.json"
+        self.posthoc_cdrsb = json.load(open(ph)) if ph.exists() else None
         self.cam = None
         if (d / "cam.npz").exists():
             g = np.load(d / "cam.npz", allow_pickle=True)
@@ -247,6 +249,19 @@ def validation(data, key):
     return "Validation: WEAK. Weak or failed checks: " + "; ".join(e["weak_or_failed"])
 
 
+def clinical_validation_lines(data):
+    """P5 status plus the post-hoc CDR-SB check (reported next to, not instead of, the pre-registered criterion)."""
+    L = [validation(data, "clinical_shap")]
+    ph = data.posthoc_cdrsb
+    if ph:
+        pre = ph["pre_registered_criterion"]
+        L.append(f"CDR-SB plausibility: pre-registered sign criterion {pre['train']:.2f} of training subjects "
+                 f"(FAIL, unchanged). Post-hoc (not pre-registered): the CDR-SB SHAP value toward AD rises with "
+                 f"CDR-SB, Spearman {ph['train']['spearman']:.2f} [{ph['train']['ci'][0]:.2f}, "
+                 f"{ph['train']['ci'][1]:.2f}] on training subjects, {ph['val']['spearman']:.2f} on validation.")
+    return L
+
+
 def mri_shap_lines(s):
     ms = s["mri_shap"]
     if ms is None:
@@ -267,30 +282,14 @@ def cell_mm(size):
 
 
 def cnn_region_text(data, s):
-    """Generated from the pre-registered naming rule P1-R3 (card_rules['cnn_naming']); never a fixed string."""
-    nm = data.rules["cnn_naming"]
+    """No region names (preregistration.md, Addendum 1, 2026-10-05: made after the results; removes claims).
+    The naming rule P1-R3 and its region tables are kept in analysis/explainability/report.md."""
     st = data.rules["cnn_stage"]
-    head = (f"CNN attribution: LayerCAM of the ALZ CNN at {st['stage']} ({cell_mm(st['map_size'])}), "
-            f"{s['cam']['n_models']} models; stage chosen by the pre-registered deletion rule.")
-    if not nm["named"]:
-        return [head, "No brain region passes the pre-registered naming rule; read this map as non-anatomical."]
-    parts = []
-    for x in nm["named"]:
-        q = [f"×{x['density']:.1f}"]
-        if x["region"].endswith("lobe"):
-            q.append("approximate")
-        if x["also_in_non_ad"]:
-            q.append("also present in non-AD subjects")
-        if not x["replicated_on_val"]:
-            q.append("not replicated on validation subjects")
-        parts.append(f"{x['region']} ({'; '.join(q)})")
-    approx = " Template atlas, affine registration: approximate." if nm["approximate_names"] else \
-        " Regions from a template atlas (affine registration)."
-    cohort = ("In AD training subjects the attribution is concentrated above the brain average in: "
-              + ", ".join(parts) + "." + approx)
-    subj = "This subject: " + ", ".join(f"{x['region']} ×{s['cam']['density'][x['region']]:.1f}"
-                                        for x in nm["named"]) + " the brain average."
-    return [head, cohort, subj]
+    return [f"CNN attribution: LayerCAM of the ALZ CNN at {st['stage']} ({cell_mm(st['map_size'])}), "
+            f"{s['cam']['n_models']} models; stage chosen by the pre-registered deletion rule.",
+            "NOT ANATOMICALLY RELIABLE: the map changes little when the CNN's trained weights are randomised, "
+            "occluding its most-attributed region does not lower the AD score more than other regions, and the "
+            "maps barely differ between AD and CN subjects. No brain region is named."]
 
 
 CAM_NOTE = ("Overlay: the whole map on brain voxels (brighter = higher); fixed slices through the template "
@@ -564,7 +563,7 @@ def render_png(data, ptid, path, category=None):
     _textbox(fig.add_subplot(gs[3, 4:]), None, [f"{r['label']}: {r['value']}; "
                                                f"{'towards' if r['shap'] > 0 else 'away from'} {s['clin_pred']} "
                                                f"({abs(r['shap']):.2f})" for r in s["shap"]]
-             + ["", validation(data, "clinical_shap")], size=7.2, width=44)
+             + [""] + clinical_validation_lines(data), size=7.0, width=44)
     panel_mri(fig.add_subplot(gs[4, :2]), s)
     if s["mri_shap"]:
         panel_mri_shap(fig.add_subplot(gs[4, 3:]), s)
@@ -652,7 +651,8 @@ def render_html(data, ptid, path, category=None):
              "Top contributions (SHAP, log-odds, mean of 5 seeds):</p><div class='grid'>" +
              _img(lambda ax: panel_shap(ax, s), (5.2, 2.6)) +
              f"<table><tr><th>Feature</th><th>Value</th><th>Direction</th><th>Magnitude</th></tr>{rows}</table>"
-             "</div>" + f"<p class='{chip(data, 'clinical_shap')}'>{e(validation(data, 'clinical_shap'))}</p></section>")
+             "</div>" + "".join(f"<p class='{chip(data, 'clinical_shap') if k == 0 else 'note'}'>{e(x)}</p>"
+                               for k, x in enumerate(clinical_validation_lines(data))) + "</section>")
     mri = "".join(f"<p>{e(x)}</p>" for x in mri_lines(s))
     imgs = "<div class='grid'>" + (_img(lambda ax: panel_mri(ax, s), (4.4, 2.3)) if s["row"].has_mri else "")
     if s["mri_shap"]:
@@ -663,7 +663,7 @@ def render_html(data, ptid, path, category=None):
     imgs += _img(lambda ax: panel_volumes(ax, data, s), (5.4, 2.6)) + "</div>"
     if s["row"].has_mri and s["cam"]:
         ct = cnn_region_text(data, s)
-        imgs += ("<h3>CNN attribution (supporting; the CNN's ALZ score is a minor input)</h3>" +
+        imgs += ("<h3>CNN attribution (not anatomically reliable)</h3>" +
                  _img_multi(lambda axs: panel_cam(axs, s), 3, (7.5, 2.6)) +
                  "".join(f"<p>{e(x)}</p>" for x in ct) +
                  f"<p class='note'>{e(CAM_NOTE)} Subject's right on the right.</p>"
