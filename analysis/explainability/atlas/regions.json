@@ -1,0 +1,71 @@
+{
+ "regions": [
+  "hippocampus",
+  "amygdala",
+  "ventricles",
+  "thalamus",
+  "basal ganglia",
+  "cerebellum",
+  "brainstem",
+  "cerebral white matter",
+  "frontal lobe",
+  "temporal lobe",
+  "parietal lobe",
+  "occipital lobe",
+  "other"
+ ],
+ "index": {
+  "hippocampus": 1,
+  "amygdala": 2,
+  "ventricles": 3,
+  "thalamus": 4,
+  "basal ganglia": 5,
+  "cerebellum": 6,
+  "brainstem": 7,
+  "cerebral white matter": 8,
+  "frontal lobe": 9,
+  "temporal lobe": 10,
+  "parietal lobe": 11,
+  "occipital lobe": 12,
+  "other": 13
+ },
+ "voxels": {
+  "hippocampus": 1191,
+  "amygdala": 482,
+  "ventricles": 2675,
+  "thalamus": 1977,
+  "basal ganglia": 3317,
+  "cerebellum": 18852,
+  "brainstem": 3037,
+  "cerebral white matter": 61884,
+  "frontal lobe": 25280,
+  "temporal lobe": 16380,
+  "parietal lobe": 16597,
+  "occipital lobe": 6775,
+  "other": 31331
+ },
+ "brain_voxels": 189778,
+ "dice_atlas_vs_mask": 0.9886862409754952,
+ "acceptance_dice_ge_0.90": true,
+ "n_smoke_subjects": 22,
+ "smoke_hippocampus_dice_median": 0.6596984037567613,
+ "approximate_names": false,
+ "card_slices": {
+  "axial_S": 29,
+  "coronal_P": 49,
+  "sagittal_R": 35
+ },
+ "hippocampus_centroid": [
+  29,
+  49,
+  48
+ ],
+ "left_hippocampus_centroid": [
+  29,
+  49,
+  35
+ ],
+ "unlisted_labels_as_other": [],
+ "source": "SynthSeg 2.0 (FreeSurfer 7.4.1 mri_synthseg --parc) on ICBM152 2009a sym (masked), m1 working grid, one-hot linear resampling to 96^3 + argmax",
+ "license": "Derived from the MNI ICBM152 2009a template; see ~/nilearn_data/icbm152_2009/COPYING (Copyright (C) 1993-2009 Louis Collins, McConnell Brain Imaging Centre, Montreal Neurological Institute, McGill University)."
+}
