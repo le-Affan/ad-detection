@@ -64,7 +64,8 @@ def main():
         if re.search(r'"test"|\btest_|split.{0,4}test|,test,', txt):
             test_hits.append(os.path.basename(f))
     check("no test split in any results file", not test_hits, ", ".join(test_hits))
-    code = glob.glob(os.path.join(HERE, "*.py")) + glob.glob(os.path.join(C.ROOT, "src", "card", "*.py"))
+    code = [f for f in glob.glob(os.path.join(HERE, "*.py")) if not f.endswith("audit.py")] + \
+        glob.glob(os.path.join(C.ROOT, "src", "card", "*.py"))
     writes = []
     for f in code:
         for i, line in enumerate(open(f), 1):
