@@ -111,3 +111,15 @@ analysis/fusion_feasibility/folds/*/vol96
 # its outputs stripped.
 demo/card_data/*
 demo/output/*
+
+# --- Explainability (post-hoc, branch explainability): subject-level outputs ---
+# Per-subject attribution maps, SHAP / Shapley values and caches are
+# DUA-restricted subject-level data and stay local. Only aggregate tables
+# (results/), group-level figures (figures/), the template-derived atlas and the
+# code are tracked. The atlas work dir holds template intermediates (large, regenerable).
+analysis/explainability/cache/*
+!analysis/explainability/cache/*.py
+analysis/explainability/subject_level/*
+!analysis/explainability/subject_level/*.py
+analysis/explainability/atlas/work/*
+!analysis/explainability/atlas/work/*.py
