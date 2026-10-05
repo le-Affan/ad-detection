@@ -1,0 +1,261 @@
+{
+ "mri_shap": {
+  "explanation": "MRI-specialist SHAP",
+  "detail": "exact linear SHAP, centred class scores, background 567 train",
+  "stability_train": 0.6,
+  "stability_train_pairs": 19900,
+  "stability_source": "200 bootstrap refits",
+  "stability_vs_frozen_median": 0.6969696969696969,
+  "stability_per_subject_train": 0.9272727272727272,
+  "stability_val": 0.7333333333333332,
+  "plausibility": {
+   "hippocampus": {
+    "train": 0.8480565371024735,
+    "n_train": 566,
+    "val": 0.8347107438016529,
+    "n_val": 121
+   },
+   "ventricles": {
+    "train": 0.1166077738515901,
+    "n_train": 566,
+    "val": 0.1487603305785124,
+    "n_val": 121
+   }
+  },
+  "faithfulness": {
+   "train": {
+    "n": 567,
+    "deletion_diff": -0.0795793038312281,
+    "deletion_ci": [
+     -0.08323895595757047,
+     -0.07589400845573567
+    ],
+    "deletion_pass": true,
+    "insertion_diff": 0.08438005817218117,
+    "insertion_ci": [
+     0.07953010834927711,
+     0.08893862943347133
+    ],
+    "insertion_pass": true,
+    "verdict": "PASS"
+   },
+   "val": {
+    "n": 121,
+    "deletion_diff": -0.08755651093193476,
+    "deletion_ci": [
+     -0.09673113397484881,
+     -0.0790021852417842
+    ],
+    "deletion_pass": true,
+    "insertion_diff": 0.09585670331130132,
+    "insertion_ci": [
+     0.08445965213119179,
+     0.10840837404683408
+    ],
+    "insertion_pass": true,
+    "verdict": "PASS"
+   }
+  },
+  "group_agreement_with_controls": true,
+  "group_order": [
+   "volumes",
+   "ALZ+BAG",
+   "age+sex"
+  ]
+ },
+ "kan": {
+  "explanation": "KAN Shapley",
+  "detail": "exact interventional Shapley, 25 frozen KANs, 13 inputs / 4 groups",
+  "stability_train": 0.8763736263736264,
+  "stability_train_pairs": 300,
+  "stability_per_subject_train": 0.8406593406593407,
+  "stability_val": 0.8791208791208791,
+  "stability_val_pairs": 300,
+  "stability_per_subject_val": 0.8351648351648352,
+  "plausibility": {
+   "CDRSB": {
+    "train": 0.6013363028953229,
+    "n_train": 449,
+    "val": 0.5894736842105263,
+    "n_val": 95
+   },
+   "MMSE": {
+    "train": 0.7922374429223744,
+    "n_train": 438,
+    "val": 0.8444444444444444,
+    "n_val": 90
+   }
+  },
+  "faithfulness": {
+   "train": {
+    "n": 569,
+    "deletion_diff": -0.18049531976117494,
+    "deletion_ci": [
+     -0.18795454269933923,
+     -0.17308635973256953
+    ],
+    "deletion_pass": true,
+    "insertion_diff": 0.19068725760831423,
+    "insertion_ci": [
+     0.18306885654020605,
+     0.19813002582581532
+    ],
+    "insertion_pass": true,
+    "verdict": "PASS"
+   },
+   "val": {
+    "n": 122,
+    "deletion_diff": -0.18422444485881845,
+    "deletion_ci": [
+     -0.20095861140729374,
+     -0.16810614447114808
+    ],
+    "deletion_pass": true,
+    "insertion_diff": 0.19711444081877758,
+    "insertion_ci": [
+     0.1798516254101671,
+     0.21520047034831713
+    ],
+    "insertion_pass": true,
+    "verdict": "PASS"
+   }
+  }
+ },
+ "clinical_shap": {
+  "explanation": "Clinical SHAP",
+  "detail": "CatBoost ShapValues, 5 frozen seeds, centred class scores",
+  "features": [
+   "ADAS11",
+   "ADAS13",
+   "CDRSB",
+   "CogIndex",
+   "EcogSPDivatt",
+   "EcogSPMem",
+   "EcogSPOrgan",
+   "EcogSPPlan",
+   "EcogSPTotal",
+   "FAQ",
+   "MMSE",
+   "PTEDUCAT",
+   "RAVLT_immediate",
+   "RAVLT_learning",
+   "RAVLT_perc_forgetting"
+  ],
+  "stability_train": 0.9010791366906474,
+  "stability_train_pairs": 10,
+  "stability_per_subject_train": 0.8794964028776979,
+  "stability_val": 0.8992805755395683,
+  "stability_val_pairs": 10,
+  "stability_per_subject_val": 0.8866906474820144,
+  "plausibility": {
+   "CDRSB": {
+    "train": 0.35634743875278396,
+    "n_train": 449,
+    "val": 0.3263157894736842,
+    "n_val": 95
+   },
+   "MMSE": {
+    "train": 0.7146118721461188,
+    "n_train": 438,
+    "val": 0.7777777777777778,
+    "n_val": 90
+   }
+  },
+  "faithfulness": {
+   "train": {
+    "n": 569,
+    "deletion_diff": -0.1935515817238349,
+    "deletion_ci": [
+     -0.19879103100489107,
+     -0.18835105780183653
+    ],
+    "deletion_pass": true,
+    "insertion_diff": 0.22583680153377284,
+    "insertion_ci": [
+     0.22019876281200707,
+     0.23127603852988063
+    ],
+    "insertion_pass": true,
+    "verdict": "PASS"
+   },
+   "val": {
+    "n": 122,
+    "deletion_diff": -0.1985303093823011,
+    "deletion_ci": [
+     -0.20932734791299715,
+     -0.18762481402526401
+    ],
+    "deletion_pass": true,
+    "insertion_diff": 0.2307450926092265,
+    "insertion_ci": [
+     0.21961907205304,
+     0.24172717859170528
+    ],
+    "insertion_pass": true,
+    "verdict": "PASS"
+   }
+  }
+ },
+ "cnn_sanity": {
+  "stage": "layer1",
+  "cascade_median_spearman_head_layer4": 0.8133763666655356,
+  "cascade_verdict": "FAIL",
+  "region_deletion_mean_difference": -0.11893337338607615,
+  "region_deletion_ci": [
+   -0.15354494842235247,
+   -0.08395975638754591
+  ],
+  "region_deletion_verdict": "FAIL"
+ },
+ "cnn": {
+  "explanation": "CNN region attribution",
+  "detail": "LayerCAM layer1 (24^3)",
+  "stability_train": 0.9065934065934067,
+  "stability_train_pairs": 15,
+  "stability_val": 0.9285714285714285,
+  "stability_per_subject_train": 0.8791208791208791,
+  "stability_per_subject_val": 0.8956043956043955,
+  "plausibility_train": {
+   "hippocampus": 1.0,
+   "ventricles": 0.9807692307692307
+  },
+  "plausibility_val": {
+   "hippocampus": 1.0,
+   "ventricles": 0.9565217391304348
+  },
+  "faithfulness": {
+   "val_AD": {
+    "n": 23,
+    "deletion_diff": -0.14077125219637612,
+    "deletion_ci": [
+     -0.16568620813601787,
+     -0.11590885536468504
+    ],
+    "deletion_pass": true,
+    "insertion_diff": 0.1239910657714418,
+    "insertion_ci": [
+     0.09693898156190317,
+     0.15047407201474425
+    ],
+    "insertion_pass": true,
+    "verdict": "PASS"
+   },
+   "train_AD": {
+    "n": 104,
+    "deletion_diff": -0.14367899606980064,
+    "deletion_ci": [
+     -0.1639452329081293,
+     -0.12490158425685273
+    ],
+    "deletion_pass": true,
+    "insertion_diff": 0.13323772353942445,
+    "insertion_ci": [
+     0.11458342316108333,
+     0.15363253957581163
+    ],
+    "insertion_pass": true,
+    "verdict": "PASS"
+   }
+  }
+ }
+}

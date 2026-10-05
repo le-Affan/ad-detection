@@ -1,0 +1,8 @@
+{
+ "max_abs_additivity_error": 1.1102230246251565e-15,
+ "pass_1e-6": true,
+ "max_abs_diff_vs_LinearExplainer": 0.0,
+ "pass_1e-8": true,
+ "n_subjects": 688,
+ "seed_copies_identical": true
+}

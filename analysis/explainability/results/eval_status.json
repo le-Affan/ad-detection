@@ -1,0 +1,170 @@
+{
+ "cnn": {
+  "name": "CNN region attribution",
+  "overall": "WEAK",
+  "weak_or_failed": [
+   "sanity: cascading randomisation (FAIL)",
+   "sanity: region deletion (FAIL)"
+  ],
+  "cells": {
+   "stability": {
+    "verdict": "PASS",
+    "detail": "train 0.91, val 0.93"
+   },
+   "plausibility: hippocampus": {
+    "verdict": "PASS",
+    "detail": "train 1.00, val 1.00"
+   },
+   "plausibility: ventricles": {
+    "verdict": "PASS",
+    "detail": "train 0.98, val 0.96"
+   },
+   "plausibility: CDRSB": {
+    "verdict": "N/A",
+    "detail": "not an input"
+   },
+   "plausibility: MMSE": {
+    "verdict": "N/A",
+    "detail": "not an input"
+   },
+   "faithfulness": {
+    "verdict": "PASS",
+    "detail": "val AD (n=23): deletion -0.14, insertion 0.12; train AD PASS (selection-biased)"
+   },
+   "sanity: cascading randomisation": {
+    "verdict": "FAIL",
+    "detail": "median Spearman after head + layer4 0.81"
+   },
+   "sanity: region deletion": {
+    "verdict": "FAIL",
+    "detail": "top-region minus control drop -0.12"
+   }
+  }
+ },
+ "mri_shap": {
+  "name": "MRI-specialist SHAP",
+  "overall": "WEAK",
+  "weak_or_failed": [
+   "stability (WEAK)",
+   "plausibility: ventricles (FAIL)"
+  ],
+  "cells": {
+   "stability": {
+    "verdict": "WEAK",
+    "detail": "train 0.60, val 0.73"
+   },
+   "plausibility: CDRSB": {
+    "verdict": "N/A",
+    "detail": "not an input"
+   },
+   "plausibility: MMSE": {
+    "verdict": "N/A",
+    "detail": "not an input"
+   },
+   "plausibility: hippocampus": {
+    "verdict": "PASS",
+    "detail": "train 0.85, val 0.83"
+   },
+   "plausibility: ventricles": {
+    "verdict": "FAIL",
+    "detail": "train 0.12, val 0.15"
+   },
+   "faithfulness": {
+    "verdict": "PASS",
+    "detail": "train PASS (deletion -0.08, insertion 0.08); val PASS"
+   },
+   "sanity: cascading randomisation": {
+    "verdict": "N/A",
+    "detail": "CNN only"
+   },
+   "sanity: region deletion": {
+    "verdict": "N/A",
+    "detail": "CNN only"
+   }
+  }
+ },
+ "clinical_shap": {
+  "name": "Clinical SHAP",
+  "overall": "WEAK",
+  "weak_or_failed": [
+   "plausibility: CDRSB (FAIL)",
+   "plausibility: MMSE (WEAK)"
+  ],
+  "cells": {
+   "stability": {
+    "verdict": "PASS",
+    "detail": "train 0.90, val 0.90"
+   },
+   "plausibility: CDRSB": {
+    "verdict": "FAIL",
+    "detail": "train 0.36, val 0.33"
+   },
+   "plausibility: MMSE": {
+    "verdict": "WEAK",
+    "detail": "train 0.71, val 0.78"
+   },
+   "plausibility: hippocampus": {
+    "verdict": "N/A",
+    "detail": "not an input"
+   },
+   "plausibility: ventricles": {
+    "verdict": "N/A",
+    "detail": "not an input"
+   },
+   "faithfulness": {
+    "verdict": "PASS",
+    "detail": "train PASS (deletion -0.19, insertion 0.23); val PASS"
+   },
+   "sanity: cascading randomisation": {
+    "verdict": "N/A",
+    "detail": "CNN only"
+   },
+   "sanity: region deletion": {
+    "verdict": "N/A",
+    "detail": "CNN only"
+   }
+  }
+ },
+ "kan": {
+  "name": "KAN Shapley",
+  "overall": "WEAK",
+  "weak_or_failed": [
+   "plausibility: CDRSB (WEAK)",
+   "plausibility: MMSE (WEAK)"
+  ],
+  "cells": {
+   "stability": {
+    "verdict": "PASS",
+    "detail": "train 0.88, val 0.88"
+   },
+   "plausibility: CDRSB": {
+    "verdict": "WEAK",
+    "detail": "train 0.60, val 0.59"
+   },
+   "plausibility: MMSE": {
+    "verdict": "WEAK",
+    "detail": "train 0.79, val 0.84"
+   },
+   "plausibility: hippocampus": {
+    "verdict": "N/A",
+    "detail": "not an input"
+   },
+   "plausibility: ventricles": {
+    "verdict": "N/A",
+    "detail": "not an input"
+   },
+   "faithfulness": {
+    "verdict": "PASS",
+    "detail": "train PASS (deletion -0.18, insertion 0.19); val PASS"
+   },
+   "sanity: cascading randomisation": {
+    "verdict": "N/A",
+    "detail": "CNN only"
+   },
+   "sanity: region deletion": {
+    "verdict": "N/A",
+    "detail": "CNN only"
+   }
+  }
+ }
+}

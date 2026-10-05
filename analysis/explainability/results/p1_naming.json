@@ -1,0 +1,249 @@
+{
+ "stage": "layer1",
+ "method": "layercam",
+ "n_train_ad": 104,
+ "n_val_ad": 23,
+ "rule": "P1-R3: named iff the bootstrap 95% CI of mean(d_r - 1) over train AD excludes 0 (positive)",
+ "named": [
+  {
+   "region": "amygdala",
+   "density": 1.3360905252807505,
+   "replicated_on_val": true,
+   "also_in_non_ad": false
+  },
+  {
+   "region": "thalamus",
+   "density": 1.2508060383028066,
+   "replicated_on_val": true,
+   "also_in_non_ad": false
+  },
+  {
+   "region": "hippocampus",
+   "density": 1.2448372110391557,
+   "replicated_on_val": true,
+   "also_in_non_ad": false
+  },
+  {
+   "region": "ventricles",
+   "density": 1.1984733371730187,
+   "replicated_on_val": true,
+   "also_in_non_ad": false
+  },
+  {
+   "region": "basal ganglia",
+   "density": 1.1967888573320438,
+   "replicated_on_val": true,
+   "also_in_non_ad": true
+  },
+  {
+   "region": "cerebral white matter",
+   "density": 1.1053735511895018,
+   "replicated_on_val": true,
+   "also_in_non_ad": false
+  },
+  {
+   "region": "brainstem",
+   "density": 1.1030963582419657,
+   "replicated_on_val": true,
+   "also_in_non_ad": false
+  }
+ ],
+ "approximate_names": false,
+ "table": [
+  {
+   "region": "hippocampus",
+   "train_ad_mean_density": 1.2448372110391557,
+   "ci_lo": 1.2289346987552778,
+   "ci_hi": 1.2610616606928002,
+   "nameable": true,
+   "val_ad_mean_density": 1.2413087051000533,
+   "replicated_on_val": true,
+   "ad_minus_cn": 0.04312792202816351,
+   "ad_minus_cn_ci": [
+    0.022917769816907258,
+    0.06353118431167094
+   ],
+   "also_in_non_ad": false
+  },
+  {
+   "region": "amygdala",
+   "train_ad_mean_density": 1.3360905252807505,
+   "ci_lo": 1.3176685667004195,
+   "ci_hi": 1.3543610640235677,
+   "nameable": true,
+   "val_ad_mean_density": 1.3317237888557687,
+   "replicated_on_val": true,
+   "ad_minus_cn": 0.03924457766751854,
+   "ad_minus_cn_ci": [
+    0.015410660647129305,
+    0.06471649265661596
+   ],
+   "also_in_non_ad": false
+  },
+  {
+   "region": "ventricles",
+   "train_ad_mean_density": 1.1984733371730187,
+   "ci_lo": 1.1824124406434724,
+   "ci_hi": 1.2145619699201216,
+   "nameable": true,
+   "val_ad_mean_density": 1.1945634605802449,
+   "replicated_on_val": true,
+   "ad_minus_cn": -0.05561595129278185,
+   "ad_minus_cn_ci": [
+    -0.07565567448477573,
+    -0.03473195107538732
+   ],
+   "also_in_non_ad": false
+  },
+  {
+   "region": "thalamus",
+   "train_ad_mean_density": 1.2508060383028066,
+   "ci_lo": 1.2371147356066297,
+   "ci_hi": 1.2641443007349127,
+   "nameable": true,
+   "val_ad_mean_density": 1.2506890066378242,
+   "replicated_on_val": true,
+   "ad_minus_cn": -0.017312724656320055,
+   "ad_minus_cn_ci": [
+    -0.03385182489947965,
+    -0.0002961109688610375
+   ],
+   "also_in_non_ad": false
+  },
+  {
+   "region": "basal ganglia",
+   "train_ad_mean_density": 1.1967888573320438,
+   "ci_lo": 1.187234001745673,
+   "ci_hi": 1.2060248761626244,
+   "nameable": true,
+   "val_ad_mean_density": 1.1903403750992319,
+   "replicated_on_val": true,
+   "ad_minus_cn": 0.0038534316135621083,
+   "ad_minus_cn_ci": [
+    -0.00841919386372022,
+    0.016226589860597013
+   ],
+   "also_in_non_ad": true
+  },
+  {
+   "region": "cerebellum",
+   "train_ad_mean_density": 0.7657562324870091,
+   "ci_lo": 0.7563484085421907,
+   "ci_hi": 0.7750827570537641,
+   "nameable": false,
+   "val_ad_mean_density": 0.7752732032339797,
+   "replicated_on_val": false,
+   "ad_minus_cn": -0.014358757368003294,
+   "ad_minus_cn_ci": [
+    -0.028125940729076777,
+    -0.0006839053005556794
+   ],
+   "also_in_non_ad": false
+  },
+  {
+   "region": "brainstem",
+   "train_ad_mean_density": 1.1030963582419657,
+   "ci_lo": 1.0893780973576481,
+   "ci_hi": 1.1159966285687508,
+   "nameable": true,
+   "val_ad_mean_density": 1.1036401006758232,
+   "replicated_on_val": true,
+   "ad_minus_cn": -0.034122215992799854,
+   "ad_minus_cn_ci": [
+    -0.053258161989304775,
+    -0.014596063629201052
+   ],
+   "also_in_non_ad": false
+  },
+  {
+   "region": "cerebral white matter",
+   "train_ad_mean_density": 1.1053735511895018,
+   "ci_lo": 1.1026768775654643,
+   "ci_hi": 1.107949710205265,
+   "nameable": true,
+   "val_ad_mean_density": 1.1001615705289134,
+   "replicated_on_val": true,
+   "ad_minus_cn": 0.007620489177452505,
+   "ad_minus_cn_ci": [
+    0.0035097465063153475,
+    0.011697533365502869
+   ],
+   "also_in_non_ad": false
+  },
+  {
+   "region": "frontal lobe",
+   "train_ad_mean_density": 0.9496316595263952,
+   "ci_lo": 0.9428090402298002,
+   "ci_hi": 0.9567977069841014,
+   "nameable": false,
+   "val_ad_mean_density": 0.9512021656876485,
+   "replicated_on_val": false,
+   "ad_minus_cn": -0.0071638399568063615,
+   "ad_minus_cn_ci": [
+    -0.0159894872253264,
+    0.002114106589685526
+   ],
+   "also_in_non_ad": true
+  },
+  {
+   "region": "temporal lobe",
+   "train_ad_mean_density": 0.9300697406760807,
+   "ci_lo": 0.9232109577332845,
+   "ci_hi": 0.9365877952392675,
+   "nameable": false,
+   "val_ad_mean_density": 0.9289216516415751,
+   "replicated_on_val": false,
+   "ad_minus_cn": 0.007249714490756287,
+   "ad_minus_cn_ci": [
+    -0.0021982811882244103,
+    0.017099825892418017
+   ],
+   "also_in_non_ad": true
+  },
+  {
+   "region": "parietal lobe",
+   "train_ad_mean_density": 0.9657517491184817,
+   "ci_lo": 0.9585522822601898,
+   "ci_hi": 0.9733230410002076,
+   "nameable": false,
+   "val_ad_mean_density": 0.9715595878925051,
+   "replicated_on_val": false,
+   "ad_minus_cn": 0.00859818598437967,
+   "ad_minus_cn_ci": [
+    -0.0010423248871832714,
+    0.01821272989562341
+   ],
+   "also_in_non_ad": true
+  },
+  {
+   "region": "occipital lobe",
+   "train_ad_mean_density": 0.8596207945988961,
+   "ci_lo": 0.8522690695205483,
+   "ci_hi": 0.8671717857084088,
+   "nameable": false,
+   "val_ad_mean_density": 0.8577747810850858,
+   "replicated_on_val": false,
+   "ad_minus_cn": 0.004996957363946453,
+   "ad_minus_cn_ci": [
+    -0.005260051031675689,
+    0.015211356684366727
+   ],
+   "also_in_non_ad": true
+  },
+  {
+   "region": "other",
+   "train_ad_mean_density": 0.9804371976025806,
+   "ci_lo": 0.9783692792462955,
+   "ci_hi": 0.9825923744795731,
+   "nameable": false,
+   "val_ad_mean_density": 0.9828334859466908,
+   "replicated_on_val": false,
+   "ad_minus_cn": -0.003559879557664236,
+   "ad_minus_cn_ci": [
+    -0.006396582596756617,
+    -0.0008405868876727848
+   ],
+   "also_in_non_ad": false
+  }
+ ]
+}

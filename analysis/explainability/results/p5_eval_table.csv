@@ -1,0 +1,5 @@
+explanation,stability,plausibility: hippocampus,plausibility: ventricles,plausibility: CDRSB,plausibility: MMSE,faithfulness,sanity: cascading randomisation,sanity: region deletion,overall
+CNN region attribution,PASS,PASS,PASS,N/A,N/A,PASS,FAIL,FAIL,WEAK
+MRI-specialist SHAP,WEAK,PASS,FAIL,N/A,N/A,PASS,N/A,N/A,WEAK
+Clinical SHAP,PASS,N/A,N/A,FAIL,WEAK,PASS,N/A,N/A,WEAK
+KAN Shapley,PASS,N/A,N/A,WEAK,WEAK,PASS,N/A,N/A,WEAK

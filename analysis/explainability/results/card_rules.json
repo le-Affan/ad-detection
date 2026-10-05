@@ -1,0 +1,866 @@
+{
+ "kan": {
+  "consistent_cells": [
+   {
+    "group": "clinical logits",
+    "target": "final_CN",
+    "stratum": "CN",
+    "median_effect": 5.300468209234619,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_CN",
+    "stratum": "EMCI",
+    "median_effect": -0.8774556723927053,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_CN",
+    "stratum": "LMCI",
+    "median_effect": -2.203010000579525,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_CN",
+    "stratum": "AD",
+    "median_effect": -2.510938043262632,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_EMCI",
+    "stratum": "CN",
+    "median_effect": -1.3970804180708343,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_EMCI",
+    "stratum": "EMCI",
+    "median_effect": 1.7178875381039287,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_EMCI",
+    "stratum": "LMCI",
+    "median_effect": 0.6646441077086421,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_EMCI",
+    "stratum": "AD",
+    "median_effect": -2.464999933123943,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_LMCI",
+    "stratum": "CN",
+    "median_effect": -2.136980713173551,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_LMCI",
+    "stratum": "EMCI",
+    "median_effect": 0.4357486316167201,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_LMCI",
+    "stratum": "AD",
+    "median_effect": 0.7688980404287576,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_AD",
+    "stratum": "CN",
+    "median_effect": -1.7088227703925782,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_AD",
+    "stratum": "EMCI",
+    "median_effect": -1.2466343876531278,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "final_AD",
+    "stratum": "AD",
+    "median_effect": 4.315522486911089,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "residual_CN",
+    "stratum": "CN",
+    "median_effect": 1.2183262034007734,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "residual_CN",
+    "stratum": "LMCI",
+    "median_effect": -0.7436425416339772,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "residual_EMCI",
+    "stratum": "LMCI",
+    "median_effect": 0.6724077822464894,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "residual_EMCI",
+    "stratum": "AD",
+    "median_effect": -0.38983136721491884,
+    "val_trainonly_replication": "partially replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "residual_LMCI",
+    "stratum": "CN",
+    "median_effect": -0.7562201656016024,
+    "val_trainonly_replication": "partially replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "residual_LMCI",
+    "stratum": "LMCI",
+    "median_effect": -0.5551794031696198,
+    "val_trainonly_replication": "partially replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "residual_LMCI",
+    "stratum": "AD",
+    "median_effect": 0.8129125454961987,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "ADD",
+    "stratum": "CN",
+    "median_effect": -0.3943140455591667,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "ADD",
+    "stratum": "EMCI",
+    "median_effect": -0.6499306047683977,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "clinical logits",
+    "target": "ADD",
+    "stratum": "AD",
+    "median_effect": 2.03898469817359,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_CN",
+    "stratum": "CN",
+    "median_effect": 0.43599514676723694,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_CN",
+    "stratum": "EMCI",
+    "median_effect": 0.15264881254676643,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_CN",
+    "stratum": "LMCI",
+    "median_effect": -0.20034244734540008,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_CN",
+    "stratum": "AD",
+    "median_effect": -0.6496902457734991,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_EMCI",
+    "stratum": "CN",
+    "median_effect": 0.15740960161464246,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_EMCI",
+    "stratum": "EMCI",
+    "median_effect": 0.08075941345365535,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_EMCI",
+    "stratum": "LMCI",
+    "median_effect": -0.13240855441609597,
+    "val_trainonly_replication": "not replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_EMCI",
+    "stratum": "AD",
+    "median_effect": -0.2297799886075414,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_LMCI",
+    "stratum": "CN",
+    "median_effect": -0.14082449570296854,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_LMCI",
+    "stratum": "EMCI",
+    "median_effect": -0.12380151170127396,
+    "val_trainonly_replication": "partially replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_LMCI",
+    "stratum": "LMCI",
+    "median_effect": 0.108864237834759,
+    "val_trainonly_replication": "partially replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_LMCI",
+    "stratum": "AD",
+    "median_effect": 0.31323122781177515,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_AD",
+    "stratum": "CN",
+    "median_effect": -0.45056151729738503,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_AD",
+    "stratum": "EMCI",
+    "median_effect": -0.11029862960766194,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_AD",
+    "stratum": "LMCI",
+    "median_effect": 0.23038272639103907,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "final_AD",
+    "stratum": "AD",
+    "median_effect": 0.542498074897698,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_CN",
+    "stratum": "CN",
+    "median_effect": 0.43599514676723694,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_CN",
+    "stratum": "EMCI",
+    "median_effect": 0.15264881254676643,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_CN",
+    "stratum": "LMCI",
+    "median_effect": -0.20034244734540008,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_CN",
+    "stratum": "AD",
+    "median_effect": -0.6496902457734991,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_EMCI",
+    "stratum": "CN",
+    "median_effect": 0.15740960161464246,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_EMCI",
+    "stratum": "EMCI",
+    "median_effect": 0.08075941345365535,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_EMCI",
+    "stratum": "LMCI",
+    "median_effect": -0.13240855441609597,
+    "val_trainonly_replication": "not replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_EMCI",
+    "stratum": "AD",
+    "median_effect": -0.2297799886075414,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_LMCI",
+    "stratum": "CN",
+    "median_effect": -0.14082449570296854,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_LMCI",
+    "stratum": "EMCI",
+    "median_effect": -0.12380151170127396,
+    "val_trainonly_replication": "partially replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_LMCI",
+    "stratum": "LMCI",
+    "median_effect": 0.108864237834759,
+    "val_trainonly_replication": "partially replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_LMCI",
+    "stratum": "AD",
+    "median_effect": 0.31323122781177515,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_AD",
+    "stratum": "CN",
+    "median_effect": -0.45056151729738503,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_AD",
+    "stratum": "EMCI",
+    "median_effect": -0.11029862960766194,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_AD",
+    "stratum": "LMCI",
+    "median_effect": 0.23038272639103907,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "residual_AD",
+    "stratum": "AD",
+    "median_effect": 0.542498074897698,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "ADD",
+    "stratum": "CN",
+    "median_effect": -0.3234220269987144,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "ADD",
+    "stratum": "EMCI",
+    "median_effect": -0.14897050109275076,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "ADD",
+    "stratum": "LMCI",
+    "median_effect": 0.21087344037180214,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "MRI logits + has_mri",
+    "target": "ADD",
+    "stratum": "AD",
+    "median_effect": 0.5343461454959608,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "age",
+    "target": "final_CN",
+    "stratum": "CN",
+    "median_effect": 0.051233392783013504,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "age",
+    "target": "final_CN",
+    "stratum": "EMCI",
+    "median_effect": -0.06836317248711113,
+    "val_trainonly_replication": "not replicated"
+   },
+   {
+    "group": "age",
+    "target": "final_CN",
+    "stratum": "AD",
+    "median_effect": 0.09272324270340115,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "age",
+    "target": "residual_CN",
+    "stratum": "CN",
+    "median_effect": 0.051233392783013504,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "age",
+    "target": "residual_CN",
+    "stratum": "EMCI",
+    "median_effect": -0.06836317248711113,
+    "val_trainonly_replication": "not replicated"
+   },
+   {
+    "group": "age",
+    "target": "residual_CN",
+    "stratum": "AD",
+    "median_effect": 0.09272324270340115,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_CN",
+    "stratum": "CN",
+    "median_effect": 0.914017839674992,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_CN",
+    "stratum": "LMCI",
+    "median_effect": -0.31208752922248095,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_CN",
+    "stratum": "AD",
+    "median_effect": -0.8930495366897612,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_EMCI",
+    "stratum": "EMCI",
+    "median_effect": 0.12445380938229203,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_LMCI",
+    "stratum": "EMCI",
+    "median_effect": 0.2580310579237511,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_LMCI",
+    "stratum": "LMCI",
+    "median_effect": 0.25815395382130846,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_LMCI",
+    "stratum": "AD",
+    "median_effect": -0.668628985860518,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_AD",
+    "stratum": "CN",
+    "median_effect": -0.7981043733442832,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_AD",
+    "stratum": "EMCI",
+    "median_effect": -0.38875659482987074,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "final_AD",
+    "stratum": "AD",
+    "median_effect": 1.7383275017541433,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_CN",
+    "stratum": "CN",
+    "median_effect": 0.914017839674992,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_CN",
+    "stratum": "LMCI",
+    "median_effect": -0.31208752922248095,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_CN",
+    "stratum": "AD",
+    "median_effect": -0.8930495366897612,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_EMCI",
+    "stratum": "EMCI",
+    "median_effect": 0.12445380938229203,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_LMCI",
+    "stratum": "EMCI",
+    "median_effect": 0.2580310579237511,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_LMCI",
+    "stratum": "LMCI",
+    "median_effect": 0.25815395382130846,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_LMCI",
+    "stratum": "AD",
+    "median_effect": -0.668628985860518,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_AD",
+    "stratum": "CN",
+    "median_effect": -0.7981043733442832,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_AD",
+    "stratum": "EMCI",
+    "median_effect": -0.38875659482987074,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "residual_AD",
+    "stratum": "AD",
+    "median_effect": 1.7383275017541433,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "ADD",
+    "stratum": "CN",
+    "median_effect": -0.942826908361867,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "ADD",
+    "stratum": "EMCI",
+    "median_effect": -0.4869167858746529,
+    "val_trainonly_replication": "replicated"
+   },
+   {
+    "group": "CDRSB + CogIndex + MMSE",
+    "target": "ADD",
+    "stratum": "AD",
+    "median_effect": 2.1544520400154092,
+    "val_trainonly_replication": "replicated"
+   }
+  ],
+  "min_effect": 0.05,
+  "groups": [
+   "clinical logits",
+   "MRI logits + has_mri",
+   "age",
+   "CDRSB + CogIndex + MMSE"
+  ],
+  "replication_gate_passed": true
+ },
+ "cnn_stage": {
+  "stage": "layer1",
+  "map_size": 24,
+  "method": "layercam",
+  "eligible_stages": [
+   "layer1",
+   "layer2"
+  ],
+  "faithfulness_rule_fail": false,
+  "sigma_voxels": 4.0
+ },
+ "stage_change": {
+  "min_transition_n": 10,
+  "A_train_oof": {
+   "indicator": "A: fusion changed the stage",
+   "split": "train_oof",
+   "n": 569,
+   "fired": 68,
+   "fire_rate": 0.1195079086115993,
+   "fire_rate_ci_lo": 0.09314586994727592,
+   "fire_rate_ci_hi": 0.14586994727592267,
+   "corrected": 31,
+   "broken": 32,
+   "both_wrong_closer": 3,
+   "both_wrong_farther": 2,
+   "both_wrong_same": 0,
+   "moved_toward": 34,
+   "moved_away": 34,
+   "net_accuracy_change": -0.0017574692442882249,
+   "net_ci_lo": -0.028119507908611598,
+   "net_ci_hi": 0.026362038664323375,
+   "mean_stage_error_reduction": 0.0,
+   "err_ci_lo": -0.028119507908611598,
+   "err_ci_hi": 0.028119507908611598,
+   "per_seed_net_min": -0.01757469244288225,
+   "per_seed_net_max": 0.0017574692442882249,
+   "per_seed_fire_min": 0.10017574692442882,
+   "per_seed_fire_max": 0.1546572934973638
+  },
+  "A_val": {
+   "indicator": "A: fusion changed the stage",
+   "split": "val",
+   "n": 122,
+   "fired": 12,
+   "fire_rate": 0.09836065573770492,
+   "fire_rate_ci_lo": 0.04918032786885246,
+   "fire_rate_ci_hi": 0.14754098360655737,
+   "corrected": 6,
+   "broken": 6,
+   "both_wrong_closer": 0,
+   "both_wrong_farther": 0,
+   "both_wrong_same": 0,
+   "moved_toward": 6,
+   "moved_away": 6,
+   "net_accuracy_change": 0.0,
+   "net_ci_lo": -0.05737704918032787,
+   "net_ci_hi": 0.05737704918032787,
+   "mean_stage_error_reduction": 0.0,
+   "err_ci_lo": -0.05737704918032787,
+   "err_ci_hi": 0.05737704918032787,
+   "per_seed_net_min": -0.04918032786885246,
+   "per_seed_net_max": 0.0,
+   "per_seed_fire_min": 0.08196721311475409,
+   "per_seed_fire_max": 0.14754098360655737
+  },
+  "A_transitions_train_oof": [
+   {
+    "indicator": "A: fusion changed the stage",
+    "split": "train_oof",
+    "from": "EMCI",
+    "to": "CN",
+    "n": 4,
+    "corrected": 0,
+    "broken": 3,
+    "both_wrong_closer": 0,
+    "both_wrong_farther": 1,
+    "both_wrong_same": 0
+   },
+   {
+    "indicator": "A: fusion changed the stage",
+    "split": "train_oof",
+    "from": "EMCI",
+    "to": "LMCI",
+    "n": 47,
+    "corrected": 20,
+    "broken": 24,
+    "both_wrong_closer": 3,
+    "both_wrong_farther": 0,
+    "both_wrong_same": 0
+   },
+   {
+    "indicator": "A: fusion changed the stage",
+    "split": "train_oof",
+    "from": "LMCI",
+    "to": "EMCI",
+    "n": 6,
+    "corrected": 5,
+    "broken": 1,
+    "both_wrong_closer": 0,
+    "both_wrong_farther": 0,
+    "both_wrong_same": 0
+   },
+   {
+    "indicator": "A: fusion changed the stage",
+    "split": "train_oof",
+    "from": "LMCI",
+    "to": "AD",
+    "n": 4,
+    "corrected": 2,
+    "broken": 1,
+    "both_wrong_closer": 0,
+    "both_wrong_farther": 1,
+    "both_wrong_same": 0
+   },
+   {
+    "indicator": "A: fusion changed the stage",
+    "split": "train_oof",
+    "from": "AD",
+    "to": "LMCI",
+    "n": 7,
+    "corrected": 4,
+    "broken": 3,
+    "both_wrong_closer": 0,
+    "both_wrong_farther": 0,
+    "both_wrong_same": 0
+   }
+  ],
+  "B_heldout_val": {
+   "indicator": "B: MRI changed the stage (train-only KANs, held out)",
+   "split": "val",
+   "n": 121,
+   "fired": 10,
+   "fire_rate": 0.08264462809917356,
+   "fire_rate_ci_lo": 0.04132231404958678,
+   "fire_rate_ci_hi": 0.1322314049586777,
+   "corrected": 6,
+   "broken": 4,
+   "both_wrong_closer": 0,
+   "both_wrong_farther": 0,
+   "both_wrong_same": 0,
+   "moved_toward": 6,
+   "moved_away": 4,
+   "net_accuracy_change": 0.01652892561983471,
+   "net_ci_lo": -0.03305785123966942,
+   "net_ci_hi": 0.06611570247933884,
+   "mean_stage_error_reduction": 0.01652892561983471,
+   "err_ci_lo": -0.03305785123966942,
+   "err_ci_hi": 0.06611570247933884,
+   "per_seed_net_min": NaN,
+   "per_seed_net_max": NaN,
+   "per_seed_fire_min": NaN,
+   "per_seed_fire_max": NaN
+  },
+  "B_frozen_train": {
+   "indicator": "B: MRI changed the stage (frozen KANs, in-sample, descriptive)",
+   "split": "train",
+   "n": 567,
+   "fired": 30,
+   "fire_rate": 0.05291005291005291,
+   "fire_rate_ci_lo": 0.03527336860670194,
+   "fire_rate_ci_hi": 0.07231040564373897,
+   "corrected": 12,
+   "broken": 18,
+   "both_wrong_closer": 0,
+   "both_wrong_farther": 0,
+   "both_wrong_same": 0,
+   "moved_toward": 12,
+   "moved_away": 18,
+   "net_accuracy_change": -0.010582010582010581,
+   "net_ci_lo": -0.029982363315696647,
+   "net_ci_hi": 0.007054673721340388,
+   "mean_stage_error_reduction": -0.010582010582010581,
+   "err_ci_lo": -0.029982363315696647,
+   "err_ci_hi": 0.007054673721340388,
+   "per_seed_net_min": NaN,
+   "per_seed_net_max": NaN,
+   "per_seed_fire_min": NaN,
+   "per_seed_fire_max": NaN
+  }
+ },
+ "cnn_naming": {
+  "stage": "layer1",
+  "method": "layercam",
+  "named": [
+   {
+    "region": "amygdala",
+    "density": 1.3360905252807505,
+    "replicated_on_val": true,
+    "also_in_non_ad": false
+   },
+   {
+    "region": "thalamus",
+    "density": 1.2508060383028066,
+    "replicated_on_val": true,
+    "also_in_non_ad": false
+   },
+   {
+    "region": "hippocampus",
+    "density": 1.2448372110391557,
+    "replicated_on_val": true,
+    "also_in_non_ad": false
+   },
+   {
+    "region": "ventricles",
+    "density": 1.1984733371730187,
+    "replicated_on_val": true,
+    "also_in_non_ad": false
+   },
+   {
+    "region": "basal ganglia",
+    "density": 1.1967888573320438,
+    "replicated_on_val": true,
+    "also_in_non_ad": true
+   },
+   {
+    "region": "cerebral white matter",
+    "density": 1.1053735511895018,
+    "replicated_on_val": true,
+    "also_in_non_ad": false
+   },
+   {
+    "region": "brainstem",
+    "density": 1.1030963582419657,
+    "replicated_on_val": true,
+    "also_in_non_ad": false
+   }
+  ],
+  "approximate_names": false
+ }
+}

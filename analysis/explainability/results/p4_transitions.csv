@@ -1,0 +1,22 @@
+indicator,split,from,to,n,corrected,broken,both_wrong_closer,both_wrong_farther,both_wrong_same
+A: fusion changed the stage,train_oof,EMCI,CN,4,0,3,0,1,0
+A: fusion changed the stage,train_oof,EMCI,LMCI,47,20,24,3,0,0
+A: fusion changed the stage,train_oof,LMCI,EMCI,6,5,1,0,0,0
+A: fusion changed the stage,train_oof,LMCI,AD,4,2,1,0,1,0
+A: fusion changed the stage,train_oof,AD,LMCI,7,4,3,0,0,0
+A: fusion changed the stage,val,EMCI,CN,2,0,2,0,0,0
+A: fusion changed the stage,val,EMCI,LMCI,7,4,3,0,0,0
+A: fusion changed the stage,val,LMCI,EMCI,1,1,0,0,0,0
+A: fusion changed the stage,val,AD,LMCI,2,1,1,0,0,0
+"B: MRI changed the stage (frozen, in-sample)",train,CN,EMCI,1,0,1,0,0,0
+"B: MRI changed the stage (frozen, in-sample)",train,EMCI,CN,1,0,1,0,0,0
+"B: MRI changed the stage (frozen, in-sample)",train,EMCI,LMCI,15,4,11,0,0,0
+"B: MRI changed the stage (frozen, in-sample)",train,LMCI,EMCI,7,5,2,0,0,0
+"B: MRI changed the stage (frozen, in-sample)",train,LMCI,AD,2,1,1,0,0,0
+"B: MRI changed the stage (frozen, in-sample)",train,AD,LMCI,4,2,2,0,0,0
+"B: MRI changed the stage (frozen, in-sample)",val,EMCI,LMCI,3,2,1,0,0,0
+"B: MRI changed the stage (frozen, in-sample)",val,LMCI,EMCI,3,2,1,0,0,0
+"B: MRI changed the stage (train-only, held out)",val,EMCI,LMCI,6,4,2,0,0,0
+"B: MRI changed the stage (train-only, held out)",val,LMCI,EMCI,2,2,0,0,0,0
+"B: MRI changed the stage (train-only, held out)",val,LMCI,AD,1,0,1,0,0,0
+"B: MRI changed the stage (train-only, held out)",val,AD,LMCI,1,0,1,0,0,0

@@ -1,0 +1,11 @@
+{
+ "max_abs_efficiency_error": 1.036333848958293e-06,
+ "pass": true,
+ "brute_force_subjects": 60,
+ "brute_force_models": 25,
+ "max_abs_brute_force_diff": 4.992350000065926e-07,
+ "brute_force_pass": true,
+ "n_models": 25,
+ "n_subjects": 691,
+ "background": "569 train subjects, prediction-time inputs"
+}
